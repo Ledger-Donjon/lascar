@@ -1,0 +1,17 @@
+build/
+dist/
+lascar.egg-info/
+*.pyc
+*__pycache__*
+*.npy
+*.h5
+*.pickle
+*.png
+*.save
+.idea/
+.eggs/
+.pytest_cache/
+.cache/
+venv/
+docs/_build/
+.vscode
