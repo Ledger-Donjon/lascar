@@ -14,4 +14,6 @@ lascar.egg-info/
 .cache/
 venv/
 docs/_build/
+docs/_templates/
+docs/_static/
 .vscode
