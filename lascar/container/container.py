@@ -381,6 +381,24 @@ class AbstractContainer(Container):
         """
         raise NotImplemented
 
+    def generate_trace_batch(self, idx_begin, idx_end):
+        """
+        Generates a trace_batch of specified indexes
+        """
+
+        raise NotImplemented
+
+        leakages = np.empty((idx_end - idx_begin,) + self._leakage_abstract.shape, self._leakage_abstract.dtype)
+        values = np.empty((idx_end - idx_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
+
+        for i, j in enumerate(range(idx_begin, idx_end)):
+            leakage, value = self.generate_trace(j)
+            leakages[i] = self.apply_both_leakage(leakage.reshape((1,) + leakage.shape))[0]
+            values[i] = self.apply_both_value(value.reshape((1,) + value.shape))[0]
+
+        return TraceBatchContainer(leakages, values)
+
+
     def __getitem__(self, key):
         """
 
@@ -414,8 +432,22 @@ class AbstractContainer(Container):
             raise ValueError("get_batch must have 0 <= offset_begin < offset_end must <= %d. Got (%d, %d)" % (
                 self.number_of_traces, offset_begin, offset_end))
 
+
         leakages = np.empty((offset_end - offset_begin,) + self._leakage_abstract.shape, self._leakage_abstract.dtype)
         values = np.empty((offset_end - offset_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
+
+        try:
+            trace_batch = self.generate_trace_batch(offset_begin,offset_end)
+
+            for i, j in enumerate(range(offset_begin, offset_end)):
+
+                leakages[i] = self.apply_both_leakage(trace_batch.leakages[j:j+1])[0]
+                values[i] = self.apply_both_value(trace_batch.values[j:j+1])[0]
+
+            return TraceBatchContainer(leakages, values)
+
+        except:
+            pass
 
         for i, j in enumerate(range(offset_begin, offset_end)):
             leakage, value = self.generate_trace(j)
