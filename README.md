@@ -11,7 +11,7 @@ A fast, versatile, and open source python3 library designed to facilitate Side-C
 
 From side-channel acquisitions to results management, passing by signal synchronisation, custom attacks, *lascar* provides classes/functions to solve most of the obstacles an attacker would face, when needed to perform sound, state-of-the-art side-channel analysis.
 
-This project has been developed in parallel of the activities done at Ledger Security team (Donjon), to fully match our needs regarding side-channel.
+This project has been developed in parallel of the activities done at Ledger Security team (Donjon), to fully match our needs regarding side-channel evaluation.
 
 
 ## Main features:
@@ -21,7 +21,7 @@ It provides many classes and functions that you can accomodate with, or inherit 
 
 - **Openness**: *lascar* library is open source and is intended to facilitate attack implementations, and exchange between users. Contributing to *lascar* is **strongly encouraged.**
 - **Simplicity**: For **basic** state of the art attacks, the corresponding *lascar* script shall stay **basic**
-- **Compatibility**: Since *lascar* relies on mainstream python libraries (numpy, sklearn, keras) compatibility: *lascar* is easily deployable
+- **Compatibility**: Since *lascar* relies on mainstream python libraries (numpy, sklearn, keras): *lascar* is easily deployable
 - **Flexibility**: Implement your own classes (for your already existing trace format, your specific attacks, the way you want your output to be...), use different languages (provided that you bind them with python),...
 
 Please note that performance has not yet been challenged.
@@ -33,7 +33,9 @@ The [tutorial](tutorial/)/[examples](examples/) folders of the library provide b
 
 Clone the repository then use the setup.py file, based on setuptools:
 
-```python3 setup.py install --user```
+```
+python3 setup.py install --user
+```
 
 Build the doc:
 
@@ -68,6 +70,9 @@ The [tutorial](tutorial/) folder contains commented scripts to understand how to
 - [04-acquisition-setup-example.py](tutorial/04-acquisition-setup-example.py)
 - [05-synchronization-example.py](tutorial/05-synchronization-example.py)
 - [06-session-introduction.py](tutorial/06-session-introduction.py)
+- [07-session-dpa-example.py](tutorial/07-session-dpa-example.py)
+- [08-session-manage-outputs.py](tutorial/08-session-manage-outputs.py)
+
 
 ## Examples
 The [examples](examples/) folder contains two parts:
