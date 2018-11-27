@@ -67,24 +67,46 @@ class Session:
         if engines is not None:
             self.add_engines(engines)
 
-        #output_method: How the result will work?
-        if isinstance(output_method, OutputMethod):
-            self.output_method = output_method
-        elif hasattr(output_method, '__iter__'):
-            self.output_method = MultipleOutputMethod(*output_method)
+        #output_method: what will I do with my engines results?
+        self.output_method = output_method
 
         #output_steps: When will OutputMethod will be called?
-        if isinstance(output_steps, int):
-            self.output_steps = list(range(output_steps, self.container.number_of_traces, output_steps))
-        elif hasattr(output_steps, '__iter__'):
-            self.output_steps = [i for i in output_steps]
-        else:
-            self.output_steps = []
-        if not self.container.number_of_traces in self.output_steps:
-            self.output_steps.append(self.container.number_of_traces)
-        self.output_steps.sort()
+        self.output_steps=output_steps
 
         self._progressbar = progressbar
+
+    @property
+    def output_method(self):
+        return self._output_method
+
+    @output_method.setter
+    def output_method(self,output_method):
+        if isinstance(output_method, OutputMethod):
+            self._output_method = output_method
+        elif hasattr(output_method, '__iter__'):
+            self._output_method = MultipleOutputMethod(*output_method)
+        else:
+            self._output_method = OutputMethod()
+
+    @property
+    def output_steps(self):
+        return self._output_steps
+
+    @output_steps.setter
+    def output_steps(self, output_steps):
+        if isinstance(output_steps, int):
+            self._output_steps = list(range(output_steps, self.container.number_of_traces+1, output_steps))
+        elif hasattr(output_steps, '__iter__'):
+            self._output_steps = [i for i in output_steps]
+        else:
+            self._output_steps = []
+
+        if not self.container.number_of_traces in self._output_steps:
+            self._output_steps.append(self.container.number_of_traces)
+        self._output_steps.sort()
+
+
+
 
     def add_engine(self, engine):
         """
