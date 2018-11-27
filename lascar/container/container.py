@@ -385,9 +385,6 @@ class AbstractContainer(Container):
         """
         Generates a trace_batch of specified indexes
         """
-
-        raise NotImplemented
-
         leakages = np.empty((idx_end - idx_begin,) + self._leakage_abstract.shape, self._leakage_abstract.dtype)
         values = np.empty((idx_end - idx_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
 
@@ -437,13 +434,12 @@ class AbstractContainer(Container):
         values = np.empty((offset_end - offset_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
 
         try:
+
             trace_batch = self.generate_trace_batch(offset_begin,offset_end)
 
             for i, j in enumerate(range(offset_begin, offset_end)):
-
-                leakages[i] = self.apply_both_leakage(trace_batch.leakages[j:j+1])[0]
-                values[i] = self.apply_both_value(trace_batch.values[j:j+1])[0]
-
+                leakages[i] = self.apply_both_leakage(trace_batch.leakages[i:i+1])[0]
+                values[i] = self.apply_both_value(trace_batch.values[i:i+1])[0]
             return TraceBatchContainer(leakages, values)
 
         except:
