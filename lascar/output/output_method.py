@@ -67,6 +67,12 @@ class OutputMethod:
         return self._finalize()
 
 
+    def _update(self,results):
+        pass
+    def _finalize(self):
+        pass
+
+
 class MultipleOutputMethod(OutputMethod):
     """
     MultipleOutputMethod is the OutputMethod used when the user want to register multiple OutputMethods.
