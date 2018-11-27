@@ -82,9 +82,8 @@ class MatPlotLibOutputMethod(OutputMethod):
         except:
             idx = self.engines.index(engine.name) + 1
 
-
-        plt.subplot(self.number_of_rows, self.number_of_columns, idx)
         if not self.single_plot:
+            plt.subplot(self.number_of_rows, self.number_of_columns, idx)
             plt.title(engine.name)
 
         if isinstance(results, np.ndarray) and len(results.shape) == 1:
