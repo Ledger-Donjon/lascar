@@ -34,3 +34,5 @@ from .hdf5_container import Hdf5Container
 from .multiple_container import MultipleContainer
 from .simulation_container import BasicAesSimulationContainer
 from .container import Trace
+
+from .npy_container import NpyContainer
