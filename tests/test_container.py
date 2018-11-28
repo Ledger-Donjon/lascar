@@ -19,8 +19,9 @@ multiple_container = MultipleContainer(TraceBatchContainer(leakages[:10], values
 #randomized_container = RandomizedContainer(trace_batch_container)
 #filtered_container = FilteredContainer(trace_batch_container, lambda trace: trace.value[0]&1)
 
+npy_container = NpyContainer.export(trace_batch_container, tempfile.mkdtemp() + "_leakages.npy", tempfile.mkdtemp() + "_values.npy")
 
-containers = [trace_batch_container, hdf5_container, multiple_container]
+containers = [trace_batch_container, hdf5_container, multiple_container, npy_container]
 
 get_batch_offsets = [(i, i + 1) for i in range(0, 100, 5)]
 get_batch_offsets += [(i, i + 5) for i in range(0, 100, 5)]

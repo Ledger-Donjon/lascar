@@ -16,8 +16,9 @@ multiple_container = MultipleContainer(TraceBatchContainer(leakages[:10], values
 
 randomized_container = RandomizedContainer(trace_batch_container)
 simulator_container = BasicAesSimulationContainer(100, 2, value_section='plaintext', additional_time_samples=4, seed=2)
+npy_container = NpyContainer.export(trace_batch_container, tempfile.mkdtemp() + "_leakages.npy", tempfile.mkdtemp() + "_values.npy")
 
-containers = [trace_batch_container, hdf5_container, multiple_container, randomized_container, simulator_container]
+containers = [trace_batch_container, hdf5_container, multiple_container, randomized_container, simulator_container, npy_container]
 
 @pytest.mark.parametrize('container', containers)
 class TestNonRegressionBasic:
