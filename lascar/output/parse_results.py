@@ -61,7 +61,6 @@ def parse_output_basic(results):
     else:
         return [(result.min(), result.max(), result.mean(), result.var()) for result in results]
 
-
 def parse_output_max(results, guesses):
     """
     parse_output_max is the ouput_parser used on GuessEngines for which you want to maximize the results.
@@ -82,10 +81,8 @@ def parse_output_max(results, guesses):
     else:
         scores = results
 
-    seq = sorted(scores)[::-1]
-    ranks = [seq.index(v) + 1 for v in scores]
-
-    return [(guess, score, rank) for guess, score, rank in itertools.zip_longest(guesses, scores, ranks)]
+    tmp = sorted(zip(guesses, scores), key=lambda x:x[1], reverse=True)
+    return [ (s[0], s[1], rank+1) for rank, s in enumerate(tmp)] 
 
 
 def parse_output_argmax(results, guesses):
@@ -109,7 +106,5 @@ def parse_output_argmax(results, guesses):
     else:
         scores = np.abs(results)
 
-    seq = sorted(scores)[::-1]
-    ranks = [seq.index(v) + 1 for v in scores]
-
-    return [(guess, score, rank) for guess, score, rank in itertools.zip_longest(guesses, scores, ranks)]
+    tmp = sorted(zip(guesses, scores), key=lambda x:x[1], reverse=True)
+    return [ (s[0], s[1], rank+1) for rank, s in enumerate(tmp)] 
