@@ -70,9 +70,12 @@ class CpaEngine(GuessEngine):
 
     def _finalize(self):
         m, v = self._session["mean"].finalize(), self._session["var"].finalize()
-        return np.nan_to_num(((self._accXM / self._number_of_processed_traces) - np.outer(
-            self._accM / self._number_of_processed_traces, m)) / np.sqrt(np.outer(
-            self._accM2 / self._number_of_processed_traces - (self._accM / self._number_of_processed_traces) ** 2, v)))
+        numerator = ((self._accXM / self._number_of_processed_traces) - np.outer( self._accM / self._number_of_processed_traces, m))
+        denominator = np.sqrt(np.outer( self._accM2 / self._number_of_processed_traces - (self._accM / self._number_of_processed_traces) ** 2, v)) 
+        mask = v==0.
+        numerator[:, mask] = 0.
+        denominator[:, mask] = 1.
+        return numerator / denominator
 
     def _clean(self):
         del self._accM
