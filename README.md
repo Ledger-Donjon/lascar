@@ -1,7 +1,7 @@
-![Ledger Logo](images/logo_ledger) &emsp;&emsp;&emsp;   ![Ledger Logo](images/logo_donjon_l)
+[![Ledger Logo](images/logo_ledger)](https://www.ledger.com/)&emsp;&emsp;&emsp;[![Ledger Logo](images/logo_donjon_l)](https://www.ledger.fr/tag/donjon/)
 
 
-# LASCAR:
+# LASCAR
 
 Ledger's Advanced Side Channel Analysis Repository
 
@@ -14,7 +14,7 @@ From side-channel acquisitions to results management, passing by signal synchron
 This project has been developed in parallel of the activities done at Ledger Security team (Donjon), to fully match our needs regarding side-channel evaluation.
 
 
-## Main features:
+## Main features
 
 The philosophy behind *lascar* is to simplify for the end user the process of a side-channel analysis.
 It provides many classes and functions that you can accomodate with, or inherit from to do the job you need.
@@ -82,7 +82,7 @@ The [examples](examples/) folder contains two parts:
 
 
 
-## ![Ledger Logo](images/logo_donjon) About Ledger's Donjon![Ledger Logo](images/logo_donjon)
+## ![Ledger Logo](images/logo_donjon) About Ledger's Donjon ![Ledger Logo](images/logo_donjon)
 Created in 2018, Ledger's Donjon (Ledger security team) regroups experts in security with a wide range of expertise (such as software, perturbation and side-channel attacks, secured development, reverse engineering, ...). Based in Paris, Ledger's Donjon tends to shift the paradigm of security through obscurity. Take a look at our [blogposts](https://www.ledger.fr/category/security/)!
 
 
