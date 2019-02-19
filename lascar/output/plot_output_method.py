@@ -175,7 +175,9 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
             self.scores[engine.name].append([i[1] for i in results_parsed])
 
             if engine.solution is not None:
-                self.scores_solution[engine.name].append(results_parsed[engine.solution][1])
+                results_parsed_tmp = [e[0] for e in results_parsed]
+                idx = results_parsed_tmp.index(engine.solution)
+                self.scores_solution[engine.name].append(results_parsed[idx][1])
 
     def _finalize(self):
 
@@ -252,4 +254,6 @@ class RankProgressionOutputMethod(ScoreProgressionOutputMethod):
             self.scores[engine.name].append([i[2] for i in results_parsed])
 
             if engine.solution is not None:
-                self.scores_solution[engine.name].append(results_parsed[engine.solution][2])
+                results_parsed_tmp = [e[0] for e in results_parsed]
+                idx = results_parsed_tmp.index(engine.solution)
+                self.scores_solution[engine.name].append(results_parsed[idx][2])
