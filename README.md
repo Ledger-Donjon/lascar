@@ -1,9 +1,9 @@
-[![Ledger Logo](images/logo_ledger)](https://www.ledger.com/)&emsp;&emsp;&emsp;[![Ledger Logo](images/logo_donjon_l)](https://www.ledger.fr/tag/donjon/)
+[![Ledger Logo](images/logo_ledger)](https://www.ledger.com/)&emsp;[![Ledger Logo](images/logo_donjon_l)](https://www.ledger.fr/tag/donjon/)
 
 
 # LASCAR
 
-Ledger's Advanced Side Channel Analysis Repository
+**L**edger's **A**dvanced **S**ide **C**hannel **A**nalysis **R**epository
 
 A fast, versatile, and open source python3 library designed to facilitate Side-Channel Analysis.
 
@@ -11,7 +11,7 @@ A fast, versatile, and open source python3 library designed to facilitate Side-C
 
 From side-channel acquisitions to results management, passing by signal synchronisation, custom attacks, *lascar* provides classes/functions to solve most of the obstacles an attacker would face, when needed to perform sound, state-of-the-art side-channel analysis.
 
-This project has been developed in parallel of the activities done at Ledger Security team (Donjon), to fully match our needs regarding side-channel evaluation.
+This project has been developed in parallel of the activities done by Ledger Donjon (Ledger's security team), to fully match our needs regarding side-channel evaluation.
 
 
 ## Main features
@@ -82,8 +82,8 @@ The [examples](examples/) folder contains two parts:
 
 
 
-## ![Ledger Logo](images/logo_donjon) About Ledger's Donjon ![Ledger Logo](images/logo_donjon)
-Created in 2018, Ledger's Donjon (Ledger security team) regroups experts in security with a wide range of expertise (such as software, perturbation and side-channel attacks, secured development, reverse engineering, ...). Based in Paris, Ledger's Donjon tends to shift the paradigm of security through obscurity. Take a look at our [blogposts](https://www.ledger.fr/category/security/)!
+## ![Ledger Donjon Logo](images/logo_donjon) About Ledger Donjon ![Ledger Donjon Logo](images/logo_donjon)
+Created in 2018, Ledger Donjon (Ledger security team) regroups experts in security with a wide range of expertise (such as software, perturbation and side-channel attacks, secured development, reverse engineering, ...). Based in Paris, Ledger's Donjon tends to shift the paradigm of security through obscurity. Take a look at our [blogposts](https://www.ledger.fr/category/security/) and the [detailed introduction](https://www.ledger.fr/2018/11/12/introducing-ledger-donjon/)!
 
 
 
