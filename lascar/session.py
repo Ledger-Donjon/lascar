@@ -1,23 +1,20 @@
-"""
-This file is part of lascar
-
-lascar is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS - manuel.sanpedro@ledger.fr, victor.servant@ledger.fr, charles@ledger.fr
-
-"""
+# This file is part of lascar
+#
+# lascar is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#
+# Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS - manuel.sanpedro@ledger.fr, victor.servant@ledger.fr, charles@ledger.fr
 
 import logging
 from threading import Thread
@@ -29,25 +26,27 @@ import progressbar
 
 class Session:
     """
-    Session is a class leading side-channel operation in lascar.
+    This class is leading side-channel operation in lascar.
 
-    a Session object's role is to:
+    a :class:`lascar.session.Session` object's role is to:
+
     - get batch of side channel traces from a Container, 'container'
     - distribute the batchs to the registered engines. 'engines'
     - manage outputs thanks to 'output_method', 'output_step'
+        
+    :param container: the container that will be read during the session. Only
+        mandatory argument for constructor.
+    :param engine: lascar engine to be registered by the Session
+    :param engines: list of lascar engines to be registered by the Session
+    :param output_method: specify the output method: how will the results from
+        the engine will be manipulated. see lascar/output for more info.
+    :param output_steps: specify when the Session will ask its engines to
+        compute results.
+    :param name: name given for the Session.
+    :param progressbar: Will the Session display a progressbar during its
+        process.
     """
     def __init__(self, container, engine=None, engines=None, output_method=DictOutputMethod(), output_steps=None, name="Session", progressbar=True):
-        """
-
-        :param container: the container that will be read during the session. Only mandatory argument for constructor.
-        :param engine: lascar engine to be registered by the Session
-        :param engines: list of lascar engines to be registered by the Session
-        :param output_method: specify the output method: how will the results from the engine will be manipulated. see lascar/output for more info.
-        :param output_steps: specify when the Session will ask its engines to compute results.
-        :param name: name given for the Session.
-        :param progressbar: Will the Session display a progressbar during its process.
-        """
-
         self.logger = logging.getLogger(__name__)
         self.logger.debug('Creating Session.')
 
@@ -106,11 +105,10 @@ class Session:
         self._output_steps.sort()
 
 
-
-
     def add_engine(self, engine):
         """
         Add an engine to the session
+
         :param engine: engine to be added
         :return: None
         """
@@ -122,6 +120,7 @@ class Session:
     def add_engines(self, engines):
         """
         Add a list of engines to the session
+
         :param engines: list of engines to be added
         :return: None
         """
@@ -132,6 +131,7 @@ class Session:
     def _generate_batch_offsets(self, batch_size):
         """
         From a maximum batch_size, and output_steps (already inside Session class, this function computes the offsets of the batchs that will be used by the Session.run() method.
+
         :param batch_size:
         :return:
         """
