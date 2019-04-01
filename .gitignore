@@ -6,7 +6,6 @@ lascar.egg-info/
 *.npy
 *.h5
 *.pickle
-*.png
 *.save
 .idea/
 .eggs/
