@@ -55,7 +55,9 @@ def hamming(value):
 def hamming_weight(value):
     """
     Compute the hamming weight of an integer
+
     https://www.expobrain.net/2013/07/29/hamming-weights-python-implementation/
+
     :param value: the integer
     :return: the hamming weight of the value
     """
@@ -70,7 +72,7 @@ class LeakageModel:
     """
     LeakageModel is an abstract class.
     A leakage model is a callable object. It can be defined by a simple function,
-    or by a class (like LeakageModel) overloading __call__
+    or by a class (like LeakageModel) overloading :meth:`__call__`
     """
 
     def __call__(self, value):
@@ -79,8 +81,8 @@ class LeakageModel:
 
 class HammingPrecomputedModel(LeakageModel):
     """
-    HammingPrecomputedModel emulate the hamming weight leakage model by precomputing all the hamming weigths
-     until a given values.
+    Emulates the hamming weight leakage model by precomputing all the hamming weigths
+    until a given values.
     """
 
     def __init__(self, max=256):

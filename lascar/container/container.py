@@ -97,6 +97,7 @@ class Container:
     The role of the Container class is to be overloaded so that it can deliver traces, stored as a specified format.
     Mostly, the __getitem__/__setitem__ have to be overloaded when user want to write its own Container format class.
 
+    :param number_of_traces:
     """
 
     def __init__(self, **kwargs):
@@ -104,8 +105,6 @@ class Container:
         Basic Constructor.
 
         To this point, child must implement leakages and values as np.array or AbstractArray
-
-        :param number_of_traces:
         """
         self.logger = logging.getLogger(__name__)
 
@@ -132,21 +131,14 @@ class Container:
     @property
     def leakage_section(self):
         """
-        Returns the current leakage_section.
-        (leakage area to be read from the original leakage)
+        Leakage area to be read from the original leakage.
 
-        :return: current leakage_section
+        :type: list, range, slice
         """
         return self._leakage_section if hasattr(self, "_leakage_section") else None
 
     @leakage_section.setter
     def leakage_section(self, section):
-        """
-        Set the leakage_section.
-        (leakage area to be read from the original leakage)
-
-        :param section: the leakage_section to set: list, range, slice
-        """
         self.logger.debug("Setting leakage_section to %s" % section)
         if self.leakage_processing is not None:
             self.logger.warning("Since leakage_section is being set, leakage_processing is set to None.")
@@ -170,19 +162,16 @@ class Container:
     @property
     def leakage_processing(self):
         """
-        Returns the current leakage_processing.
-        (function applied upon the leakages after reading and leakage_section)
-        :return: current leakage_processing
+        Leakage_processing. function applied upon the leakages after reading and
+        leakage_section)
+
+        :type: function (or callable) taking leakage[leakage_section] as an
+            argument
         """
         return self._leakage_processing if hasattr(self, "_leakage_processing") else None
 
     @leakage_processing.setter
     def leakage_processing(self, processing):
-        """
-        Sets the current leakage_processing.
-        (function applied upon the leakages after reading and leakage_section)
-        :param processing: function (or callable) taking leakage[leakage_section] as an argument
-        """
         self.logger.debug("Setting leakage_processing to %s" % processing)
 
         if processing is None:
@@ -218,21 +207,14 @@ class Container:
     @property
     def value_section(self):
         """
-        Returns the current value_section.
-        (value area to be read from the original value)
+        Value area to be read from the original value.
 
-        :return: current value_section
+        :type: list, range, slice
         """
         return self._value_section if hasattr(self, "_value_section") else None
 
     @value_section.setter
     def value_section(self, section):
-        """
-        Set the value_section.
-        (value area to be read from the original value)
-
-        :param section: the value_section to set: list, range, slice
-        """
         self.logger.debug("Setting value_section to %s" % section)
         if self.value_processing is not None:
             self.logger.warning("Since value_section is being set, value_processing is set to None.")
@@ -256,19 +238,15 @@ class Container:
     @property
     def value_processing(self):
         """
-        Returns the current value_processing.
-        (function applied upon the values after reading and value_section)
-        :return: current value_processing
+        Current value_processing. function applied upon the values after
+        reading and value_section.
+
+        :type: function (or callable) taking value[value_section] as an argument
         """
         return self._value_processing if hasattr(self, "_value_processing") else None
 
     @value_processing.setter
     def value_processing(self, processing):
-        """
-        Sets the current value_processing.
-        (function applied upon the values after reading and value_section)
-        :param processing: function (or callable) taking value[value_section] as an argument
-        """
         self.logger.debug("Setting value_processing to %s" % processing)
 
         if processing is None:
@@ -348,16 +326,14 @@ class Container:
 
 class AbstractContainer(Container):
     """
-    AbstractContainer is a Container class used when the s&ide-channel traces are generated from functions.
+    AbstractContainer is a Container class used when the side-channel traces are generated from functions.
     It can be used for instance:
+
     - setting up acquisitions with oscilloscope and DUT
     - when implementing Simulated traces
     """
 
     def __init__(self, number_of_traces, **kwargs):
-        """
-        Basic Constructor.
-        """
         self.logger = logging.getLogger(__name__)
 
         trace = self.generate_trace(0)
@@ -395,7 +371,6 @@ class AbstractContainer(Container):
 
     def __getitem__(self, key):
         """
-
         :rtype: Trace or TraceBatch depending on key
         """
         self.logger.debug("__getitem__ with key %s" % str(key))
@@ -463,6 +438,7 @@ class TraceBatchContainer(Container):
     def __getitem__(self, key):
         """
         Trace or TraceBatch getter
+
         :param key: an int or an iterable
         :return: the Trace or TraceBatch containing the Trace in key
         """
@@ -489,6 +465,7 @@ class TraceBatchContainer(Container):
     def save(self, filename):
         """
         Save the current TraceBatchContainer to a file using np.save
+
         :param filename:
         :return:
         """
@@ -535,16 +512,17 @@ class TraceBatchContainer(Container):
 
 class AbstractArray:
     """
-    AbstractArray is used when your leakage or data cannot be represented as an array (most of the time in AbstractContainer)
-    It simply emulates a few methods needed by other classes (such as Session)
+    Used when your leakage or data cannot be represented as an
+    array (most of the time in
+    :class:`lascar.container.container.AbstractContainer`)
+    It simply emulates a few methods needed by other classes (such as
+    :class:`lascar.session.Session`)
+    
+    :param shape: the shape of your leakages (or values)
+    :param dtype: the dtype of your leakages (or values)
     """
 
     def __init__(self, shape, dtype):
-        """
-        Basic constructor
-        :param shape: the shape of your leakages (or values)
-        :param dtype: the dtype of your leakages (or values)
-        """
         self.shape = shape
         self.dtype = dtype
 
