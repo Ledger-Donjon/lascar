@@ -1,0 +1,10 @@
+numpy
+h5py
+matplotlib
+vispy
+sklearn
+scipy
+keras
+progressbar2
+pytest
+numba
