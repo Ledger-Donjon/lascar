@@ -35,4 +35,7 @@ setup(name='lascar',
       packages=find_packages(),
       setup_requires=["pytest-runner", ],
       tests_require=["pytest"],
+      entry_points = {
+                       'console_scripts': ['lascarctl=scripts.lascarctl:main'],
+    }
       )
