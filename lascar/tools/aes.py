@@ -18,6 +18,7 @@
 
 import numpy as np
 
+# Aes Sbox
 sbox = np.array((
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
     0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -37,6 +38,7 @@ sbox = np.array((
     0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
 ), dtype=np.uint8);
 
+# Aes Sbox inverse
 inv_sbox = np.array((
     0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
     0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
@@ -56,6 +58,7 @@ inv_sbox = np.array((
     0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
 ), dtype=np.uint8)
 
+# 02 multiplication table
 mul2 = np.array((
     0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E,
     0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C, 0x3E,
@@ -75,6 +78,7 @@ mul2 = np.array((
     0xFB, 0xF9, 0xFF, 0xFD, 0xF3, 0xF1, 0xF7, 0xF5, 0xEB, 0xE9, 0xEF, 0xED, 0xE3, 0xE1, 0xE7, 0xE5
 ), dtype=np.uint8)
 
+# 03 multiplication table
 mul3 = np.array((
     0x00, 0x03, 0x06, 0x05, 0x0C, 0x0F, 0x0A, 0x09, 0x18, 0x1B, 0x1E, 0x1D, 0x14, 0x17, 0x12, 0x11,
     0x30, 0x33, 0x36, 0x35, 0x3C, 0x3F, 0x3A, 0x39, 0x28, 0x2B, 0x2E, 0x2D, 0x24, 0x27, 0x22, 0x21,
@@ -94,6 +98,7 @@ mul3 = np.array((
     0x0B, 0x08, 0x0D, 0x0E, 0x07, 0x04, 0x01, 0x02, 0x13, 0x10, 0x15, 0x16, 0x1F, 0x1C, 0x19, 0x1A
 ), dtype=np.uint8)
 
+# 14 multiplication table
 mul14 = np.array((
     0x00, 0x0E, 0x1C, 0x12, 0x38, 0x36, 0x24, 0x2A, 0x70, 0x7E, 0x6C, 0x62, 0x48, 0x46, 0x54, 0x5A,
     0xE0, 0xEE, 0xFC, 0xF2, 0xD8, 0xD6, 0xC4, 0xCA, 0x90, 0x9E, 0x8C, 0x82, 0xA8, 0xA6, 0xB4, 0xBA,
@@ -113,6 +118,7 @@ mul14 = np.array((
     0xD7, 0xD9, 0xCB, 0xC5, 0xEF, 0xE1, 0xF3, 0xFD, 0xA7, 0xA9, 0xBB, 0xB5, 0x9F, 0x91, 0x83, 0x8D
 ), dtype=np.uint8)
 
+# 11 multiplication table
 mul11 = np.array((
     0x00, 0x0B, 0x16, 0x1D, 0x2C, 0x27, 0x3A, 0x31, 0x58, 0x53, 0x4E, 0x45, 0x74, 0x7F, 0x62, 0x69,
     0xB0, 0xBB, 0xA6, 0xAD, 0x9C, 0x97, 0x8A, 0x81, 0xE8, 0xE3, 0xFE, 0xF5, 0xC4, 0xCF, 0xD2, 0xD9,
@@ -132,6 +138,7 @@ mul11 = np.array((
     0xCA, 0xC1, 0xDC, 0xD7, 0xE6, 0xED, 0xF0, 0xFB, 0x92, 0x99, 0x84, 0x8F, 0xBE, 0xB5, 0xA8, 0xA3
 ), dtype=np.uint8)
 
+# 09 multiplication table
 mul9 = np.array((
     0x00, 0x09, 0x12, 0x1B, 0x24, 0x2D, 0x36, 0x3F, 0x48, 0x41, 0x5A, 0x53, 0x6C, 0x65, 0x7E, 0x77,
     0x90, 0x99, 0x82, 0x8B, 0xB4, 0xBD, 0xA6, 0xAF, 0xD8, 0xD1, 0xCA, 0xC3, 0xFC, 0xF5, 0xEE, 0xE7,
@@ -151,6 +158,7 @@ mul9 = np.array((
     0x31, 0x38, 0x23, 0x2A, 0x15, 0x1C, 0x07, 0x0E, 0x79, 0x70, 0x6B, 0x62, 0x5D, 0x54, 0x4F, 0x46
 ), dtype=np.uint8)
 
+# 13 multiplication table
 mul13 = np.array((
     0x00, 0x0D, 0x1A, 0x17, 0x34, 0x39, 0x2E, 0x23, 0x68, 0x65, 0x72, 0x7F, 0x5C, 0x51, 0x46, 0x4B,
     0xD0, 0xDD, 0xCA, 0xC7, 0xE4, 0xE9, 0xFE, 0xF3, 0xB8, 0xB5, 0xA2, 0xAF, 0x8C, 0x81, 0x96, 0x9B,
@@ -170,15 +178,33 @@ mul13 = np.array((
     0xDC, 0xD1, 0xC6, 0xCB, 0xE8, 0xE5, 0xF2, 0xFF, 0xB4, 0xB9, 0xAE, 0xA3, 0x80, 0x8D, 0x9A, 0x97
 ), dtype=np.uint8)
 
-rcon = np.array((
-    0x8D, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB
-), dtype=np.uint8)
 
+# Shiftrows tables:
 shiftrows = [0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11]
 shiftrows_inverse = [0, 13, 10, 7, 4, 1, 14, 11, 8, 5, 2, 15, 12, 9, 6, 3]
 
 
-class AesKeySchedule(object):
+# Rcon contants
+rcon = np.array((
+    0x8D, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB
+), dtype=np.uint8)
+
+
+class Aes(object):
+    """
+
+    Aes class.
+    Provide methods to perform Aes (128,192 256)
+    (use staticaly)
+
+    Handle list of uint8 (instead of char/str)
+
+    Example:
+        input = [0]*16
+        key = [0] * 16
+        Aes.encrypt( input, key)
+
+    """
 
     @staticmethod
     def xor(s1, s2):
@@ -193,208 +219,156 @@ class AesKeySchedule(object):
         return (sbox[b] for b in word)
 
     @staticmethod
-    def __call__(key):
+    def add_round_key(state, key):
+        return [state[i] ^ key[i] for i in range(16)]
+
+    @staticmethod
+    def sub_bytes(state):
+        return [sbox[i] for i in state]
+
+    @staticmethod
+    def inverse_sub_bytes(state):
+        return [inv_sbox[i] for i in state]
+
+    @staticmethod
+    def shift_rows(state):
+        return np.array(state)[shiftrows]
+
+    @staticmethod
+    def inverse_shift_rows(state):
+        return np.array(state)[shiftrows_inverse]
+
+    @staticmethod
+    def mix_columns(state):
+        for i in range(4):
+            state[4*i],state[4*i+1],state[4*i+2],state[4*i+3] = mul2[state[4*i + 0]] ^ mul3[state[4*i + 1]] ^ state[4*i + 2] ^ state[4*i + 3], \
+                                                                mul2[state[4*i + 1]] ^ mul3[state[4*i + 2]] ^ state[4*i + 3] ^ state[4*i + 0], \
+                                                                mul2[state[4*i + 2]] ^ mul3[state[4*i + 3]] ^ state[4*i + 0] ^ state[4*i + 1], \
+                                                                mul2[state[4*i + 3]] ^ mul3[state[4*i + 0]] ^ state[4*i + 1] ^ state[4*i + 2]
+        return state
+
+    @staticmethod
+    def inverse_mix_columns(state):
+        for i in range(4):
+            state[4*i],state[4*i+1],state[4*i+2],state[4*i+3] = mul14[state[4*i + 0]] ^ mul11[state[4*i + 1]] ^ mul13[state[4*i + 2]] ^ mul9[state[4*i + 3]], \
+                                                                mul14[state[4*i + 1]] ^ mul11[state[4*i + 2]] ^ mul13[state[4*i + 3]] ^ mul9[state[4*i + 0]], \
+                                                                mul14[state[4*i + 2]] ^ mul11[state[4*i + 3]] ^ mul13[state[4*i + 0]] ^ mul9[state[4*i + 1]], \
+                                                                mul14[state[4*i + 3]] ^ mul11[state[4*i + 0]] ^ mul13[state[4*i + 1]] ^ mul9[state[4*i + 2]]
+        return state
+
+
+    @staticmethod
+    def key_schedule(key):
         if len(key) == 16:
-            nb = 4
-            nr = 10
-            nk = 4
+            nb, nr, nk = 4, 10, 4
+        elif len(key) == 24:
+            nb, nr, nk = 4, 12, 6
+        elif len(key) == 32:
+            nb, nr, nk = 4, 14, 8
+        else:
+            raise ValueError('Invalid key size')
 
         expanded = list(key)
         for i in range(nk, nb * (nr + 1)):
             t = expanded[(i - 1) * 4:i * 4]
             if i % nk == 0:
-                t = AesKeySchedule.xor(AesKeySchedule.sub_word(AesKeySchedule.rot_word(t)),
-                                       (rcon[i // nk], 0, 0, 0))
+                t = Aes.xor(Aes.sub_word(Aes.rot_word(t)),
+                            (rcon[i // nk], 0, 0, 0))
             elif nk > 6 and i % nk == 4:
-                t = AesKeySchedule.sub_word(t)
-            expanded.extend(AesKeySchedule.xor(t, expanded[(i - nk) * 4:(i - nk + 1) * 4]))
+                t = Aes.sub_word(t)
+            expanded.extend(Aes.xor(t, expanded[(i - nk) * 4:(i - nk + 1) * 4]))
         return expanded
 
+    @staticmethod
+    def encrypt(input, key):
+        nr = 6+ 2*(len(key)//8)
+        key_scheduled = Aes.key_schedule(key)
+        state = [i for i in input]
 
-def list2num(x):
-    res = 0
-    for i in range(16):
-        res |= ((int(x[i]) & 0xff) << (120 - 8 * i))
-    return (res)
+        state = Aes.add_round_key(state, key_scheduled[:16])
 
+        for i in range(1,nr):
+            state = Aes.sub_bytes(state)
+            state = Aes.shift_rows(state)
+            state = Aes.mix_columns(state)
+            state = Aes.add_round_key(state, key_scheduled[i*16:(i+1)*16])
 
-def selectbyte(x, i, j=-1):
-    if j == -1:
-        return ((x >> (120 - 8 * i)) & 0xff)
-    else:
-        return ((x >> (120 - 8 * (i * 4 + j))) & 0xff)
+        state = Aes.sub_bytes(state)
+        state = Aes.shift_rows(state)
+        state = Aes.add_round_key(state, key_scheduled[-16:])
+        return state
 
+    @staticmethod
+    def encrypt_keep_iv(input, key_scheduled):
+        """
+        encrypt and keep all intermediate values
+        :param input:
+        :param key_scheduled:
+        :return:
+        """
+        nr = int(len(key_scheduled)/16)
 
-def list2state(list_in):
-    state = [[0 for i in range(4)] for j in range(4)]
-    for i in range(4):
-        for j in range(4):
-            state[i][j] = int(list_in[i * 4 + j])
-    return state
+        res = []
 
+        state = [i for i in input]
+        res +=state
 
-def hex2state(hex_in):
-    state = [[0 for i in range(4)] for j in range(4)]
-    for i in range(4):
-        for j in range(4):
-            state[i][j] = hex_in >> (120 - 8 * (i * 4 + j)) & 0xFF
-    return state
+        state = Aes.add_round_key(state, key_scheduled[:16])
+        res +=state
 
+        for i in range(1,nr):
+            state = Aes.sub_bytes(state)
+            res += list(state)
+            state = Aes.shift_rows(state)
+            res += list(state)
+            state = Aes.mix_columns(state)
+            res += list(state)
+            state = Aes.add_round_key(state, key_scheduled[i*16:(i+1)*16])
+            res += list(state)
 
-def state2hex(x):
-    res = 0
-    for i in range(4):
-        for j in range(4):
-            res |= ((x[i][j] & 0xff) << (120 - 8 * (4 * i + j)))
-    return res
+        state = Aes.sub_bytes(state)
+        res+=state
+        state = Aes.shift_rows(state)
+        res += list(state)
+        state = Aes.add_round_key(state, key_scheduled[-16:])
+        res += list(state)
 
+        return res
 
-class aes128:
-    def __init__(self, key):
-        self.states = []
-        self.skeys = []
+    @staticmethod
+    def decrypt_keep_iv(input, key_scheduled):
+        """
+        decrypt and keep all intermediate values
 
-        self.ops = []
-        self.key_schedule(key)
+        :param input:
+        :param key_scheduled:
+        :return:
+        """
 
-    def save_states(self, op, rd):
-        self.states.append(state2hex(self.state))
-        self.ops.append(op + "_rd_" + str(rd))
+        nr = int(len(key_scheduled)/16)
+        res = []
 
-    def key_schedule(self, key):
-        w = [[0 for i in range(4)] for j in range(60)]
+        state = [i for i in input]
+        res +=state
 
-        if isinstance(key, int):
-            w[0:3] = hex2state(key)
-        elif hasattr(key, "__getitem__"):
-            w[0:3] = list2state(key)
-        else:
-            return NotImplemented
+        state = Aes.add_round_key(state, key_scheduled[-16:])
+        res +=state
 
-        # number of rounds / Only for AES 128
-        nr = 11
+        for i in range(nr-1,0,-1):
+            state = Aes.inverse_sub_bytes(state)
+            res += list(state)
+            state = Aes.inverse_shift_rows(state)
+            res += list(state)
+            state = Aes.inverse_mix_columns(state)
+            res += list(state)
+            state = Aes.add_round_key(state, key_scheduled[i*16:(i+1)*16])
+            res += list(state)
 
-        for i in range(4, 4 * nr):
-            if i % 4 == 0:
-                for j in range(4):
-                    rc = rcon[int(i / 4)] if j == 0 else 0
-                    w[i][j] = w[i - 4][j] ^ sbox[w[i - 1][(j + 1) % 4]] ^ rc
-            else:
-                for j in range(4):
-                    w[i][j] = w[i - 4][j] ^ w[i - 1][j]
-        self.subkeys = [[0 for i in range(4)] for j in range(nr)]
-        for r in range(nr):
-            for j in range(4):
-                self.subkeys[r][j] = w[r * 4 + j]
-            self.skeys.append(state2hex(self.subkeys[r]))
+        state = Aes.inverse_sub_bytes(state)
+        res+=state
+        state = Aes.inverse_shift_rows(state)
+        res += list(state)
+        state = Aes.add_round_key(state, key_scheduled[:16])
+        res += list(state)
 
-    def encrypt(self, plaintext):
-
-        if isinstance(plaintext, int):
-            self.state = hex2state(plaintext)
-        elif hasattr(plaintext, "__getitem__"):
-            self.state = list2state(plaintext)
-        else:
-            return NotImplemented
-
-        self.save_states("inputs", 0)
-
-        self.addroundkey(self.state, self.subkeys[0])
-        self.save_states("addkey", 0)
-
-        for i in range(1, 11):
-            self.subbytes(self.state)
-            self.save_states("subbytes", i)
-            self.shiftrows(self.state)
-            self.save_states("shiftrows", i)
-            if i != 10:
-                self.mixcolumns(self.state)
-                self.save_states("mixcolumns", i)
-            self.addroundkey(self.state, self.subkeys[i])
-            self.save_states("addkey", i)
-
-        return state2hex(self.state)
-
-    def decrypt(self, ciphertext):
-        self.state = hex2state(ciphertext)
-        self.save_states("inputs", 0)
-
-        for i in range(10, 0, -1):
-            self.addroundkey(self.state, self.subkeys[i])
-            self.save_states("addkey", i)
-            if (i != 10):
-                self.invmixcolumns(self.state)
-                self.save_states("invmixcolumns", i)
-            self.invshiftrows(self.state)
-            self.save_states("invshiftrows", i)
-            self.invsubbytes(self.state)
-            self.save_states("invsubbytes", i)
-
-        self.addroundkey(self.state, self.subkeys[0])
-        self.save_states("addkey", i)
-
-        return state2hex(self.state)
-
-    def addroundkey(self, s, k):
-        for i in range(4):
-            for j in range(4):
-                s[i][j] ^= k[i][j]
-
-    def subbytes(self, s):
-        for i in range(4):
-            for j in range(4):
-                s[i][j] = sbox[s[i][j]]
-
-    def invsubbytes(self, s):
-        for i in range(4):
-            for j in range(4):
-                s[i][j] = inv_sbox[s[i][j]]
-
-    def shiftrows(self, s):
-        s[0][1], s[1][1], s[2][1], s[3][1] = s[1][1], s[2][1], s[3][1], s[0][1]
-        s[0][2], s[1][2], s[2][2], s[3][2] = s[2][2], s[3][2], s[0][2], s[1][2]
-        s[0][3], s[1][3], s[2][3], s[3][3] = s[3][3], s[0][3], s[1][3], s[2][3]
-
-    def invshiftrows(self, s):
-        s[0][1], s[1][1], s[2][1], s[3][1] = s[3][1], s[0][1], s[1][1], s[2][1]
-        s[0][2], s[1][2], s[2][2], s[3][2] = s[2][2], s[3][2], s[0][2], s[1][2]
-        s[0][3], s[1][3], s[2][3], s[3][3] = s[1][3], s[2][3], s[3][3], s[0][3]
-
-    def mixcolumn(self, c):
-        c[0], c[1], c[2], c[3] = mul2[c[0]] ^ mul3[c[1]] ^ c[2] ^ c[3], \
-                                 mul2[c[1]] ^ mul3[c[2]] ^ c[3] ^ c[0], \
-                                 mul2[c[2]] ^ mul3[c[3]] ^ c[0] ^ c[1], \
-                                 mul2[c[3]] ^ mul3[c[0]] ^ c[1] ^ c[2]
-
-    def fastInvMixColumn(self, c):
-        c[0], c[1], c[2], c[3] = mul14[c[0]] ^ mul11[c[1]] ^ mul13[c[2]] ^ mul9[c[3]], \
-                                 mul14[c[1]] ^ mul11[c[2]] ^ mul13[c[3]] ^ mul9[c[0]], \
-                                 mul14[c[2]] ^ mul11[c[3]] ^ mul13[c[0]] ^ mul9[c[1]], \
-                                 mul14[c[3]] ^ mul11[c[0]] ^ mul13[c[1]] ^ mul9[c[2]]
-
-    def mixcolumns(self, s):
-        for i in range(4):
-            self.mixcolumn(s[i])
-
-    def invmixcolumns(self, s):
-        for i in range(4):
-            self.fastInvMixColumn(s[i])
-
-
-if __name__ == '__main__':
-    pt = 0x00112233445566778899AABBCCDDEEFF
-    key = 0x000102030405060708090A0B0C0D0E0F
-    exp = 0x69C4E0D86A7B0430D8CDB78070B4C55A
-    import time;
-
-    ticks = time.time()
-
-    for i in range(1000):
-        aes_enc = aes128(key)
-        aes_enc.encrypt(pt)
-    print(time.time() - ticks)
-    assert (exp == aes_enc.encrypt(pt))
-
-    aes_dec = aes128(key)
-    assert (pt == aes_dec.decrypt(exp))
-    print("Tests OK")
+        return res

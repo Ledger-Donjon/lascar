@@ -91,3 +91,16 @@ class NpyContainer(Container):
         session.run(batch_size)
 
         return out
+
+    def get_leakage_mean_var(self):
+        """
+        Compute mean/var of the leakage.
+        :return: mean/var of the container leakages
+        """
+        try:
+            mean, var = self.leakages.mean(0), self.leakages.var(0)
+            return self.apply_both_value(mean), self.apply_both_value(var)
+
+        except:
+            return Container.get_leakage_mean_var()
+

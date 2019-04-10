@@ -156,15 +156,13 @@ class StandardScalerProcessing(Processing):
 
     def __init__(self, container, filename=None):
         # compute mean/var:
-        from lascar.session import Session
+        self.mean, self.std_inv = container.get_leakage_mean_var()
 
-        session = Session(container).run()
-        self.mean = session['mean'].finalize()
-        self.std = np.sqrt(session['var'].finalize())
+        self.std_inv = 1/np.sqrt(self.std_inv)
         Processing.__init__(self, filename)
 
     def __call__(self, leakage):
-        return (leakage - self.mean) / self.std
+        return (leakage - self.mean) * self.std_inv
 
 
 class ReshapeProcessing(Processing):

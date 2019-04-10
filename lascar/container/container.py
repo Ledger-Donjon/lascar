@@ -509,6 +509,18 @@ class TraceBatchContainer(Container):
             return False
         return np.all(self.leakages == other.leakages) and np.all(self.values == other.values)
 
+    def get_leakage_mean_var(self):
+        """
+        Compute mean/var of the leakage.
+        :return: mean/var of the container leakages
+        """
+        try:
+            mean, var = self.leakages.mean(0), self.leakages.var(0)
+            return self.apply_both_value(mean), self.apply_both_value(var)
+
+        except:
+            return Container.get_leakage_mean_var()
+
 
 class AbstractArray:
     """
@@ -535,3 +547,22 @@ class AbstractArray:
 
     def __str__(self):
         return '[%s, %s]' % (self.shape, self.dtype)
+
+
+
+class AcquisitionFromGenerators(AbstractContainer):
+    
+    def __init__(self, number_of_traces, value_generator, leakage_generator):
+
+        self.value_generator = value_generator
+        self.leakage_generator = leakage_generator
+    
+        AbstractContainer.__init__(self, number_of_traces)
+
+        self.logger.info('Creating AcquisitionBase.')
+
+    def generate_trace(self,idx):
+        self.logger.debug('Generate trace %d.'%(idx))
+        value = next(self.value_generator)
+        leakage = next(self.leakage_generator)
+        return Trace(leakage, value)

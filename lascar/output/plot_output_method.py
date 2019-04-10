@@ -45,9 +45,6 @@ class MatPlotLibOutputMethod(OutputMethod):
         :param filename: it set, save the figure to filename
         :param legend: it set, displays thee legend on the figure
         """
-        if not len(engines):
-            raise ValueError('MatPlotLibOutputMethod need engines to be instantiated...')
-
         OutputMethod.__init__(self, *engines)
 
         self.number_of_columns = number_of_columns
@@ -66,13 +63,14 @@ class MatPlotLibOutputMethod(OutputMethod):
         if number_of_columns and not number_of_rows:
             self.number_of_rows = ceil(len(engines) / number_of_columns)
 
+        if not number_of_columns and not number_of_rows:
+            self.number_of_columns = min(4, len(engines)) if len(engines) else 4
+            self.number_of_rows = max(1,ceil(len(engines) / 4))
+
         self.single_plot = single_plot
         if single_plot:
             self.number_of_rows = 1
             self.number_of_columns = 1
-        elif not number_of_columns and not number_of_rows:
-            self.number_of_columns = min(4, len(engines)) if len(engines) else 4
-            self.number_of_rows = max(1,ceil(len(engines) / 4))
 
     def _update(self, engine, results):
 
@@ -100,16 +98,18 @@ class MatPlotLibOutputMethod(OutputMethod):
                 engine.name))
             return
 
+        if idx == len(self.engines):
+
+            if self.legend:
+                plt.legend()
+
+            if self.filename:
+                plt.savefig(self.filename)
+            if self.display:
+                plt.show()
 
     def _finalize(self):
-        if self.legend:
-            plt.legend()
-
-        if self.filename:
-            plt.savefig(self.filename)
-        if self.display:
-            plt.show()
-
+        pass
 
     def from_output_method(self, output_method):
         pass
@@ -248,7 +248,7 @@ class RankProgressionOutputMethod(ScoreProgressionOutputMethod):
                 self.scores[engine.name] = []
                 self.scores_solution[engine.name] = []
 
-            self.scores[engine.name].append([i[2] for i in results_parsed])
+            self.scores[engine.name].append([i[0] for i in results_parsed])
 
             if engine.solution is not None:
                 results_parsed_tmp = [e[0] for e in results_parsed]

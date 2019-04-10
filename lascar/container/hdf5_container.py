@@ -119,5 +119,31 @@ class Hdf5Container(Container):
 
         session = Session(container, engine=ContainerDumpEngine(out), name=name if name else 'Hdf5Container')
         session.run(batch_size)
+        # Adding mean/var: to leakage_dataset_name as attributes
+        try:
+            out._file[leakages_dataset_name].attrs['mean'] = session['mean'].finalize()
+            out._file[leakages_dataset_name].attrs['var'] = session['var'].finalize()
+        except:
+            pass
 
         return out
+
+
+    def get_leakage_mean_var(self):
+        """
+        Compute mean/var of the leakage.
+        :return: mean/var of the container leakages
+        """
+        try:
+            mean, var = self.leakages.attrs['mean'], self.leakages.attrs['var']
+            return self.apply_both_value(mean), self.apply_both_value(var)
+
+        except:
+            mean,var = Container.get_leakage_mean_var(self)
+
+            try:
+                self.leakages.attrs['mean'] = mean
+                self.leakages.attrs['var'] = var
+            except:
+                pass
+        return mean,var
