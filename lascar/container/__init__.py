@@ -33,3 +33,4 @@ from .simulation_container import BasicAesSimulationContainer
 from .container import Trace
 
 from .npy_container import NpyContainer
+from .container import AcquisitionFromGenerators
