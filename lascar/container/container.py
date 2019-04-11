@@ -323,6 +323,16 @@ class Container:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def get_leakage_mean_var(self):
+        """
+        Compute mean/var of the leakage.
+        :return: mean/var of the container leakages
+        """
+        from lascar import Session
+        session = Session(self).run()
+        return session['mean'].finalize(), session['var'].finalize()
+
+
 
 class AbstractContainer(Container):
     """
