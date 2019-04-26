@@ -165,6 +165,150 @@ def ttest(names_in, batch_size, name_out, plot):
 
     if name_out:
         np.save(name_out, results)
-    
-if __name__ == '__main__':
+
+@main.command()
+@click.argument("names_in", nargs=-1)
+@click.option("-l", "--leakages_dataset", default="leakages", type=str, help='Indicate the name of the leakage dataset')
+@click.option("-v", "--values_dataset", default="values", type=str, help='Indicate the name of the values dataset')
+def info(names_in, leakages_dataset, values_dataset):
+    """
+    Get information on an Hdf5Container
+    """
+    container = load_container(*names_in)
+    print(container)
+
+
+
+from PyQt5 import QtWidgets as qt
+import PyQt5.QtCore as qtc
+import numpy as np
+from vispy import scene, color
+
+import pkg_resources
+
+import numpy as np
+from vispy import scene
+from vispy import color
+
+
+
+class plot:
+
+    bg_clr = "#222"  # dark background color
+    # bg_clr = "#fff"  # clear
+    highlighted = color.Color("#41CCB4")
+    others = highlighted.darker(0.5)
+
+    def __init__(self, parent=None):
+        self.canvas = scene.SceneCanvas(
+            size=(1280, 900),
+            keys="interactive",
+            bgcolor=plot.bg_clr,
+            parent=parent,
+        )
+
+        self.grid = self.canvas.central_widget.add_grid(spacing=0)
+        self.view = self.grid.add_view(row=0, col=1, camera="panzoom")
+        self.colormap = color.get_colormap('husl')[np.linspace(0., 1., 24)]
+
+        self.n = 0
+        self.lines = {}
+
+        self.x_axis = scene.AxisWidget(orientation="bottom", text_color="#ddd")
+        self.y_axis = scene.AxisWidget(orientation="left", text_color="#ddd")
+        self.x_axis.stretch = (1, 0.05)
+        self.y_axis.stretch = (0.05, 1)
+        self.grid.add_widget(self.x_axis, row=1, col=1)
+        self.grid.add_widget(self.y_axis, row=0, col=0)
+        self.x_axis.link_view(self.view)
+        self.y_axis.link_view(self.view)
+
+        self.canvas.show()
+        if parent is None:
+            self.canvas.app.run()
+
+    def add_curve(self, curve, index):
+        self.n += 1
+        self.lines[index] = scene.LinePlot(curve, color=self.colormap[self.n], parent=self.view.scene)
+        # self.view.camera.set_range(x=(0, curve.shape[0]), y=(curve.min(), curve.max()))
+
+    def remove_curve(self, index):
+        self.n -= 1
+        self.lines[index].parent = None
+        self.lines[index] = None
+        self.lines.pop(index)
+
+
+class CurveSelector(qt.QMainWindow):
+    def __init__(self, c):
+
+        super().__init__()
+
+        style_file = pkg_resources.resource_filename(__name__, "/styles.css")
+
+        #with open(style_file) as stylesheet:
+        #    self.setStyleSheet(stylesheet.read())
+
+        self.etraces = np.array(c.leakages)
+        self.instr = [ '%f/%f'%(v[0],v[1]) for v in c.values]
+        self.index = 0
+        self.current_selection = []
+        self.add_widgets()
+        self.place_widgets()
+
+    def add_widgets(self):
+        self.plot_ = plot(parent=self)
+        self.plot_.view.camera.set_range(x=(0, self.etraces.shape[1]), y=(self.etraces.min(), self.etraces.max()))
+        self.instr_list = qt.QListWidget(self)
+        self.instr_list.setSelectionMode(3)
+        self.instr_list.currentRowChanged.connect(self.rowchange)
+        self.instr_list.addItems(self.instr)
+
+    def rowchange(self, event):
+        s = list(map(self.instr_list.row,self.instr_list.selectedItems()))
+        r = set(self.current_selection)
+        delete_items = r-set(s)
+        add_items = set(s)-r
+
+        for i in delete_items:
+            self.plot_.remove_curve(i)
+
+        for i in add_items:
+            self.plot_.add_curve(self.etraces[i],i)
+
+        self.current_selection = s
+
+        # self.instr_change_focus(self.instr_list.currentItem())
+
+    def instr_change_focus(self, item):
+        self.index = self.instr_list.row(item)
+        self.focus_change(self.index)
+
+    def focus_change(self, r):
+        self.plot_.line.set_data(self.etraces[r], symbol=None)
+
+    def place_widgets(self):
+        self.frame = qt.QFrame(self)
+        self.setCentralWidget(self.frame)
+
+        self.frame_layout = qt.QHBoxLayout(self.frame)
+        self.frame_layout.addWidget(self.instr_list)
+        self.frame_layout.addWidget(self.plot_.canvas.native)
+
+    @main.command()
+    @click.argument("name_in")
+    def plot(name_in):
+        """
+        Plot an Hdf5Container
+        """
+        container = Hdf5Container(name_in)
+        app_ = qt.QApplication([])
+
+        v = CurveSelector( container)
+        v.show()
+        sys.exit(app_.exec_())
+
+
+if __name__ == "__main__":
     main()
+
