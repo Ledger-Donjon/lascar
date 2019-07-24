@@ -249,8 +249,8 @@ class CurveSelector(qt.QMainWindow):
         #with open(style_file) as stylesheet:
         #    self.setStyleSheet(stylesheet.read())
 
-        self.etraces = np.array(c.leakages)
-        self.instr = [ '%f/%f'%(v[0],v[1]) for v in c.values]
+        self.etraces = c.leakages
+        self.instr = [ str(i) for i in range(len(c))]
         self.index = 0
         self.current_selection = []
         self.add_widgets()
@@ -258,7 +258,7 @@ class CurveSelector(qt.QMainWindow):
 
     def add_widgets(self):
         self.plot_ = plot(parent=self)
-        self.plot_.view.camera.set_range(x=(0, self.etraces.shape[1]), y=(self.etraces.min(), self.etraces.max()))
+        self.plot_.view.camera.set_range(x=(0, self.etraces.shape[1]), y=(self.etraces[0].min(), self.etraces[0].max()))
         self.instr_list = qt.QListWidget(self)
         self.instr_list.setSelectionMode(3)
         self.instr_list.currentRowChanged.connect(self.rowchange)
