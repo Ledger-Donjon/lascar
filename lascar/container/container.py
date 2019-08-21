@@ -576,3 +576,19 @@ class AcquisitionFromGenerators(AbstractContainer):
         value = next(self.value_generator)
         leakage = next(self.leakage_generator)
         return Trace(leakage, value)
+
+class AcquisitionFromGetters(AbstractContainer):
+    
+    def __init__(self, number_of_traces, leakage_getter, value_getter, **kwargs):
+        
+        self.leakage_getter = leakage_getter
+        self.value_getter = value_getter
+        
+        AbstractContainer.__init__(self, number_of_traces, **kwargs)
+        
+    def generate_trace(self, idx):
+
+        value = self.value_getter.get_value()
+        leakage = self.leakage_getter.get_leakage()
+        
+        return Trace(leakage, value)

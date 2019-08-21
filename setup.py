@@ -25,10 +25,16 @@ import sys
 if sys.version_info[0] < 3:
     sys.exit("Sorry, only Python 3.x is supported ")
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+
 setup(name='lascar',
-      version='0.1',
+      version='1.1',
       description="Ledger's Advanced Side-Channel Analysis Repository - Toolsuite for side-channel acquisition, container and analysis by Ledger.",
-      #url='',
+      long_description=long_description,
+      long_description_content_type="text/markdown",
+      url="https://github.com/Ledger-Donjon/lascar",      
       author='Charles Guillemet, Manuel San Pedro, Victor Servant',
       author_email='charles@ledger.fr, manuel.sanpedro@ledger.fr, victor.servant@ledger.fr',
       install_requires=['numpy', 'h5py', 'matplotlib', 'vispy', 'sklearn', 'scipy', 'keras','progressbar2','pytest', 'numba'],  ## PyQt5 is here as a backend for vispy, this might change in the future
