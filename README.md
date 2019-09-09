@@ -76,11 +76,8 @@ The [tutorial](tutorial/) folder contains commented scripts to understand how to
 
 
 ## Examples
-The [examples](examples/) folder contains two parts:
 
-- [base](examples/base) folder: basic scripts for state-of-the-art side-channel use cases one simulated traces: compute Snr, Cpa, T-Test, Profiled Attacks( including Deep-Learning Attacks).
-- [ascad](examples/ascad) folder: Use real traces of a secure AES implementation on a on the ATMega8515 provided by ANSSI at [ASCAD](https://github.com/ANSSI-FR/ASCAD). The idea is to reproduce with *lascar* the study made in their [paper](https://eprint.iacr.org/2018/053.pdf).
-
+See [examples.md](examples/examples.md)
 
 
 ## ![Ledger Donjon Logo](images/logo_donjon) About Ledger Donjon ![Ledger Donjon Logo](images/logo_donjon)
