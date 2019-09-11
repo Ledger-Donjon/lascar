@@ -1,5 +1,7 @@
+
 [![Ledger Logo](images/logo_ledger)](https://www.ledger.com/)&emsp;[![Ledger Logo](images/logo_donjon_l)](https://www.ledger.fr/tag/donjon/)
 
+[![Gitter](https://badges.gitter.im/lascar-dev/community.svg)](https://gitter.im/lascar-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Documentation Status](https://readthedocs.org/projects/lascar/badge/?version=latest)](https://lascar.readthedocs.io/en/latest/?badge=latest)
 
 # LASCAR
