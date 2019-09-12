@@ -19,9 +19,9 @@ def selection_function(value, guess):  # selection_with_guess function must take
     """
     What would the hamming weight of the output of the 3rd sbox be if the key was equal to 'guess' ?
     """
-    return hamming(sbox[value['plaintext'][3] ^ guess])  # here we partition on the value of the 3rd plaintext byte
+    return hamming(sbox[value['plaintext'][3] ^ guess])  
 
-guess_range = range(16) # number of possible classes (~output of the partiton_function) for the partition_function
+guess_range = range(256) # the guess values: here we make hypothesis on a key byte, hence range(256)
 
 cpa_engine = CpaEngine("cpa_plaintext_3", selection_function, guess_range)
 
