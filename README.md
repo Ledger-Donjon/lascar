@@ -1,6 +1,8 @@
+
 [![Ledger Logo](images/logo_ledger)](https://www.ledger.com/)&emsp;[![Ledger Logo](images/logo_donjon_l)](https://www.ledger.fr/tag/donjon/)
 
-[![Documentation Status](https://readthedocs.org/projects/lascar/badge/?version=latest)](https://lascar.readthedocs.io/en/latest/?badge=latest)
+[![Gitter](https://badges.gitter.im/lascar-dev/community.svg)](https://gitter.im/lascar-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Documentation Status](https://readthedocs.org/projects/lascar/badge/?version=latest)](https://lascar.readthedocs.io/en/latest/?badge=latest) [![Join the chat at https://gitter.im/Ledger-Donjon/lascar](https://badges.gitter.im/Ledger-Donjon/lascar.svg)](https://gitter.im/Ledger-Donjon/lascar?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # LASCAR
 
