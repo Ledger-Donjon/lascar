@@ -128,8 +128,8 @@ class CpaPartitionedEngine(PartitionerEngine, GuessEngine):
 
         m, v = self._session["mean"].finalize(), self._session["var"].finalize()
         return np.nan_to_num(((accXM / self._number_of_processed_traces) - np.outer(
-            accM / self._number_of_processed_traces, m) / np.sqrt(np.outer(
-            accM2 / self._number_of_processed_traces - (accM / self._number_of_processed_traces) ** 2, v))))
+            accM / self._number_of_processed_traces, m)) / np.sqrt(np.outer(
+            accM2 / self._number_of_processed_traces - (accM / self._number_of_processed_traces) ** 2, v)))
 
     def _clean(self):
         del self._accM
