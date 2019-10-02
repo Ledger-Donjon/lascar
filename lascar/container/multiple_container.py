@@ -183,10 +183,11 @@ class MultipleContainer(Container):
         :return: mean/var of the container leakages
         """
 
-        means = np.zeros((self.leakages.shape[1:]))
+        sum_x = np.zeros((self.leakages.shape[1:]))
         sum_x2 = np.zeros((self.leakages.shape[1:]))
         for c in self._containers:
             m,v = c.get_leakage_mean_var()
-            means += m
+            sum_x += m*len(c)
             sum_x2 += (v+m**2)*len(c)
-        return means/len(self._containers), (sum_x2/len(self)) - (means/len(self._containers))**2
+
+        return sum_x/len(self), (sum_x2/len(self)) - (sum_x/len(self))**2
