@@ -334,12 +334,28 @@ class Container:
 
 
 
+
+# def to_trace(func):
+#     def wrapper(*args, **kwargs):
+#         result = func(*args, **kwargs)
+
+#         if isinstance(result, Trace):
+#             return result
+
+#         try:
+#             return Trace(result)
+#         except:        
+#             raise TypeError("the output must be a 2-uple of numpy array: leakage,value.")
+#         return result
+#     return wrapper
+
+
 class AbstractContainer(Container):
     """
     AbstractContainer is a Container class used when the side-channel traces are generated from functions.
     It can be used for instance:
 
-    - setting up acquisitions with oscilloscope and DUT
+    - setting up sitions with oscilloscope and DUT
     - when implementing Simulated traces
     """
 
@@ -351,6 +367,9 @@ class AbstractContainer(Container):
         self.values = AbstractArray((number_of_traces,) + trace.value.shape, trace.value.dtype)
 
         Container.__init__(self, **kwargs)
+    
+
+
 
     def generate_trace(self, idx):
         """
@@ -560,35 +579,47 @@ class AbstractArray:
 
 
 
-class AcquisitionFromGenerators(AbstractContainer):
-    
-    def __init__(self, number_of_traces, value_generator, leakage_generator):
+class AcquisitionFromGetters(AbstractContainer):
+    """
+    An AcquisitionFromGetters is built from 2 object whose role are similar:
 
-        self.value_generator = value_generator
-        self.leakage_generator = leakage_generator
-    
-        AbstractContainer.__init__(self, number_of_traces)
+    - value_getter which delivers values (for instance a class communicating with the dut)
+    - leakage_getter which delivers leakages (for instance an oscilloscope)
 
-        self.logger.info('Creating AcquisitionBase.')
+    value_getter and leakage_getter must either:
+    - be iterable: each iteration returns the leakage or value
+    OR
+    - implement a .get() method which returns leakage or value
+
+    """
+    
+    def __init__(self, number_of_traces, value_getter, leakage_getter,**kargs):
+
+        self.value_getter = value_getter
+        self.leakage_getter = leakage_getter
+    
+        if hasattr(value_getter, "__iter__"):
+            self.get_value = lambda : next(self.value_getter)
+        elif hasattr(value_getter, "get"):
+            self.get_value = lambda : self.value_getter.get()
+        else:
+            raise ValueError("value_getter must either be an iterator/generator OR implement a get method")
+        
+        if hasattr(leakage_getter, "__iter__"):
+            self.get_value = lambda : next(self.leakage_getter)
+        elif hasattr(leakage_getter, "get"):
+            self.get_leakage = lambda : self.leakage_getter.get()
+        else:
+            raise ValueError("leakage_getter must either be an iterator/generator OR implement a get method")
+        
+        AbstractContainer.__init__(self, number_of_traces, **kargs)
+        self.logger.info('Creating AcquisitionFromGenerators.')
 
     def generate_trace(self,idx):
         self.logger.debug('Generate trace %d.'%(idx))
-        value = next(self.value_generator)
-        leakage = next(self.leakage_generator)
+        value = self.get_value()
+        leakage = self.get_leakage()
+
         return Trace(leakage, value)
 
-class AcquisitionFromGetters(AbstractContainer):
-    
-    def __init__(self, number_of_traces, leakage_getter, value_getter, **kwargs):
-        
-        self.leakage_getter = leakage_getter
-        self.value_getter = value_getter
-        
-        AbstractContainer.__init__(self, number_of_traces, **kwargs)
-        
-    def generate_trace(self, idx):
 
-        value = self.value_getter.get_value()
-        leakage = self.leakage_getter.get_leakage()
-        
-        return Trace(leakage, value)
