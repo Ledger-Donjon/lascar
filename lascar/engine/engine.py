@@ -94,8 +94,8 @@ class Engine:
         if self._number_of_processed_traces not in self.finalize_step:
             self.logger.warning('%s Engine cannot be cleaned, finalize() has not been called.', self.name)
             return
-
         self._clean()
+
 
 
 class MeanEngine(Engine):
@@ -211,3 +211,51 @@ class ContainerDumpEngine(Engine):
 
     def _finalize(self):
         return self.container
+
+
+class PearsonCorrelationEngine(Engine):
+    """
+    PearsonCorrelationEngine is an engine whose role is compute the Pearson Correlation coefficient between 
+    the observed trace leakages and a model function applied to the trace values
+
+    The model function is a function who takes "value" as input and output a scalar.
+    (eg it can compute the hamming weight at the output of a sbox)
+    """
+
+    def __init__(self, name, model):
+        """
+
+        """
+        
+        Engine.__init__(self, name)
+        self._model = lambda x: int(model(x))
+        self.logger.debug('Creating PearsonCorrelationEngine %s.' % (name))
+
+
+    def _initialize(self):
+        """
+        Initialize the accumulators needed by PearsonCorrelationEngine
+        :return:
+        """
+        #self.size_in_memory += np.prod(self._session.leakage_shape) * 8
+        
+        self._acc_xm = np.zeros(self._session.leakage_shape, dtype=np.double)
+        self._acc_m = 0
+        self._acc_m2 = 0
+    
+    def _update(self, batch):
+
+        model_values = list(map(self._model, batch.values))
+        self._acc_m += sum(model_values)
+        self._acc_m2 += sum(np.power(model_values,2))
+        self._acc_xm += np.dot( model_values, batch.leakages)
+        
+    def _finalize(self):
+
+        m, v = self._session["mean"].finalize(), self._session["var"].finalize()
+        numerator = (self._acc_xm / self._number_of_processed_traces) - (self._acc_m /self._number_of_processed_traces)*m
+        denominator = np.sqrt(v * ((self._acc_m2 /self._number_of_processed_traces)-(self._acc_m /self._number_of_processed_traces)**2))
+        mask = v==0.
+        numerator[ mask] = 0.
+        denominator[ mask] = 1.
+        return np.nan_to_num(numerator / denominator)
