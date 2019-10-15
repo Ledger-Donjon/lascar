@@ -64,11 +64,13 @@ class OutputMethod:
         return self._finalize()
 
 
-    def _update(self,results):
+    def _update(self,engine,results):
         pass
     def _finalize(self):
         pass
 
+class NullOutputMethod(OutputMethod):
+    pass
 
 class MultipleOutputMethod(OutputMethod):
     """

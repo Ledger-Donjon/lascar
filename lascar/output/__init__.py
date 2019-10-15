@@ -17,6 +17,7 @@
 # Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS - manuel.sanpedro@ledger.fr, victor.servant@ledger.fr, charles@ledger.fr
 
 from .output_method import OutputMethod
+from .output_method import NullOutputMethod
 from .output_method import MultipleOutputMethod
 from .console_output_method import ConsoleOutputMethod
 from .hdf5_output_method import Hdf5OutputMethod

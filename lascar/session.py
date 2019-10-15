@@ -20,7 +20,7 @@ import logging
 from threading import Thread
 import numpy as np
 from .engine import MeanEngine, VarEngine
-from .output import MultipleOutputMethod, DictOutputMethod, OutputMethod
+from .output import MultipleOutputMethod, DictOutputMethod, OutputMethod, NullOutputMethod
 
 import progressbar
 
@@ -46,7 +46,7 @@ class Session:
     :param progressbar: Will the Session display a progressbar during its
         process.
     """
-    def __init__(self, container, engine=None, engines=None, output_method=DictOutputMethod(), output_steps=None, name="Session", progressbar=True):
+    def __init__(self, container, engine=None, engines=None, output_method=None, output_steps=None, name="Session", progressbar=True):
         self.logger = logging.getLogger(__name__)
         self.logger.debug('Creating Session.')
 
@@ -67,7 +67,10 @@ class Session:
             self.add_engines(engines)
 
         #output_method: what will I do with my engines results?
-        self.output_method = output_method
+        if output_method is not None:
+            self.output_method = output_method
+        else:
+            self.output_method = NullOutputMethod()
 
         #output_steps: When will OutputMethod will be called?
         self.output_steps=output_steps
