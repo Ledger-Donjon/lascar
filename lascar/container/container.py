@@ -549,6 +549,10 @@ class TraceBatchContainer(Container):
 
         except:
             return Container.get_leakage_mean_var()
+    
+    @staticmethod
+    def export(container):
+        return container[:]
 
 
 class AbstractArray:
