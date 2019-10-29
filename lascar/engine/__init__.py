@@ -21,6 +21,8 @@ from .engine import MeanEngine
 from .engine import VarEngine
 from .engine import Engine
 from .engine import PearsonCorrelationEngine
+from .engine import GroupedEngines
+
 from .guess_engine import GuessEngine
 from .partitioner_engine import PartitionerEngine
 from .cpa_engine import CpaEngine

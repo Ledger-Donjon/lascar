@@ -86,6 +86,9 @@ class Engine:
         self.logger.debug('Engine %s Finalizing.', self.name)
         self.finalize_step.append(self._number_of_processed_traces)
         return self._finalize()
+    
+    def get_results():
+        return self.finalize()
 
     def clean(self):
 
@@ -259,3 +262,28 @@ class PearsonCorrelationEngine(Engine):
         numerator[ mask] = 0.
         denominator[ mask] = 1.
         return np.nan_to_num(numerator / denominator)
+
+
+class GroupedEngines(Engine):
+    """
+    GroupedEngines is an abstact engine whose role regroup engines within one.
+    Useful when performing multiple charac/attacks at the same time.
+    """
+    
+    def __init__(self, name, *engines):
+        Engine.__init__(self, name)
+        self.engines = engines
+    
+    def _initialize(self):
+        [e.initialize(self._session) for e in self.engines]
+    
+    def _update(self, batch):
+        [e.update(batch) for e in self.engines]
+
+    def _finalize(self):
+
+        result = [e.finalize() for e in self.engines]
+        if isinstance(result[0], np.ndarray):
+            return np.array(result)
+        else:
+            return result
