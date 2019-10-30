@@ -26,7 +26,7 @@ import numpy as np
 
 from collections import namedtuple
 
-_Trace = namedtuple('Trace', ['leakage', 'value'])
+_Trace = namedtuple("Trace", ["leakage", "value"])
 
 
 class Trace(_Trace):
@@ -54,16 +54,23 @@ class Trace(_Trace):
         return super_obj.__new__(cls, args)
 
     def __str__(self):
-        return 'Trace with leakage:[%s, %s] value:[%s, %s]' % (
-            self.leakage.shape, self.leakage.dtype, self.value.shape, self.value.dtype)
+        return "Trace with leakage:[%s, %s] value:[%s, %s]" % (
+            self.leakage.shape,
+            self.leakage.dtype,
+            self.value.shape,
+            self.value.dtype,
+        )
 
     def __repr__(self):
         return "{}({})".format(
             self.__class__.__name__,
-            ', '.join("{}=%r".format(name) for name in self._fields) % self)
+            ", ".join("{}=%r".format(name) for name in self._fields) % self,
+        )
 
     def __eq__(self, other):
-        return np.all(self.leakage == other.leakage) and np.all(self.value == other.value)
+        return np.all(self.leakage == other.leakage) and np.all(
+            self.value == other.value
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -72,16 +79,24 @@ class Trace(_Trace):
 
         if isinstance(other, Trace):
             return TraceBatchContainer(
-                np.vstack([self.leakage, other.leakage]) if len(self.leakage.shape) > 0 else np.hstack(
-                    [self.leakage, other.leakage]),
-                np.vstack([self.value, other.value]) if len(self.value.shape) > 0 else np.hstack(
-                    [self.value, other.value]))
+                np.vstack([self.leakage, other.leakage])
+                if len(self.leakage.shape) > 0
+                else np.hstack([self.leakage, other.leakage]),
+                np.vstack([self.value, other.value])
+                if len(self.value.shape) > 0
+                else np.hstack([self.value, other.value]),
+            )
         if isinstance(other, TraceBatchContainer):
-            return TraceBatchContainer(np.vstack(
-                [self.leakage, other.leakages] if len(self.leakage.shape) > 0 else np.hstack(
-                    [self.leakage, other.leakages])),
-                                       np.vstack([self.value, other.values]) if len(
-                                           self.value.shape) > 0 else np.hstack([self.value, other.values]))
+            return TraceBatchContainer(
+                np.vstack(
+                    [self.leakage, other.leakages]
+                    if len(self.leakage.shape) > 0
+                    else np.hstack([self.leakage, other.leakages])
+                ),
+                np.vstack([self.value, other.values])
+                if len(self.value.shape) > 0
+                else np.hstack([self.value, other.values]),
+            )
 
 
 class Container:
@@ -109,24 +124,38 @@ class Container:
         self.logger = logging.getLogger(__name__)
 
         if self.leakages.shape[0] != self.values.shape[0]:
-            raise ValueError("leakages and values dont share the same first dim (number_of_traces): %s %s" % (
-                self.leakages.shape, self.values.shape))
+            raise ValueError(
+                "leakages and values dont share the same first dim (number_of_traces): %s %s"
+                % (self.leakages.shape, self.values.shape)
+            )
 
         self.number_of_traces_max = self.leakages.shape[0]
 
-        self._leakage_base_abstract = AbstractArray(self.leakages.shape[1:], self.leakages.dtype)
-        self._leakage_section_abstract = AbstractArray(self.leakages.shape[1:], self.leakages.dtype)
-        self._leakage_abstract = AbstractArray(self.leakages.shape[1:], self.leakages.dtype)
+        self._leakage_base_abstract = AbstractArray(
+            self.leakages.shape[1:], self.leakages.dtype
+        )
+        self._leakage_section_abstract = AbstractArray(
+            self.leakages.shape[1:], self.leakages.dtype
+        )
+        self._leakage_abstract = AbstractArray(
+            self.leakages.shape[1:], self.leakages.dtype
+        )
 
-        self._value_base_abstract = AbstractArray(self.values.shape[1:], self.values.dtype)
-        self._value_section_abstract = AbstractArray(self.values.shape[1:], self.values.dtype)
+        self._value_base_abstract = AbstractArray(
+            self.values.shape[1:], self.values.dtype
+        )
+        self._value_section_abstract = AbstractArray(
+            self.values.shape[1:], self.values.dtype
+        )
         self._value_abstract = AbstractArray(self.values.shape[1:], self.values.dtype)
 
-        self.number_of_traces = kwargs.get('number_of_traces', self.number_of_traces_max)
-        self.leakage_section = kwargs.get('leakage_section', None)
-        self.value_section = kwargs.get('value_section', None)
-        self.leakage_processing = kwargs.get('leakage_processing', None)
-        self.value_processing = kwargs.get('value_processing', None)
+        self.number_of_traces = kwargs.get(
+            "number_of_traces", self.number_of_traces_max
+        )
+        self.leakage_section = kwargs.get("leakage_section", None)
+        self.value_section = kwargs.get("value_section", None)
+        self.leakage_processing = kwargs.get("leakage_processing", None)
+        self.value_processing = kwargs.get("value_processing", None)
 
     @property
     def leakage_section(self):
@@ -141,7 +170,9 @@ class Container:
     def leakage_section(self, section):
         self.logger.debug("Setting leakage_section to %s" % section)
         if self.leakage_processing is not None:
-            self.logger.warning("Since leakage_section is being set, leakage_processing is set to None.")
+            self.logger.warning(
+                "Since leakage_section is being set, leakage_processing is set to None."
+            )
             self.leakage_processing = None
 
         if section is None:  # reset leakage_section and leakage_end
@@ -154,8 +185,14 @@ class Container:
                 self._leakage_section_abstract.update(leakage)
                 self._leakage_abstract.update(leakage)
             except:
-                raise TypeError("Cant apply section \"%s\" to leakage of shape/dtype %s/%s" % (
-                    section, self._leakage_base_abstract.shape, self._leakage_base_abstract.dtype))
+                raise TypeError(
+                    'Cant apply section "%s" to leakage of shape/dtype %s/%s'
+                    % (
+                        section,
+                        self._leakage_base_abstract.shape,
+                        self._leakage_base_abstract.dtype,
+                    )
+                )
 
         self._leakage_section = section
 
@@ -168,7 +205,9 @@ class Container:
         :type: function (or callable) taking leakage[leakage_section] as an
             argument
         """
-        return self._leakage_processing if hasattr(self, "_leakage_processing") else None
+        return (
+            self._leakage_processing if hasattr(self, "_leakage_processing") else None
+        )
 
     @leakage_processing.setter
     def leakage_processing(self, processing):
@@ -182,8 +221,14 @@ class Container:
                 leakage = processing(self._leakage_section_abstract.zeros())
                 self._leakage_abstract.update(leakage)
             except:
-                raise TypeError("Cant apply processing \"%s\" to leakage of shape/dtype %s/%s" % (
-                    processing, self._leakage_base_abstract.shape, self._leakage_base_abstract.dtype))
+                raise TypeError(
+                    'Cant apply processing "%s" to leakage of shape/dtype %s/%s'
+                    % (
+                        processing,
+                        self._leakage_base_abstract.shape,
+                        self._leakage_base_abstract.dtype,
+                    )
+                )
 
         self._leakage_processing = processing
 
@@ -217,7 +262,9 @@ class Container:
     def value_section(self, section):
         self.logger.debug("Setting value_section to %s" % section)
         if self.value_processing is not None:
-            self.logger.warning("Since value_section is being set, value_processing is set to None.")
+            self.logger.warning(
+                "Since value_section is being set, value_processing is set to None."
+            )
             self.value_processing = None
 
         if section is None:  # reset value_section and value_end
@@ -230,8 +277,14 @@ class Container:
                 self._value_section_abstract.update(value)
                 self._value_abstract.update(value)
             except:
-                raise TypeError("Cant apply section \"%s\" to value of shape/dtype %s/%s" % (
-                    section, self._value_base_abstract.shape, self._value_base_abstract.dtype))
+                raise TypeError(
+                    'Cant apply section "%s" to value of shape/dtype %s/%s'
+                    % (
+                        section,
+                        self._value_base_abstract.shape,
+                        self._value_base_abstract.dtype,
+                    )
+                )
 
         self._value_section = section
 
@@ -257,8 +310,14 @@ class Container:
                 value = processing(self._value_section_abstract.zeros())
                 self._value_abstract.update(value)
             except:
-                raise TypeError("Cant apply processing \"%s\" to value of shape/dtype %s/%s" % (
-                    processing, self._value_base_abstract.shape, self._value_base_abstract.dtype))
+                raise TypeError(
+                    'Cant apply processing "%s" to value of shape/dtype %s/%s'
+                    % (
+                        processing,
+                        self._value_base_abstract.shape,
+                        self._value_base_abstract.dtype,
+                    )
+                )
 
         self._value_processing = processing
 
@@ -281,6 +340,7 @@ class Container:
 
     def plot_leakage(self, key):
         from lascar.plotting import plot
+
         self.logger.debug("plot_leakage at index %s", key)
 
         plot([self[i].leakage for i in key])
@@ -299,16 +359,19 @@ class Container:
             yield self[i]
 
     def __str__(self):
-        res = 'Container with %d traces. ' % (self.number_of_traces)
-        res += 'leakages: %s, values: %s. ' % (self._leakage_abstract, self._value_abstract)
+        res = "Container with %d traces. " % (self.number_of_traces)
+        res += "leakages: %s, values: %s. " % (
+            self._leakage_abstract,
+            self._value_abstract,
+        )
         if self.leakage_section is not None:
-            res += 'leakage_section set to %s. ' % self.leakage_section
+            res += "leakage_section set to %s. " % self.leakage_section
         if self.leakage_processing is not None:
-            res += 'leakage_processing set to %s. ' % self.leakage_processing
+            res += "leakage_processing set to %s. " % self.leakage_processing
         if self.value_section is not None:
-            res += 'value_section set to %s. ' % self.value_section
+            res += "value_section set to %s. " % self.value_section
         if self.value_processing is not None:
-            res += 'value_processing set to %s. ' % self.value_processing
+            res += "value_processing set to %s. " % self.value_processing
 
         return res
 
@@ -329,10 +392,9 @@ class Container:
         :return: mean/var of the container leakages
         """
         from lascar import Session
+
         session = Session(self).run()
-        return session['mean'].finalize(), session['var'].finalize()
-
-
+        return session["mean"].finalize(), session["var"].finalize()
 
 
 # def to_trace(func):
@@ -344,7 +406,7 @@ class Container:
 
 #         try:
 #             return Trace(result)
-#         except:        
+#         except:
 #             raise TypeError("the output must be a 2-uple of numpy array: leakage,value.")
 #         return result
 #     return wrapper
@@ -363,13 +425,14 @@ class AbstractContainer(Container):
         self.logger = logging.getLogger(__name__)
 
         trace = self.generate_trace(0)
-        self.leakages = AbstractArray((number_of_traces,) + trace.leakage.shape, trace.leakage.dtype)
-        self.values = AbstractArray((number_of_traces,) + trace.value.shape, trace.value.dtype)
+        self.leakages = AbstractArray(
+            (number_of_traces,) + trace.leakage.shape, trace.leakage.dtype
+        )
+        self.values = AbstractArray(
+            (number_of_traces,) + trace.value.shape, trace.value.dtype
+        )
 
         Container.__init__(self, **kwargs)
-    
-
-
 
     def generate_trace(self, idx):
         """
@@ -387,16 +450,23 @@ class AbstractContainer(Container):
         """
         Generates a trace_batch of specified indexes
         """
-        leakages = np.empty((idx_end - idx_begin,) + self._leakage_abstract.shape, self._leakage_abstract.dtype)
-        values = np.empty((idx_end - idx_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
+        leakages = np.empty(
+            (idx_end - idx_begin,) + self._leakage_abstract.shape,
+            self._leakage_abstract.dtype,
+        )
+        values = np.empty(
+            (idx_end - idx_begin,) + self._value_abstract.shape,
+            self._value_abstract.dtype,
+        )
 
         for i, j in enumerate(range(idx_begin, idx_end)):
             leakage, value = self.generate_trace(j)
-            leakages[i] = self.apply_both_leakage(leakage.reshape((1,) + leakage.shape))[0]
+            leakages[i] = self.apply_both_leakage(
+                leakage.reshape((1,) + leakage.shape)
+            )[0]
             values[i] = self.apply_both_value(value.reshape((1,) + value.shape))[0]
 
         return TraceBatchContainer(leakages, values)
-
 
     def __getitem__(self, key):
         """
@@ -413,34 +483,53 @@ class AbstractContainer(Container):
         elif isinstance(key, slice):
             # check contiguity:
             if key.step is not None and key.step > 1:
-                raise ValueError("AbstractContainer __getitem__ slice elements must be contiguous")
+                raise ValueError(
+                    "AbstractContainer __getitem__ slice elements must be contiguous"
+                )
             offset_begin = key.start if key.start else 0
             offset_end = key.stop if key.stop else self.number_of_traces
 
         elif isinstance(key, list):
             # check contiguity:
             if np.any(np.diff(np.array(key)) != 1):
-                raise ValueError("AbstractContainer __getitem__ list elements must be contiguous")
+                raise ValueError(
+                    "AbstractContainer __getitem__ list elements must be contiguous"
+                )
             offset_begin = key[0]
             offset_end = key[-1]
         else:
-            raise ValueError("AbstractContainer __getitem__ only accepts int, list and slices (contiguous)")
+            raise ValueError(
+                "AbstractContainer __getitem__ only accepts int, list and slices (contiguous)"
+            )
 
-        if offset_begin < 0 or offset_end <= offset_begin or offset_end > self.number_of_traces:
-            raise ValueError("get_batch must have 0 <= offset_begin < offset_end must <= %d. Got (%d, %d)" % (
-                self.number_of_traces, offset_begin, offset_end))
+        if (
+            offset_begin < 0
+            or offset_end <= offset_begin
+            or offset_end > self.number_of_traces
+        ):
+            raise ValueError(
+                "get_batch must have 0 <= offset_begin < offset_end must <= %d. Got (%d, %d)"
+                % (self.number_of_traces, offset_begin, offset_end)
+            )
 
-
-        leakages = np.empty((offset_end - offset_begin,) + self._leakage_abstract.shape, self._leakage_abstract.dtype)
-        values = np.empty((offset_end - offset_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
+        leakages = np.empty(
+            (offset_end - offset_begin,) + self._leakage_abstract.shape,
+            self._leakage_abstract.dtype,
+        )
+        values = np.empty(
+            (offset_end - offset_begin,) + self._value_abstract.shape,
+            self._value_abstract.dtype,
+        )
 
         try:
 
-            trace_batch = self.generate_trace_batch(offset_begin,offset_end)
+            trace_batch = self.generate_trace_batch(offset_begin, offset_end)
 
             for i, j in enumerate(range(offset_begin, offset_end)):
-                leakages[i] = self.apply_both_leakage(trace_batch.leakages[i:i+1])[0]
-                values[i] = self.apply_both_value(trace_batch.values[i:i+1])[0]
+                leakages[i] = self.apply_both_leakage(trace_batch.leakages[i : i + 1])[
+                    0
+                ]
+                values[i] = self.apply_both_value(trace_batch.values[i : i + 1])[0]
             return TraceBatchContainer(leakages, values)
 
         except:
@@ -448,19 +537,20 @@ class AbstractContainer(Container):
 
         for i, j in enumerate(range(offset_begin, offset_end)):
             leakage, value = self.generate_trace(j)
-            leakages[i] = self.apply_both_leakage(leakage.reshape((1,) + leakage.shape))[0]
+            leakages[i] = self.apply_both_leakage(
+                leakage.reshape((1,) + leakage.shape)
+            )[0]
             values[i] = self.apply_both_value(value.reshape((1,) + value.shape))[0]
 
         return TraceBatchContainer(leakages, values)
 
 
 class TraceBatchContainer(Container):
-
     def __init__(self, *args, **kwargs):
 
         if len(args) == 2:
-            self.leakages = args[0] if not kwargs.get('copy', 0) else np.copy(args[0])
-            self.values = args[1] if not kwargs.get('copy', 0) else np.copy(args[1])
+            self.leakages = args[0] if not kwargs.get("copy", 0) else np.copy(args[0])
+            self.values = args[1] if not kwargs.get("copy", 0) else np.copy(args[1])
 
         Container.__init__(self, **kwargs)
 
@@ -474,8 +564,8 @@ class TraceBatchContainer(Container):
         self.logger.debug("__getitem__ with key %s %s" % (str(key), type(key)))
 
         if isinstance(key, (int, np.int64)):
-            leakage = self.apply_both_leakage(self.leakages[key:key + 1])[0]
-            value = self.apply_both_value(self.values[key:key + 1])[0]
+            leakage = self.apply_both_leakage(self.leakages[key : key + 1])[0]
+            value = self.apply_both_value(self.values[key : key + 1])[0]
             return Trace(leakage, value)
 
         else:
@@ -500,7 +590,7 @@ class TraceBatchContainer(Container):
         """
         self.logger.debug("save TraceBatch to  %s" % filename)
 
-        with open(filename, 'wb') as f:
+        with open(filename, "wb") as f:
             np.savez(f, leakages=self.leakages, values=self.values)
 
     @staticmethod
@@ -512,31 +602,39 @@ class TraceBatchContainer(Container):
         :return:
         """
         tmp = np.load(filename)
-        return TraceBatchContainer(tmp['leakages'], tmp['values'])
+        return TraceBatchContainer(tmp["leakages"], tmp["values"])
 
     pass
 
     def __add__(self, other):
         if isinstance(other, Trace):
             return TraceBatchContainer(
-                np.vstack([self.leakages, other.leakage]) if len(self.leakages.shape) > 1 else np.hstack(
-                    [self.leakages, other.leakage]),
-                np.vstack([self.values, other.value]) if len(self.values.shape) > 1 else np.hstack(
-                    [self.values, other.value]))
+                np.vstack([self.leakages, other.leakage])
+                if len(self.leakages.shape) > 1
+                else np.hstack([self.leakages, other.leakage]),
+                np.vstack([self.values, other.value])
+                if len(self.values.shape) > 1
+                else np.hstack([self.values, other.value]),
+            )
 
         if isinstance(other, TraceBatchContainer):
             return TraceBatchContainer(
-                np.vstack([self.leakages, other.leakages]) if len(self.leakages.shape) > 1 else np.hstack(
-                    [self.leakages, other.leakages]),
-                np.vstack([self.values, other.values]) if len(self.values.shape) > 1 else np.hstack(
-                    [self.values, other.values]))
+                np.vstack([self.leakages, other.leakages])
+                if len(self.leakages.shape) > 1
+                else np.hstack([self.leakages, other.leakages]),
+                np.vstack([self.values, other.values])
+                if len(self.values.shape) > 1
+                else np.hstack([self.values, other.values]),
+            )
 
     def __eq__(self, other):
         if not isinstance(other, TraceBatchContainer):
             return Container.__eq__(self, other)
         if len(self) != len(other):
             return False
-        return np.all(self.leakages == other.leakages) and np.all(self.values == other.values)
+        return np.all(self.leakages == other.leakages) and np.all(
+            self.values == other.values
+        )
 
     def get_leakage_mean_var(self):
         """
@@ -549,7 +647,7 @@ class TraceBatchContainer(Container):
 
         except:
             return Container.get_leakage_mean_var()
-    
+
     @staticmethod
     def export(container):
         return container[:]
@@ -579,8 +677,7 @@ class AbstractArray:
         return np.zeros(self.shape, self.dtype)
 
     def __str__(self):
-        return '[%s, %s]' % (self.shape, self.dtype)
-
+        return "[%s, %s]" % (self.shape, self.dtype)
 
 
 class AcquisitionFromGetters(AbstractContainer):
@@ -596,34 +693,36 @@ class AcquisitionFromGetters(AbstractContainer):
     - implement a .get() method which returns leakage or value
 
     """
-    
-    def __init__(self, number_of_traces, value_getter, leakage_getter,**kargs):
+
+    def __init__(self, number_of_traces, value_getter, leakage_getter, **kargs):
 
         self.value_getter = value_getter
         self.leakage_getter = leakage_getter
-    
-        if hasattr(value_getter, "__iter__"):
-            self.get_value = lambda : next(self.value_getter)
-        elif hasattr(value_getter, "get"):
-            self.get_value = lambda : self.value_getter.get()
-        else:
-            raise ValueError("value_getter must either be an iterator/generator OR implement a get method")
-        
-        if hasattr(leakage_getter, "__iter__"):
-            self.get_value = lambda : next(self.leakage_getter)
-        elif hasattr(leakage_getter, "get"):
-            self.get_leakage = lambda : self.leakage_getter.get()
-        else:
-            raise ValueError("leakage_getter must either be an iterator/generator OR implement a get method")
-        
-        AbstractContainer.__init__(self, number_of_traces, **kargs)
-        self.logger.info('Creating AcquisitionFromGenerators.')
 
-    def generate_trace(self,idx):
-        self.logger.debug('Generate trace %d.'%(idx))
+        if hasattr(value_getter, "__iter__"):
+            self.get_value = lambda: next(self.value_getter)
+        elif hasattr(value_getter, "get"):
+            self.get_value = lambda: self.value_getter.get()
+        else:
+            raise ValueError(
+                "value_getter must either be an iterator/generator OR implement a get method"
+            )
+
+        if hasattr(leakage_getter, "__iter__"):
+            self.get_value = lambda: next(self.leakage_getter)
+        elif hasattr(leakage_getter, "get"):
+            self.get_leakage = lambda: self.leakage_getter.get()
+        else:
+            raise ValueError(
+                "leakage_getter must either be an iterator/generator OR implement a get method"
+            )
+
+        AbstractContainer.__init__(self, number_of_traces, **kargs)
+        self.logger.info("Creating AcquisitionFromGenerators.")
+
+    def generate_trace(self, idx):
+        self.logger.debug("Generate trace %d." % (idx))
         value = self.get_value()
         leakage = self.get_leakage()
 
         return Trace(leakage, value)
-
-

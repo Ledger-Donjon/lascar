@@ -39,12 +39,15 @@ class NpyContainer(Container):
 
         """
 
-        self.leakages = np.lib.format.open_memmap(leakages_filename,'r+')
-        self.values = np.lib.format.open_memmap(values_filename,'r+')
+        self.leakages = np.lib.format.open_memmap(leakages_filename, "r+")
+        self.values = np.lib.format.open_memmap(values_filename, "r+")
 
         Container.__init__(self, **kwargs)
 
-        self.logger.debug('Creating NpyContainer from files %s / %s.'%(leakages_filename, values_filename) )
+        self.logger.debug(
+            "Creating NpyContainer from files %s / %s."
+            % (leakages_filename, values_filename)
+        )
 
     def __getitem__(self, key):
         return TraceBatchContainer.__getitem__(self, key)
@@ -52,20 +55,41 @@ class NpyContainer(Container):
     def __setitem__(self, key, value):
         TraceBatchContainer.__setitem__(self, key, value)
 
-
-    def _void_container(leakages_filename, values_filename, number_of_traces, leakage_shape, leakage_dtype, value_shape, value_dtype,
-                        leakages_dataset_name="leakages", values_dataset_name="values", **kwargs):
+    def _void_container(
+        leakages_filename,
+        values_filename,
+        number_of_traces,
+        leakage_shape,
+        leakage_dtype,
+        value_shape,
+        value_dtype,
+        leakages_dataset_name="leakages",
+        values_dataset_name="values",
+        **kwargs
+    ):
         """
 
         """
 
-        leakages = np.lib.format.open_memmap(leakages_filename,"w+",shape=(number_of_traces,) + leakage_shape, dtype=leakage_dtype)
-        values = np.lib.format.open_memmap(values_filename,"w+",shape=(number_of_traces,) + value_shape, dtype=value_dtype)
+        leakages = np.lib.format.open_memmap(
+            leakages_filename,
+            "w+",
+            shape=(number_of_traces,) + leakage_shape,
+            dtype=leakage_dtype,
+        )
+        values = np.lib.format.open_memmap(
+            values_filename,
+            "w+",
+            shape=(number_of_traces,) + value_shape,
+            dtype=value_dtype,
+        )
 
         return NpyContainer(leakages_filename, values_filename, **kwargs)
 
     @staticmethod
-    def export(container, leakages_filename, values_filename, name=None, batch_size=100):
+    def export(
+        container, leakages_filename, values_filename, name=None, batch_size=100
+    ):
         """
         export method is used to export an existing container into an NpyContainer.
 
@@ -81,13 +105,24 @@ class NpyContainer(Container):
         """
 
         leakage, value = container[0]
-        out = NpyContainer._void_container(leakages_filename, values_filename, container.number_of_traces, leakage.shape, leakage.dtype,
-                                           value.shape, value.dtype)
+        out = NpyContainer._void_container(
+            leakages_filename,
+            values_filename,
+            container.number_of_traces,
+            leakage.shape,
+            leakage.dtype,
+            value.shape,
+            value.dtype,
+        )
 
         from lascar import Session
         from lascar.engine import ContainerDumpEngine
 
-        session = Session(container, engine=ContainerDumpEngine(out), name=name if name else 'NpyContainer')
+        session = Session(
+            container,
+            engine=ContainerDumpEngine(out),
+            name=name if name else "NpyContainer",
+        )
         session.run(batch_size)
 
         return out
@@ -103,4 +138,3 @@ class NpyContainer(Container):
 
         except:
             return Container.get_leakage_mean_var()
-

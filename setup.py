@@ -29,19 +29,29 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-setup(name='lascar',
-      version='1.1',
-      description="Ledger's Advanced Side-Channel Analysis Repository - Toolsuite for side-channel acquisition, container and analysis by Ledger.",
-      long_description=long_description,
-      long_description_content_type="text/markdown",
-      url="https://github.com/Ledger-Donjon/lascar",      
-      author='Charles Guillemet, Manuel San Pedro, Victor Servant',
-      author_email='charles@ledger.fr, manuel.sanpedro@ledger.fr, victor.servant@ledger.fr',
-      install_requires=['numpy', 'h5py', 'matplotlib', 'vispy', 'sklearn', 'scipy', 'keras','progressbar2','pytest', 'numba'],  ## PyQt5 is here as a backend for vispy, this might change in the future
-      packages=find_packages(),
-      setup_requires=["pytest-runner", ],
-      tests_require=["pytest"],
-      entry_points = {
-                       'console_scripts': ['lascarctl=scripts.lascarctl:main'],
-    }
-      )
+setup(
+    name="lascar",
+    version="1.1",
+    description="Ledger's Advanced Side-Channel Analysis Repository - Toolsuite for side-channel acquisition, container and analysis by Ledger.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/Ledger-Donjon/lascar",
+    author="Charles Guillemet, Manuel San Pedro, Victor Servant",
+    author_email="charles@ledger.fr, manuel.sanpedro@ledger.fr, victor.servant@ledger.fr",
+    install_requires=[
+        "numpy",
+        "h5py",
+        "matplotlib",
+        "vispy",
+        "sklearn",
+        "scipy",
+        "keras",
+        "progressbar2",
+        "pytest",
+        "numba",
+    ],  ## PyQt5 is here as a backend for vispy, this might change in the future
+    packages=find_packages(),
+    setup_requires=["pytest-runner",],
+    tests_require=["pytest"],
+    entry_points={"console_scripts": ["lascarctl=scripts.lascarctl:main"],},
+)

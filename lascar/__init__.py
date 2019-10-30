@@ -32,15 +32,17 @@ logger.addHandler(console_handler)
 # Handle runtime warnings with a user-controlled behaviour
 import numpy as np
 
+
 def error_handler(error_type, flag):
     print("{} (flag: {}) encountered.".format(error_type, flag))
-    if input("Abort (q) or ignore for this session (press enter) ?")=='q':
+    if input("Abort (q) or ignore for this session (press enter) ?") == "q":
         raise Exception("Abort.")
     else:
-        np.seterr(divide='warn')
+        np.seterr(divide="warn")
         np.seterrcall(error_handler)
 
-np.seterr(divide='call')
+
+np.seterr(divide="call")
 np.seterrcall(error_handler)
 
 # Write logs to a rotating logfile

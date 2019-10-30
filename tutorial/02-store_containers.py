@@ -18,8 +18,13 @@ If you want to use your own trace format with lascar, you would just have to imp
 """
 from lascar import TraceBatchContainer, Hdf5Container
 import numpy as np
-leakages = np.random.rand(10, 100)  # 10 fake side-channel leakages, each one with 10 time samples: as a np.ndarray
-values = np.random.randint(0, 256, (10, 16,))  # the 10 values associated, each one of as 16 uint8: as a np.ndarray
+
+leakages = np.random.rand(
+    10, 100
+)  # 10 fake side-channel leakages, each one with 10 time samples: as a np.ndarray
+values = np.random.randint(
+    0, 256, (10, 16,)
+)  # the 10 values associated, each one of as 16 uint8: as a np.ndarray
 
 trace_batch_container = TraceBatchContainer(leakages, values)
 
@@ -35,6 +40,5 @@ hdf5_container = Hdf5Container.export(trace_batch_container, "tmp.h5")
 Since Hdf5Container is a Container, it implements all the features seen before.
 We can check that the traces returned by both trace_batch_container and hdf5_container are the same:
 """
-for i in range( len(trace_batch_container)):
+for i in range(len(trace_batch_container)):
     assert trace_batch_container[i] == hdf5_container[i]
-

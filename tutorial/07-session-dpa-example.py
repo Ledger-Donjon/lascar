@@ -10,8 +10,9 @@ For that, we will build a DpaEngine, and register it to a Session.
 
 """
 
-#First the Container:
+# First the Container:
 from lascar import BasicAesSimulationContainer
+
 container = BasicAesSimulationContainer(500, noise=1)
 
 
@@ -29,22 +30,27 @@ In this example, we will focus on the LSB bit of the 3rd AES sbox. This value is
 """
 
 from lascar.tools.aes import sbox
-def selection_function(value,guess):
-    return sbox[ value['plaintext'][3] ^ guess] & 1
+
+
+def selection_function(value, guess):
+    return sbox[value["plaintext"][3] ^ guess] & 1
+
 
 guess_range = range(256)
 
 
 from lascar import DpaEngine
-dpa_engine = DpaEngine('dpa', selection_function, guess_range)
+
+dpa_engine = DpaEngine("dpa", selection_function, guess_range)
 
 
 # We can now create a Session, register the dpa_lsb_engine, and run it.
 from lascar import Session
+
 session = Session(container, engine=dpa_engine)
 # session.add_engine( dpa_lsb_engine) # the engine can be added after the session creation
 
-session.run(batch_size=100) # the session will load traces by batches of 100 traces
+session.run(batch_size=100)  # the session will load traces by batches of 100 traces
 
 """
 Now, to get the result, one solution could be to request the dpa_lsb_engine.finalize() method.
@@ -56,8 +62,9 @@ For more option about how to manage results of sca, please follow the next step 
 results = dpa_engine.finalize()
 
 print(results.shape)
-print("Best Guess is %02X."% results.max(1).argmax())
+print("Best Guess is %02X." % results.max(1).argmax())
 
 import matplotlib.pyplot as plt
-_=plt.plot( results.T)
-_=plt.show()
+
+_ = plt.plot(results.T)
+_ = plt.show()

@@ -40,19 +40,19 @@ class FilteredContainer(AbstractContainer):
         self.container = container
         self.traces_indexes = []
 
-        if hasattr(filtering, '__call__'):
+        if hasattr(filtering, "__call__"):
             for i, trace in enumerate(container):
                 if filtering(trace):
                     self.traces_indexes.append(i)
 
-        elif hasattr(filtering, '__iter__') and hasattr(filtering, '__len__'):
+        elif hasattr(filtering, "__iter__") and hasattr(filtering, "__len__"):
             self.traces_indexes = filtering
 
         else:
             raise ValueError("filtering must be either a callable, or an iterable")
 
         AbstractContainer.__init__(self, len(self.traces_indexes), **kwargs)
-        self.logger.debug('Creating FilteredContainer.')
+        self.logger.debug("Creating FilteredContainer.")
 
     def generate_trace(self, idx):
         """
@@ -72,7 +72,9 @@ class RandomizedContainer(FilteredContainer):
     """
 
     def __init__(self, container, **kwargs):
-        FilteredContainer.__init__(self, container, np.random.permutation(container.number_of_traces), **kwargs)
+        FilteredContainer.__init__(
+            self, container, np.random.permutation(container.number_of_traces), **kwargs
+        )
 
 
 def split_container(container, random=True, **kwargs):
@@ -91,19 +93,23 @@ def split_container(container, random=True, **kwargs):
     number_of_splits = kwargs.pop("number_of_splits", 0)
     size_of_splits = kwargs.pop("size_of_splits", 0)
 
-    if (not number_of_splits and not size_of_splits) or (number_of_splits and size_of_splits):
-        raise ValueError("split_container needs as kwargs EITHER number_of_splits OR size_of_splits")
+    if (not number_of_splits and not size_of_splits) or (
+        number_of_splits and size_of_splits
+    ):
+        raise ValueError(
+            "split_container needs as kwargs EITHER number_of_splits OR size_of_splits"
+        )
 
     if number_of_splits:
         m = number_of_splits
-        offsets = np.split(indexes[:n - (n % m)], m)
+        offsets = np.split(indexes[: n - (n % m)], m)
         if n % m:
-            offsets[-1] = np.append(offsets[-1], indexes[n - (n % m):])
+            offsets[-1] = np.append(offsets[-1], indexes[n - (n % m) :])
 
     if size_of_splits:
         m = size_of_splits
-        offsets = [indexes[m * i:m * (i + 1)] for i in range(n // m)]
+        offsets = [indexes[m * i : m * (i + 1)] for i in range(n // m)]
         if n % m:
-            offsets[-1] = np.append(offsets[-1], indexes[n - (n % m):])
+            offsets[-1] = np.append(offsets[-1], indexes[n - (n % m) :])
 
     return [FilteredContainer(container, indexes, **kwargs) for indexes in offsets]

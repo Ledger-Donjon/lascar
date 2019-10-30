@@ -50,9 +50,13 @@ class OutputMethod:
         if self.engines is ():
             self.engines = list(engine._session.engines)
 
-        if not (engine in self.engines or engine.name in self.engines or len(self.engines) == 0):
+        if not (
+            engine in self.engines
+            or engine.name in self.engines
+            or len(self.engines) == 0
+        ):
             return
-        self.logger.debug('Update engine %s', engine.name)
+        self.logger.debug("Update engine %s", engine.name)
         self._update(engine, results)
 
     def finalize(self):
@@ -60,17 +64,19 @@ class OutputMethod:
         At the end of the Session processing side-channel traces, the OutputMethod finalize() method is called to conclude the ouput strategy
         :return:
         """
-        self.logger.debug('Finalize.')
+        self.logger.debug("Finalize.")
         return self._finalize()
 
-
-    def _update(self,engine,results):
+    def _update(self, engine, results):
         pass
+
     def _finalize(self):
         pass
 
+
 class NullOutputMethod(OutputMethod):
     pass
+
 
 class MultipleOutputMethod(OutputMethod):
     """

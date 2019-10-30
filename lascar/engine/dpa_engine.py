@@ -47,17 +47,28 @@ class DpaEngine(GuessEngine):
         """
         GuessEngine.__init__(self, name, selection_function, guess_range, solution)
         self.output_parser_mode = "max"
-        self.logger.debug('Creating DpaEngine \"%s\" with %d guesses.', name, len(guess_range))
+        self.logger.debug(
+            'Creating DpaEngine "%s" with %d guesses.', name, len(guess_range)
+        )
 
     def _initialize(self):
-        self._acc_x = np.zeros((self._number_of_guesses, 2,) + self._session.leakage_shape, np.double)
+        self._acc_x = np.zeros(
+            (self._number_of_guesses, 2,) + self._session.leakage_shape, np.double
+        )
         self._count_x = np.zeros((self._number_of_guesses, 2,), np.double)
 
     def _update(self, batch):
-        y = np.array([[self._function(d, guess) for guess in self._guess_range] for d in batch.values])
+        y = np.array(
+            [
+                [self._function(d, guess) for guess in self._guess_range]
+                for d in batch.values
+            ]
+        )
 
         for i in range(len(batch)):
-            y = np.array([self._function(batch.values[i], guess) for guess in self._guess_range])
+            y = np.array(
+                [self._function(batch.values[i], guess) for guess in self._guess_range]
+            )
 
             idx_0 = np.where(y == 0)[0]
             idx_1 = np.where(y == 1)[0]
@@ -72,5 +83,13 @@ class DpaEngine(GuessEngine):
         """
         for each guess, returns the square of difference of the means of the two classes
         """
-        return np.nan_to_num([((self._acc_x[guess, 1] / self._count_x[guess, 1]) - (
-                self._acc_x[guess, 0] / self._count_x[guess, 0])) ** 2 for guess in self._guess_range])
+        return np.nan_to_num(
+            [
+                (
+                    (self._acc_x[guess, 1] / self._count_x[guess, 1])
+                    - (self._acc_x[guess, 0] / self._count_x[guess, 0])
+                )
+                ** 2
+                for guess in self._guess_range
+            ]
+        )

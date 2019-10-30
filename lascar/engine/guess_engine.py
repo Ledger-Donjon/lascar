@@ -53,17 +53,22 @@ class GuessEngine(Engine):
             try:
                 from numba import jit, uint32
             except Exception:
-                raise Exception("Cannot jit without Numba. Please install Numba or consider turning off the jit option")
+                raise Exception(
+                    "Cannot jit without Numba. Please install Numba or consider turning off the jit option"
+                )
 
             try:
                 f = jit(nopython=True)(self._function)
             except Exception:
                 raise Exception(
-                    "Numba could not jit this guess function. If it contains an assignment such as `value['your_string']`, Numba most likely cannot resolve it. Use the 'value_section' field of your container instead and set it to 'your_string'.")
+                    "Numba could not jit this guess function. If it contains an assignment such as `value['your_string']`, Numba most likely cannot resolve it. Use the 'value_section' field of your container instead and set it to 'your_string'."
+                )
 
             @jit(nopython=True)
             def hf(guessrange, batchvalues):
-                out = np.zeros((batchvalues.shape[0], guessrange.shape[0]), dtype=np.uint32)
+                out = np.zeros(
+                    (batchvalues.shape[0], guessrange.shape[0]), dtype=np.uint32
+                )
                 for d in np.arange(batchvalues.shape[0]):
                     for guess in np.arange(guessrange.shape[0]):
                         out[d, guess] = f(batchvalues[d], guessrange[guess])
@@ -73,4 +78,6 @@ class GuessEngine(Engine):
             self._guess_range = np.array(guess_range, dtype=np.uint32)
 
     def _mapfunction(self, guess_range, batch):
-        return np.array([[self._function(d, guess) for guess in guess_range] for d in batch])
+        return np.array(
+            [[self._function(d, guess) for guess in guess_range] for d in batch]
+        )

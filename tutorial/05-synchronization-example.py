@@ -10,14 +10,15 @@ We will then design a Synchronization method, which will consist in a leakage_pr
 
 """
 
-from lascar import AbstractContainer,Trace
+from lascar import AbstractContainer, Trace
 import numpy as np
 
 """
 First the SimulatedContainer, on which we will set up the synchronization:
 """
-class SimulatedContainer(AbstractContainer):
 
+
+class SimulatedContainer(AbstractContainer):
     def generate_trace(self, idx):
         """
         our leakage will consist in 100 time samples, with a peak randomly inserted.
@@ -25,14 +26,19 @@ class SimulatedContainer(AbstractContainer):
         """
 
         leakage = np.random.rand(100)
-        random_offset = np.random.randint(20, 80) #the offset where the peak will be inserted
-        leakage[random_offset: random_offset+11] += np.hanning(11) * 4
+        random_offset = np.random.randint(
+            20, 80
+        )  # the offset where the peak will be inserted
+        leakage[random_offset : random_offset + 11] += np.hanning(11) * 4
 
-        value = np.zeros(()) # the value wont be used in here...
+        value = np.zeros(())  # the value wont be used in here...
 
-        return Trace( leakage, value)
+        return Trace(leakage, value)
 
-simulated_container = SimulatedContainer(100) # 100 is the number of traces for the SimulatedContainer, needed by the AbstractContainer constructor.
+
+simulated_container = SimulatedContainer(
+    100
+)  # 100 is the number of traces for the SimulatedContainer, needed by the AbstractContainer constructor.
 
 
 # We can use the plot_leakge() method to display the first traces, and note that the leakages are not stackable, as expected
@@ -53,6 +59,7 @@ but the soundness of the synchronization is not the point here)
 
 """
 
+
 class Synchronization:
     def __init__(self, leakage_ref):
         self.ref_peak_offset = leakage_ref.argmax()
@@ -63,14 +70,14 @@ class Synchronization:
         """
         peak_offset = leakage.argmax()
 
-        return np.roll(leakage, self.ref_peak_offset-peak_offset )
+        return np.roll(leakage, self.ref_peak_offset - peak_offset)
 
 
 # Now we can instatiate a Synchronisation, using the leakage of the first trace as a reference:
 ref_leakage = simulated_container[0].leakage
-synchronization = Synchronization( ref_leakage)
+synchronization = Synchronization(ref_leakage)
 
-#As seen in the first tutorial, we just have to set the simulated_container leakage_processing attribute:
+# As seen in the first tutorial, we just have to set the simulated_container leakage_processing attribute:
 simulated_container.leakage_processing = synchronization
 
 
@@ -79,6 +86,5 @@ simulated_container.plot_leakage(range(3))
 
 # Dont forget that you always have the possibility to store your synchronized traces:
 from lascar import Hdf5Container
+
 hdf5_container = Hdf5Container.export(simulated_container, "tmp.h5")
-
-

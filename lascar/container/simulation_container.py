@@ -32,15 +32,22 @@ from .container import AbstractContainer, Trace
 DEFAULT_KEY = [i for i in range(16)]
 
 
-
-
 class BasicAesSimulationContainer(AbstractContainer):
     """
     BascAesSimulationContainer is an AbstractContainer used to naively
     simulate traces during the first Subbyte of the first round of an AES.
     """
 
-    def __init__(self,number_of_traces,noise=1,key=DEFAULT_KEY,seed=1337,leakage_model='default',additional_time_samples=10,**kwargs):
+    def __init__(
+        self,
+        number_of_traces,
+        noise=1,
+        key=DEFAULT_KEY,
+        seed=1337,
+        leakage_model="default",
+        additional_time_samples=10,
+        **kwargs
+    ):
         """
         Basic constructor:
 
@@ -54,24 +61,24 @@ class BasicAesSimulationContainer(AbstractContainer):
 
         if leakage_model == "default":
             leakage_model = HammingPrecomputedModel()
-            
+
         self.seed = seed
         self.noise = noise
 
         self.leakage_model = leakage_model
         self.additional_time_samples = additional_time_samples
 
-        self.value_dtype = np.dtype([('plaintext', np.uint8, (16,)),
-                                     ('key', np.uint8, (16,)),
-                                     ])
+        self.value_dtype = np.dtype(
+            [("plaintext", np.uint8, (16,)), ("key", np.uint8, (16,)),]
+        )
 
         self.key = key
 
         AbstractContainer.__init__(self, number_of_traces, **kwargs)
 
-        self.logger.debug('Creating BasicAesSimulationContainer.')
-        self.logger.debug('Noise set to %f, seed set to %d.', self.noise, self.seed)
-        self.logger.debug('Key set to %s', str(key))
+        self.logger.debug("Creating BasicAesSimulationContainer.")
+        self.logger.debug("Noise set to %f, seed set to %d.", self.noise, self.seed)
+        self.logger.debug("Key set to %s", str(key))
 
     def generate_trace(self, idx):
         np.random.seed(seed=self.seed ^ idx)  # for reproducibility
@@ -81,7 +88,12 @@ class BasicAesSimulationContainer(AbstractContainer):
         value["key"] = self.key
 
         leakage = np.random.normal(0, self.noise, (16 + self.additional_time_samples,))
-        leakage[:16] += np.array([self.leakage_model(sbox[value['plaintext'][i] ^ value['key'][i]]) for i in range(16)])
+        leakage[:16] += np.array(
+            [
+                self.leakage_model(sbox[value["plaintext"][i] ^ value["key"][i]])
+                for i in range(16)
+            ]
+        )
         return Trace(leakage, value)
 
 
@@ -89,7 +101,17 @@ class AesSimulationContainer(AbstractContainer):
     """
     aes
     """
-    def __init__(self,number_of_traces,noise=1,key=DEFAULT_KEY,seed=1337,leakage_model='default',additional_time_samples=10,**kwargs):
+
+    def __init__(
+        self,
+        number_of_traces,
+        noise=1,
+        key=DEFAULT_KEY,
+        seed=1337,
+        leakage_model="default",
+        additional_time_samples=10,
+        **kwargs
+    ):
         """
         Basic constructor:
 
@@ -110,18 +132,21 @@ class AesSimulationContainer(AbstractContainer):
         self.leakage_model = leakage_model
         self.additional_time_samples = additional_time_samples
 
-        self.value_dtype = np.dtype([('plaintext', np.uint8, (16,)),
-                                     ('key', np.uint8, (len(key),)),
-                                     ('ciphertext', np.uint8, (16,))
-                                     ])
+        self.value_dtype = np.dtype(
+            [
+                ("plaintext", np.uint8, (16,)),
+                ("key", np.uint8, (len(key),)),
+                ("ciphertext", np.uint8, (16,)),
+            ]
+        )
 
         self.key = key
 
         AbstractContainer.__init__(self, number_of_traces, **kwargs)
 
-        self.logger.debug('Creating AesSimulationContainer.')
-        self.logger.debug('Noise set to %f, seed set to %d.', self.noise, self.seed)
-        self.logger.debug('Key set to %s', str(key))
+        self.logger.debug("Creating AesSimulationContainer.")
+        self.logger.debug("Noise set to %f, seed set to %d.", self.noise, self.seed)
+        self.logger.debug("Key set to %s", str(key))
 
     def generate_trace(self, idx):
         np.random.seed(seed=self.seed ^ idx)  # for reproducibility
@@ -130,13 +155,12 @@ class AesSimulationContainer(AbstractContainer):
         value["plaintext"] = np.random.randint(0, 256, (16,), np.uint8)
         value["key"] = self.key
 
-        leakage = Aes.encrypt_keep_iv(value['plaintext'], value['key'])
+        leakage = Aes.encrypt_keep_iv(value["plaintext"], value["key"])
 
         value["ciphertext"] = leakage[-16:]
         leakage += np.random.normal(0, self.noise, (len(leakage),))
 
         return Trace(leakage, value)
-
 
 
 #
@@ -159,5 +183,3 @@ class AesSimulationContainer(AbstractContainer):
 #
 #     def generate_trace(self, idx):
 #         return self._function(idx)
-
-

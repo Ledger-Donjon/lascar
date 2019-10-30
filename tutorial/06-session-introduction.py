@@ -15,8 +15,9 @@ In this script we will look at the basic functionalities of the Session class.
 
 """
 
-#First we need a Conainer, let's use BasicAesSimulationContainer. Say with 10000 traces, and the noise set to 1.
+# First we need a Conainer, let's use BasicAesSimulationContainer. Say with 10000 traces, and the noise set to 1.
 from lascar import BasicAesSimulationContainer
+
 container = BasicAesSimulationContainer(10000, noise=1)
 
 
@@ -25,6 +26,7 @@ The only required argument for a Session is the Container it works on.
 (Other optional keywords argument will be presented later)
 """
 from lascar import Session
+
 session = Session(container)
 
 
@@ -51,16 +53,18 @@ By default, a Session only registers MeanEngine and VarEngine.
 The Mean/Variance of the leakage is the only thing computed in that very case:
 """
 
-print(session.engines) # engines is a dict of all the engines registered by the Session, with key equal to the name given
+print(
+    session.engines
+)  # engines is a dict of all the engines registered by the Session, with key equal to the name given
 
 session.run()
 
 
 # Now that the engines has been fed with all the traces, we can access their results through their finalize() method:
 mean = session.engines["mean"].finalize()
-mean = session.engines["mean"].finalize() # shortcut
+mean = session.engines["mean"].finalize()  # shortcut
 
-variance = session['var'].finalize()
+variance = session["var"].finalize()
 
 print("mean=", mean)
 print("variance=", variance)

@@ -44,7 +44,9 @@ class SnrEngine(PartitionerEngine):
         :param partition_range: possible values for the partitioning.
         """
         PartitionerEngine.__init__(self, name, partition_function, partition_range, 2)
-        self.logger.debug('Creating SnrEngine  \"%s\" with %d classes.' % (name, len(partition_range)))
+        self.logger.debug(
+            'Creating SnrEngine  "%s" with %d classes.' % (name, len(partition_range))
+        )
 
     def _finalize(self):
 
@@ -58,12 +60,17 @@ class SnrEngine(PartitionerEngine):
             if not self._partition_count[i]:
                 continue
 
-            acc += (self._acc_x_by_partition[0, i] / self._partition_count[i])
+            acc += self._acc_x_by_partition[0, i] / self._partition_count[i]
             acc2 += (self._acc_x_by_partition[0, i] / self._partition_count[i]) ** 2
-            acc3 += ((self._acc_x_by_partition[1, i] * self._partition_count[i]) - self._acc_x_by_partition[
-                0, i] ** 2) / (self._partition_count[i] ** 2)
+            acc3 += (
+                (self._acc_x_by_partition[1, i] * self._partition_count[i])
+                - self._acc_x_by_partition[0, i] ** 2
+            ) / (self._partition_count[i] ** 2)
 
             number_of_partitions += 1
 
         return np.nan_to_num(
-            ((acc2 / number_of_partitions) - (acc / number_of_partitions) ** 2) / (acc3 / number_of_partitions), False)
+            ((acc2 / number_of_partitions) - (acc / number_of_partitions) ** 2)
+            / (acc3 / number_of_partitions),
+            False,
+        )

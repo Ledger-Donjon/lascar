@@ -46,10 +46,13 @@ class ConsoleOutputMethod(OutputMethod):
         if results_parsed is None:
             return
 
-        res_str = '%s with %d traces: ' % (engine.name, engine._number_of_processed_traces)
+        res_str = "%s with %d traces: " % (
+            engine.name,
+            engine._number_of_processed_traces,
+        )
 
         if engine.output_parser_mode == "basic":
-            res_str += ' %s' % results_parsed
+            res_str += " %s" % results_parsed
 
         else:
 
@@ -58,10 +61,13 @@ class ConsoleOutputMethod(OutputMethod):
             ranks = [r[2] for r in results_parsed]
             indexes = [ranks.index(i + 1) for i in range(max_candidates)]
 
-            res_str += ' - '.join("[{:>02x}] {:>4.2f} (rank {})".format(*results_parsed[i]) for i in indexes)
+            res_str += " - ".join(
+                "[{:>02x}] {:>4.2f} (rank {})".format(*results_parsed[i])
+                for i in indexes
+            )
 
         self.logger.info("Results: " + res_str)
-        self.result += res_str + '\n'
+        self.result += res_str + "\n"
 
     def finalize(self):
         if self.filename is not None:

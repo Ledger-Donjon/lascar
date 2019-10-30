@@ -61,7 +61,7 @@ class Engine:
         :param session: the Session that will drive it
         :return:
         """
-        self.logger.debug('Engine %s Initializing.', self.name)
+        self.logger.debug("Engine %s Initializing.", self.name)
         self._session = session
         self._number_of_processed_traces = 0
         self._initialize()
@@ -73,32 +73,34 @@ class Engine:
         :param batch: a TraceBatch
         :return:
         """
-        self.logger.debug('Engine %s update with batch %s.', self.name, batch)
+        self.logger.debug("Engine %s update with batch %s.", self.name, batch)
 
         if not self.is_initialized:
-            raise ValueError('%s Engine need first to be initialized .' % self.name)
+            raise ValueError("%s Engine need first to be initialized ." % self.name)
 
-        self.logger.debug('%s Engine updating .', self.name)
+        self.logger.debug("%s Engine updating .", self.name)
         self._update(batch)
         self._number_of_processed_traces += len(batch)
 
     def finalize(self):
-        self.logger.debug('Engine %s Finalizing.', self.name)
+        self.logger.debug("Engine %s Finalizing.", self.name)
         self.finalize_step.append(self._number_of_processed_traces)
         return self._finalize()
-    
+
     def get_results():
         return self.finalize()
 
     def clean(self):
 
-        self.logger.debug('Engine %s Cleaning.', self.name)
+        self.logger.debug("Engine %s Cleaning.", self.name)
 
         if self._number_of_processed_traces not in self.finalize_step:
-            self.logger.warning('%s Engine cannot be cleaned, finalize() has not been called.', self.name)
+            self.logger.warning(
+                "%s Engine cannot be cleaned, finalize() has not been called.",
+                self.name,
+            )
             return
         self._clean()
-
 
 
 class MeanEngine(Engine):
@@ -114,7 +116,7 @@ class MeanEngine(Engine):
 
         """
         Engine.__init__(self, "mean")
-        self.logger.debug('Creating MeanEngine.')
+        self.logger.debug("Creating MeanEngine.")
 
     def _initialize(self):
         """
@@ -159,7 +161,7 @@ class VarEngine(Engine):
         VarEngine Consructor.
         """
         Engine.__init__(self, "var")
-        self.logger.debug('Creating VarEngine.')
+        self.logger.debug("Creating VarEngine.")
 
     def _initialize(self):
         """
@@ -179,8 +181,11 @@ class VarEngine(Engine):
         Output the mean of the leakage processed by the session.
         :return: the mean of the leakage processed by the session.
         """
-        return np.nan_to_num((self._acc_x2 / self._number_of_processed_traces) - self._session['mean'].finalize() ** 2,
-                             False)
+        return np.nan_to_num(
+            (self._acc_x2 / self._number_of_processed_traces)
+            - self._session["mean"].finalize() ** 2,
+            False,
+        )
 
     def _clean(self):
         pass  # Never clean VarEngine (it can be used by other engines
@@ -200,7 +205,7 @@ class ContainerDumpEngine(Engine):
         """
 
         Engine.__init__(self, "dump")
-        self.logger.debug('Creating ContainerDumpEngine.')
+        self.logger.debug("Creating ContainerDumpEngine.")
 
         self.container = container_void
         self.output_parser_mode = None
@@ -209,7 +214,7 @@ class ContainerDumpEngine(Engine):
         self.current_offset = 0
 
     def _update(self, batch):
-        self.container[self.current_offset: self.current_offset + len(batch)] = batch
+        self.container[self.current_offset : self.current_offset + len(batch)] = batch
         self.current_offset += len(batch)
 
     def _finalize(self):
@@ -229,38 +234,45 @@ class PearsonCorrelationEngine(Engine):
         """
 
         """
-        
+
         Engine.__init__(self, name)
         self._model = lambda x: int(model(x))
-        self.logger.debug('Creating PearsonCorrelationEngine %s.' % (name))
-
+        self.logger.debug("Creating PearsonCorrelationEngine %s." % (name))
 
     def _initialize(self):
         """
         Initialize the accumulators needed by PearsonCorrelationEngine
         :return:
         """
-        #self.size_in_memory += np.prod(self._session.leakage_shape) * 8
-        
+        # self.size_in_memory += np.prod(self._session.leakage_shape) * 8
+
         self._acc_xm = np.zeros(self._session.leakage_shape, dtype=np.double)
         self._acc_m = 0
         self._acc_m2 = 0
-    
+
     def _update(self, batch):
 
         model_values = list(map(self._model, batch.values))
         self._acc_m += sum(model_values)
-        self._acc_m2 += sum(np.power(model_values,2))
-        self._acc_xm += np.dot( model_values, batch.leakages)
-        
+        self._acc_m2 += sum(np.power(model_values, 2))
+        self._acc_xm += np.dot(model_values, batch.leakages)
+
     def _finalize(self):
 
         m, v = self._session["mean"].finalize(), self._session["var"].finalize()
-        numerator = (self._acc_xm / self._number_of_processed_traces) - (self._acc_m /self._number_of_processed_traces)*m
-        denominator = np.sqrt(v * ((self._acc_m2 /self._number_of_processed_traces)-(self._acc_m /self._number_of_processed_traces)**2))
-        mask = v==0.
-        numerator[ mask] = 0.
-        denominator[ mask] = 1.
+        numerator = (self._acc_xm / self._number_of_processed_traces) - (
+            self._acc_m / self._number_of_processed_traces
+        ) * m
+        denominator = np.sqrt(
+            v
+            * (
+                (self._acc_m2 / self._number_of_processed_traces)
+                - (self._acc_m / self._number_of_processed_traces) ** 2
+            )
+        )
+        mask = v == 0.0
+        numerator[mask] = 0.0
+        denominator[mask] = 1.0
         return np.nan_to_num(numerator / denominator)
 
 
@@ -269,14 +281,14 @@ class GroupedEngines(Engine):
     GroupedEngines is an abstact engine whose role regroup engines within one.
     Useful when performing multiple charac/attacks at the same time.
     """
-    
+
     def __init__(self, name, *engines):
         Engine.__init__(self, name)
         self.engines = engines
-    
+
     def _initialize(self):
         [e.initialize(self._session) for e in self.engines]
-    
+
     def _update(self, batch):
         [e.update(batch) for e in self.engines]
 

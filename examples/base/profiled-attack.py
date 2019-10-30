@@ -46,29 +46,53 @@ byte = 3  # key byte to be attacked. In BasicAesSimulationContainer, k_3 = 3
 """
 container_profile = BasicAesSimulationContainer(5000, 0.5)  # 5000 traces for profiling
 container_profile.leakage_section = [
-    byte]  # POI selection: trivial here since on BasicAesSimulationContainer, the 3rd byte leaks on the third sample
+    byte
+]  # POI selection: trivial here since on BasicAesSimulationContainer, the 3rd byte leaks on the third sample
 
-solution = container_profile[0].value['key'][byte]
+solution = container_profile[0].value["key"][byte]
 
 # partition_function must take 1 argument: the value returned by the container at each trace
 def partition_function(value):
-    return sbox[value['plaintext'][3] ^ value['key'][3]]  # here we partition on the output of the 3rd sbox
+    return sbox[
+        value["plaintext"][3] ^ value["key"][3]
+    ]  # here we partition on the output of the 3rd sbox
 
 
-number_of_partitions = 256  # number of possible classes (~values) for the partition_function
+number_of_partitions = (
+    256  # number of possible classes (~values) for the partition_function
+)
 
 classifier_qda = QuadraticDiscriminantAnalysis()
 
 from lascar.tools.keras_neural_networks import mlp_best
-classifier_keras = mlp_best(container_profile._leakage_abstract.shape, number_of_classes=number_of_partitions, nodes=[100,50], dropout=0.2)
+
+classifier_keras = mlp_best(
+    container_profile._leakage_abstract.shape,
+    number_of_classes=number_of_partitions,
+    nodes=[100, 50],
+    dropout=0.2,
+)
 
 
-classifier_profile_engine_qda =   ProfileEngine("profile qda", classifier_qda, partition_function, number_of_partitions)
-classifier_profile_engine_keras = ProfileEngine("profile keras", classifier_keras, partition_function, number_of_partitions, epochs=20)
+classifier_profile_engine_qda = ProfileEngine(
+    "profile qda", classifier_qda, partition_function, number_of_partitions
+)
+classifier_profile_engine_keras = ProfileEngine(
+    "profile keras",
+    classifier_keras,
+    partition_function,
+    number_of_partitions,
+    epochs=20,
+)
 
-session = Session(container_profile, engines=[classifier_profile_engine_qda, classifier_profile_engine_keras]).run()
+session = Session(
+    container_profile,
+    engines=[classifier_profile_engine_qda, classifier_profile_engine_keras],
+).run()
 
-save_classifier(classifier_qda, "classifier_qda.save")  # The classifier can be saved for further usage
+save_classifier(
+    classifier_qda, "classifier_qda.save"
+)  # The classifier can be saved for further usage
 save_classifier(classifier_keras, "classifier_keras.save")
 
 
@@ -79,22 +103,43 @@ save_classifier(classifier_keras, "classifier_keras.save")
 
 # The sensitive value with guess hypothesis
 def sensitive_value_with_guess(data, guess):
-    return sbox[data['plaintext'][byte] ^ guess]
+    return sbox[data["plaintext"][byte] ^ guess]
 
 
 guess_range = range(256)  # what are the hypothesis for the guess
 
-container_attack = BasicAesSimulationContainer(50, 1, seed=12)  # 200 traces for attack (different seed used for having different traces)
+container_attack = BasicAesSimulationContainer(
+    50, 1, seed=12
+)  # 200 traces for attack (different seed used for having different traces)
 container_attack.leakage_section = [byte]  # Same POI-selection than for profiling phase
 
-classifier_qda = load_classifier("classifier_qda.save")  # the classifier is imported from a file
+classifier_qda = load_classifier(
+    "classifier_qda.save"
+)  # the classifier is imported from a file
 classifier_keras = load_classifier("classifier_keras.save")
 
-classifier_match_engine_qda = MatchEngine("match qda", classifier_qda, sensitive_value_with_guess, guess_range, solution=container_attack.key[byte])
-classifier_match_engine_keras = MatchEngine("match keras", classifier_keras, sensitive_value_with_guess, guess_range, solution=container_attack.key[byte])
+classifier_match_engine_qda = MatchEngine(
+    "match qda",
+    classifier_qda,
+    sensitive_value_with_guess,
+    guess_range,
+    solution=container_attack.key[byte],
+)
+classifier_match_engine_keras = MatchEngine(
+    "match keras",
+    classifier_keras,
+    sensitive_value_with_guess,
+    guess_range,
+    solution=container_attack.key[byte],
+)
 
-engines = [classifier_match_engine_qda,classifier_match_engine_keras]
+engines = [classifier_match_engine_qda, classifier_match_engine_keras]
 
-session = Session(container_attack, engines=engines, output_method=ScoreProgressionOutputMethod(*engines), output_steps=range(0, 50, 5))
+session = Session(
+    container_attack,
+    engines=engines,
+    output_method=ScoreProgressionOutputMethod(*engines),
+    output_steps=range(0, 50, 5),
+)
 
 session.run()

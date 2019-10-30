@@ -56,7 +56,11 @@ def parse_output_basic(results):
     if len(results.shape) == 1:
         return [(results.min(), results.max(), results.mean(), results.var())]
     else:
-        return [(result.min(), result.max(), result.mean(), result.var()) for result in results]
+        return [
+            (result.min(), result.max(), result.mean(), result.var())
+            for result in results
+        ]
+
 
 def parse_output_max(results, guesses):
     """
@@ -78,8 +82,8 @@ def parse_output_max(results, guesses):
     else:
         scores = results
 
-    tmp = sorted(zip(guesses, scores), key=lambda x:x[1], reverse=True)
-    return [ (s[0], s[1], rank+1) for rank, s in enumerate(tmp)] 
+    tmp = sorted(zip(guesses, scores), key=lambda x: x[1], reverse=True)
+    return [(s[0], s[1], rank + 1) for rank, s in enumerate(tmp)]
 
 
 def parse_output_argmax(results, guesses):
@@ -103,5 +107,5 @@ def parse_output_argmax(results, guesses):
     else:
         scores = np.abs(results)
 
-    tmp = sorted(zip(guesses, scores), key=lambda x:x[1], reverse=True)
-    return [ (s[0], s[1], rank+1) for rank, s in enumerate(tmp)] 
+    tmp = sorted(zip(guesses, scores), key=lambda x: x[1], reverse=True)
+    return [(s[0], s[1], rank + 1) for rank, s in enumerate(tmp)]

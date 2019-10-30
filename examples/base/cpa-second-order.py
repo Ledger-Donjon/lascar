@@ -11,6 +11,7 @@ Finaly, a classical CPA is used to retrieve the key.
 from lascar import *
 from lascar.tools.aes import sbox
 
+
 class ToyAesSecondOrderContainer(AbstractContainer):
     """
 
@@ -22,32 +23,34 @@ class ToyAesSecondOrderContainer(AbstractContainer):
     where key is fixed, y is the "plaintext", and mask is random/unknown
 
     """
+
     def __init__(self, number_of_traces, noise=1, key=42, **kwargs):
-        
-        value_dtype = np.dtype([('y', np.uint8),
-                                ('mask', np.uint8), 
-                                ('key', np.uint8),
-                                ])
+
+        value_dtype = np.dtype(
+            [("y", np.uint8), ("mask", np.uint8), ("key", np.uint8),]
+        )
 
         self.value = np.zeros((), value_dtype)
-        self.value['key'] = key
+        self.value["key"] = key
         self.noise = noise
         AbstractContainer.__init__(self, number_of_traces, **kwargs)
-        
-    def generate_trace(self,idx):
 
-        np.random.seed(seed=idx) # for reproducibility
+    def generate_trace(self, idx):
+
+        np.random.seed(seed=idx)  # for reproducibility
 
         # for each trace, both y and mask values are random
-        self.value['y'] = np.random.randint(0,256)
-        self.value['mask'] = np.random.randint(0,256)
+        self.value["y"] = np.random.randint(0, 256)
+        self.value["mask"] = np.random.randint(0, 256)
 
         # the leakage consists in 15 random value (with chosen noise),
         # on the sample with index [5], the hamming weight of the mask
         # on the sample with index [10], the hamming weight of the masked output of the sbox.
         leakage = np.random.normal(0, self.noise, (15,))
-        leakage[5] += hamming_weight(np.uint8(self.value['mask']))
-        leakage[10] += hamming_weight( sbox[self.value['y']^self.value['key']]^self.value['mask'] )
+        leakage[5] += hamming_weight(np.uint8(self.value["mask"]))
+        leakage[10] += hamming_weight(
+            sbox[self.value["y"] ^ self.value["key"]] ^ self.value["mask"]
+        )
 
         return Trace(leakage, self.value)
 
@@ -67,17 +70,21 @@ For instance, applying CenteredProductProcessing(container, ([4,5], [10,11,12]))
 But in this simple case, we know exactly when occurs the relevant events ([5] and [10])
 
 """
-container.leakage_processing = CenteredProductProcessing(container, ([5],[10]))
+container.leakage_processing = CenteredProductProcessing(container, ([5], [10]))
 
-cpa_engine = CpaEngine("cpa-high-order",
-                       lambda value, guess: hamming(sbox[value['y'] ^ guess]),
-                       range(256),
-                       solution=42)
+cpa_engine = CpaEngine(
+    "cpa-high-order",
+    lambda value, guess: hamming(sbox[value["y"] ^ guess]),
+    range(256),
+    solution=42,
+)
 
 
-session = Session(container,
-                  engine=cpa_engine,
-                  output_method=ScoreProgressionOutputMethod(cpa_engine),
-                  output_steps=50) # the steps at which the results will be computed
+session = Session(
+    container,
+    engine=cpa_engine,
+    output_method=ScoreProgressionOutputMethod(cpa_engine),
+    output_steps=50,
+)  # the steps at which the results will be computed
 
 session.run(100)

@@ -15,8 +15,10 @@ from lascar.tools.aes import sbox
 
 
 if not len(sys.argv) == 3:
-    print("Need to specify the location of ASCAD_DIR and the type of Neural Network to test: mlp or cnn.")
-    print("USAGE: python3 %s ASCAD_DIR [mlp,cnn]"% sys.argv[0])
+    print(
+        "Need to specify the location of ASCAD_DIR and the type of Neural Network to test: mlp or cnn."
+    )
+    print("USAGE: python3 %s ASCAD_DIR [mlp,cnn]" % sys.argv[0])
     exit()
 
 ASCAD_DIR = sys.argv[1]
@@ -25,6 +27,7 @@ filename = ASCAD_DIR + "/ASCAD_data/ASCAD_databases/ASCAD.h5"
 
 # The following functions are extracted https://github.com/ANSSI-FR/ASCAD/blob/master/ASCAD_train_models.py
 from ASCAD_train_models import mlp_best, cnn_best
+
 if sys.argv[2] == "mlp":
     nn = mlp_best()
 elif sys.argv[2] == "cnn":
@@ -45,7 +48,12 @@ However if using cnn network, you need to process the leakages: they need to be 
 Hence the use of leakage_processing=ReshapeProcessing(nn.input_shape[1:])
 """
 
-profiling_container = Hdf5Container(filename, "/Profiling_traces/traces", "/Profiling_traces/metadata", leakage_processing=ReshapeProcessing(nn.input_shape[1:]))
+profiling_container = Hdf5Container(
+    filename,
+    "/Profiling_traces/traces",
+    "/Profiling_traces/metadata",
+    leakage_processing=ReshapeProcessing(nn.input_shape[1:]),
+)
 
 # Profile:
 def partition_function(value):
@@ -54,14 +62,23 @@ def partition_function(value):
     :param value: a value isued from a trace (ie a single item from /Profiling_traces/metadata
     :return: the label under study for the trace.
     """
-    return sbox[ value['plaintext'][targeted_byte] ^ value['key'][targeted_byte]]
+    return sbox[value["plaintext"][targeted_byte] ^ value["key"][targeted_byte]]
 
-partition_values = range(256) # The range for the labels.
+
+partition_values = range(256)  # The range for the labels.
 
 
 # An engine has to be created, dedicated to the profiling of a classifier (here a keras neural network) with leakages/labels.
-nn_profile_engine = ProfileEngine("nn_profile", nn, partition_function, partition_values, epochs=5, batch_size=200, test_size=0)
+nn_profile_engine = ProfileEngine(
+    "nn_profile",
+    nn,
+    partition_function,
+    partition_values,
+    epochs=5,
+    batch_size=200,
+    test_size=0,
+)
 
 Session(profiling_container, engine=nn_profile_engine).run()
 
-nn.save('model.h5')
+nn.save("model.h5")

@@ -53,11 +53,15 @@ class DictOutputMethod(OutputMethod):
         try:
             if not engine.name in self.results:
                 self.results[engine.name] = {}
-            self.results[engine.name][engine._number_of_processed_traces] = np.copy(results)
+            self.results[engine.name][engine._number_of_processed_traces] = np.copy(
+                results
+            )
         except Exception as e:
             print(e)
-            self.logger.warning("Engine %s with %d traces: cannot be used with DictOutputMethod" % (
-                engine.name, engine._number_of_processed_traces))
+            self.logger.warning(
+                "Engine %s with %d traces: cannot be used with DictOutputMethod"
+                % (engine.name, engine._number_of_processed_traces)
+            )
 
     def _finalize(self):
         if self.filename is not None:
@@ -75,7 +79,6 @@ class DictOutputMethod(OutputMethod):
         if len(self.results[item]) > 1:
             return self.results[item]
         elif len(self.results[item]) == 1:
-            return self.results[item][ list(self.results[item])[0] ]
+            return self.results[item][list(self.results[item])[0]]
         else:
-            raise ValueError('%s not set for this output method.'%(item))
-
+            raise ValueError("%s not set for this output method." % (item))

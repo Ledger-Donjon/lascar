@@ -37,7 +37,14 @@ class Hdf5Container(Container):
     - 1 dataset containing the values
     """
 
-    def __init__(self, filename, leakages_dataset_name="leakages", values_dataset_name="values", mode="r", **kwargs):
+    def __init__(
+        self,
+        filename,
+        leakages_dataset_name="leakages",
+        values_dataset_name="values",
+        mode="r",
+        **kwargs
+    ):
         """
         Basic constructor
 
@@ -53,8 +60,10 @@ class Hdf5Container(Container):
 
         Container.__init__(self, **kwargs)
 
-        self.logger.debug('Creating Hdf5Container from file %s with datasests %s/%s.' % (
-            filename, leakages_dataset_name, values_dataset_name))
+        self.logger.debug(
+            "Creating Hdf5Container from file %s with datasests %s/%s."
+            % (filename, leakages_dataset_name, values_dataset_name)
+        )
 
     def __getitem__(self, key):
         return TraceBatchContainer.__getitem__(self, key)
@@ -63,8 +72,17 @@ class Hdf5Container(Container):
         TraceBatchContainer.__setitem__(self, key, value)
 
     @staticmethod
-    def void_container(filename, number_of_traces, leakage_shape, leakage_dtype, value_shape, value_dtype,
-                       leakages_dataset_name="leakages", values_dataset_name="values", **kwargs):
+    def void_container(
+        filename,
+        number_of_traces,
+        leakage_shape,
+        leakage_dtype,
+        value_shape,
+        value_dtype,
+        leakages_dataset_name="leakages",
+        values_dataset_name="values",
+        **kwargs
+    ):
         """
         void_container is a static method for building an empty Hdf5Container with the specified parameters.
 
@@ -88,15 +106,27 @@ class Hdf5Container(Container):
             file.close()
             file = h5py.File(filename, "w")
 
-        file.create_dataset(leakages_dataset_name, (number_of_traces,) + leakage_shape, leakage_dtype)
-        file.create_dataset(values_dataset_name, (number_of_traces,) + value_shape, value_dtype)
+        file.create_dataset(
+            leakages_dataset_name, (number_of_traces,) + leakage_shape, leakage_dtype
+        )
+        file.create_dataset(
+            values_dataset_name, (number_of_traces,) + value_shape, value_dtype
+        )
         file.close()
 
-        return Hdf5Container(filename, leakages_dataset_name, values_dataset_name, mode='r+', **kwargs)
+        return Hdf5Container(
+            filename, leakages_dataset_name, values_dataset_name, mode="r+", **kwargs
+        )
 
     @staticmethod
-    def export(container, filename, name=None, leakages_dataset_name="leakages", values_dataset_name="values",
-               batch_size=100):
+    def export(
+        container,
+        filename,
+        name=None,
+        leakages_dataset_name="leakages",
+        values_dataset_name="values",
+        batch_size=100,
+    ):
         """
         export method is used to export an existing container into an Hdf5Container.
 
@@ -111,23 +141,34 @@ class Hdf5Container(Container):
         """
 
         leakage, value = container[0]
-        out = Hdf5Container.void_container(filename, container.number_of_traces, leakage.shape, leakage.dtype,
-                                           value.shape, value.dtype, leakages_dataset_name, values_dataset_name)
+        out = Hdf5Container.void_container(
+            filename,
+            container.number_of_traces,
+            leakage.shape,
+            leakage.dtype,
+            value.shape,
+            value.dtype,
+            leakages_dataset_name,
+            values_dataset_name,
+        )
 
         from lascar import Session
         from lascar.engine import ContainerDumpEngine
 
-        session = Session(container, engine=ContainerDumpEngine(out), name=name if name else 'Hdf5Container')
+        session = Session(
+            container,
+            engine=ContainerDumpEngine(out),
+            name=name if name else "Hdf5Container",
+        )
         session.run(batch_size)
         # Adding mean/var: to leakage_dataset_name as attributes
         try:
-            out._file[leakages_dataset_name].attrs['mean'] = session['mean'].finalize()
-            out._file[leakages_dataset_name].attrs['var'] = session['var'].finalize()
+            out._file[leakages_dataset_name].attrs["mean"] = session["mean"].finalize()
+            out._file[leakages_dataset_name].attrs["var"] = session["var"].finalize()
         except:
             pass
 
         return out
-
 
     def get_leakage_mean_var(self):
         """
@@ -135,15 +176,15 @@ class Hdf5Container(Container):
         :return: mean/var of the container leakages
         """
         try:
-            mean, var = self.leakages.attrs['mean'], self.leakages.attrs['var']
+            mean, var = self.leakages.attrs["mean"], self.leakages.attrs["var"]
             return self.apply_both_value(mean), self.apply_both_value(var)
 
         except:
-            mean,var = Container.get_leakage_mean_var(self)
+            mean, var = Container.get_leakage_mean_var(self)
 
             try:
-                self.leakages.attrs['mean'] = mean
-                self.leakages.attrs['var'] = var
+                self.leakages.attrs["mean"] = mean
+                self.leakages.attrs["var"] = var
             except:
                 pass
-        return mean,var
+        return mean, var

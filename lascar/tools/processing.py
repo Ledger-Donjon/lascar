@@ -43,11 +43,11 @@ class Processing:
         return leakage
 
     def save(self, filename):
-        pickle.dump(self, open(filename, 'wb'))
+        pickle.dump(self, open(filename, "wb"))
 
     @staticmethod
     def load(filename):
-        return pickle.load(open(filename, 'rb'))
+        return pickle.load(open(filename, "rb"))
 
 
 class CenteredProductProcessing(Processing):
@@ -72,14 +72,18 @@ class CenteredProductProcessing(Processing):
         """
         # compute mean:
         from lascar.session import Session
+
         session = Session(container, name="CenteredProduct:")
         session.run(batch_size)
-        self.mean = session['mean'].finalize()
+        self.mean = session["mean"].finalize()
         number_of_leakage_samples = container._leakage_abstract.shape[0]
 
         if rois is None:
             self.order = order
-            self.combinations = [list(i) for i in itertools.combinations(range(number_of_leakage_samples), order)]
+            self.combinations = [
+                list(i)
+                for i in itertools.combinations(range(number_of_leakage_samples), order)
+            ]
 
         else:
 
@@ -98,7 +102,14 @@ class PcaProcessing(Processing):
     (based on sklearn.decomposition.PCA)
     """
 
-    def __init__(self, container, number_of_components, random_state=0, post_section=None, filename=None):
+    def __init__(
+        self,
+        container,
+        number_of_components,
+        random_state=0,
+        post_section=None,
+        filename=None,
+    ):
         """
         :param container: the container on which to perform PCA
         :param number_of_components: number of component used for the dimensionality reduction
@@ -108,7 +119,7 @@ class PcaProcessing(Processing):
         self._pca = PCA(n_components=number_of_components, random_state=random_state)
 
         # compute pca:
-        batch = container[:container.number_of_traces]
+        batch = container[: container.number_of_traces]
         self._pca.fit(batch.leakages)
 
         self.post_section = post_section
@@ -127,16 +138,25 @@ class IcaProcessing(Processing):
     (based on sklearn.decomposition.ICA)
     """
 
-    def __init__(self, container, number_of_components, random_state=0, post_section=None, filename=None):
+    def __init__(
+        self,
+        container,
+        number_of_components,
+        random_state=0,
+        post_section=None,
+        filename=None,
+    ):
         """
         :param container: the container on which to perform ICA
         :param number_of_components: number of component used for the dimensionality reduction
         :param random_state: optional, for the sklearn object
         """
-        self._ica = FastICA(n_components=number_of_components, random_state=random_state)
+        self._ica = FastICA(
+            n_components=number_of_components, random_state=random_state
+        )
 
         # compute ica:
-        batch = container[:container.number_of_traces]
+        batch = container[: container.number_of_traces]
         self._ica.fit(batch.leakages)
 
         self.post_section = post_section
@@ -158,7 +178,7 @@ class StandardScalerProcessing(Processing):
         # compute mean/var:
         self.mean, self.std_inv = container.get_leakage_mean_var()
 
-        self.std_inv = 1/np.sqrt(self.std_inv)
+        self.std_inv = 1 / np.sqrt(self.std_inv)
         Processing.__init__(self, filename)
 
     def __call__(self, leakage):
@@ -179,7 +199,6 @@ class ReshapeProcessing(Processing):
 
 
 class CascadedProcessing(Processing):
-
     def __init__(self, *processings, filename=None):
         self.processings = processings
         Processing.__init__(self, filename)

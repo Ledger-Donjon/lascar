@@ -44,7 +44,10 @@ class NicvEngine(PartitionerEngine):
         :param partition_range: possible values for the partitioning.
         """
         PartitionerEngine.__init__(self, name, partition_function, partition_range, 1)
-        self.logger.debug('Creating NicvEngine \"%s\" with %d classes.' % (name, len(self._partition_range)))
+        self.logger.debug(
+            'Creating NicvEngine "%s" with %d classes.'
+            % (name, len(self._partition_range))
+        )
 
     def _finalize(self):
 
@@ -58,12 +61,14 @@ class NicvEngine(PartitionerEngine):
                 continue
 
             # tmp = self._acc_x_by_partition[0, i] / self._partition_count[i]
-            acc += (self._acc_x_by_partition[0, i] / self._partition_count[i])
+            acc += self._acc_x_by_partition[0, i] / self._partition_count[i]
             acc2 += (self._acc_x_by_partition[0, i] / self._partition_count[i]) ** 2
             # acc += tmp
             # acc2 += tmp * tmp
             number_of_partitions += 1
 
         return np.nan_to_num(
-            ((acc2 / number_of_partitions) - (acc / number_of_partitions) ** 2) / self._session["var"].finalize(),
-            False)
+            ((acc2 / number_of_partitions) - (acc / number_of_partitions) ** 2)
+            / self._session["var"].finalize(),
+            False,
+        )

@@ -16,24 +16,25 @@ functions = [
 ]
 
 
-
-@pytest.mark.parametrize('container, function', [(container, f) for f in functions])
+@pytest.mark.parametrize("container, function", [(container, f) for f in functions])
 def test_function(container, function):
     container.leakage_processing = function
     for i, trace in enumerate(container):
         assert np.all(trace.leakage == function(leakages[i]))
 
+
 rois = [
     [[2], [3]],
-    [[0, 1], [2, 3] ],
-    [[0, 1], [2, 3], [4, 5] ],
+    [[0, 1], [2, 3]],
+    [[0, 1], [2, 3], [4, 5]],
 ]
 
-@pytest.mark.parametrize('container, roi', [(container, roi) for roi in rois])
+
+@pytest.mark.parametrize("container, roi", [(container, roi) for roi in rois])
 def test_centered_product(container, roi):
 
-    container.leakage_processing = lambda x:x
-    centered_product = CenteredProductProcessing(container,roi)
+    container.leakage_processing = lambda x: x
+    centered_product = CenteredProductProcessing(container, roi)
 
     filename = tempfile.mkdtemp() + "/tmp.pickle"
     centered_product.save(filename)
@@ -44,16 +45,19 @@ def test_centered_product(container, roi):
 
     for i, trace in enumerate(container):
 
-        x=np.array(  [ np.prod((leakages[i]-m)[u]) for u in combinations])
+        x = np.array([np.prod((leakages[i] - m)[u]) for u in combinations])
         assert np.all(np.isclose(centered_product_bis(trace.leakage), x))
 
 
-numbers_of_components = range(1,20,5)
+numbers_of_components = range(1, 20, 5)
 
-@pytest.mark.parametrize('container, n', [(container, n) for n in numbers_of_components])
+
+@pytest.mark.parametrize(
+    "container, n", [(container, n) for n in numbers_of_components]
+)
 def test_pca(container, n):
 
-    container.leakage_processing = lambda x:x
+    container.leakage_processing = lambda x: x
     pca_processing = PcaProcessing(container, n)
 
     filename = tempfile.mkdtemp() + "/tmp.pickle"
@@ -66,12 +70,16 @@ def test_pca(container, n):
         x = pca[i]
         assert np.all(np.isclose(pca_processing_bis(trace.leakage), x))
 
-numbers_of_components = range(1,20,5)
 
-@pytest.mark.parametrize('container, n', [(container, n) for n in numbers_of_components])
+numbers_of_components = range(1, 20, 5)
+
+
+@pytest.mark.parametrize(
+    "container, n", [(container, n) for n in numbers_of_components]
+)
 def test_ica(container, n):
 
-    container.leakage_processing = lambda x:x
+    container.leakage_processing = lambda x: x
     ica_processing = IcaProcessing(container, n)
 
     filename = tempfile.mkdtemp() + "/tmp.pickle"
@@ -81,28 +89,25 @@ def test_ica(container, n):
 
     ica = FastICA(n, random_state=0).fit_transform(leakages)
     for i, trace in enumerate(container):
-        x=ica[i]
+        x = ica[i]
         assert np.all(np.isclose(ica_processing_bis(trace.leakage), x))
 
 
-
-@pytest.mark.parametrize('container', [container])
+@pytest.mark.parametrize("container", [container])
 def test_standard_scaler(container):
 
-    container.leakage_processing = lambda x:x
+    container.leakage_processing = lambda x: x
     standard_scaler = StandardScalerProcessing(container)
 
     filename = tempfile.mkdtemp() + "/tmp.pickle"
     standard_scaler.save(filename)
     standard_scaler_bis = Processing.load(filename)
 
-
     m = leakages.mean(0)
     for i, trace in enumerate(container):
 
-        x= (leakages[i]-leakages.mean(0))/leakages.std(0)
+        x = (leakages[i] - leakages.mean(0)) / leakages.std(0)
         assert np.all(np.isclose(standard_scaler_bis(trace.leakage), x))
-
 
 
 # processings = []

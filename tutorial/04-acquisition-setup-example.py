@@ -14,30 +14,34 @@ We create a class AcquisitionSetup, inheriting from AbstractContainer, and overr
 from lascar import AbstractContainer, Trace
 import numpy as np
 
-#First the Device Under Test (Dut):
+# First the Device Under Test (Dut):
 class Dut:
     def __init__(self):
         # ...dummy initialisation, put here all the communication objects, constants etc...
-        self.foo = 'foo'
-        self.dumb = 'dumb'
+        self.foo = "foo"
+        self.dumb = "dumb"
         # ...
 
     def go(self):
         # dummy aes, returns the plaintext and the ciphertext, concatenated.
 
-        plaintext = np.random.randint(0,256, (16,)) # 16 random bytes for the plaintext
+        plaintext = np.random.randint(
+            0, 256, (16,)
+        )  # 16 random bytes for the plaintext
         # self.aes(plaintext) : request the device to cipher plaintext
-        ciphertext = np.random.randint(0,256, (16,)) # 16 random bytes for the ciphertext
+        ciphertext = np.random.randint(
+            0, 256, (16,)
+        )  # 16 random bytes for the ciphertext
 
-        return np.append(plaintext,ciphertext)
+        return np.append(plaintext, ciphertext)
 
 
-#Then the Oscilloscope:
+# Then the Oscilloscope:
 class Oscilloscope:
     def __init__(self):
         # ...dummy initialisation, put here all the communication objects, constants etc...
-        self.bar = 'bar'
-        self.dumb = 'dumb'
+        self.bar = "bar"
+        self.dumb = "dumb"
         # ...
 
     def get_trace(self):
@@ -45,9 +49,8 @@ class Oscilloscope:
         return np.random.rand(100)
 
 
-#Then the AbstractContainer:
+# Then the AbstractContainer:
 class AcquisitionSetup(AbstractContainer):
-
     def __init__(self, number_of_traces):
         """
         :param number_of_traces: only required argument for the constructor of an AbstractContainer
@@ -65,7 +68,9 @@ class AcquisitionSetup(AbstractContainer):
         :return:  Trace with leakage from oscilloscope, and value from the dut plaintext/ciphertext
         """
 
-        self.logger.debug("Generate trace %d",index) # The container logger can be used!
+        self.logger.debug(
+            "Generate trace %d", index
+        )  # The container logger can be used!
 
         value = self.dut.go()
         leakage = self.oscilloscope.get_trace()
@@ -73,20 +78,18 @@ class AcquisitionSetup(AbstractContainer):
         return Trace(leakage, value)
 
 
-
 # Now everything is ready to create our AcquisitionContainer:
 acquisition_container = AcquisitionSetup(100)
-print("acquisition_container:",acquisition_container)
+print("acquisition_container:", acquisition_container)
 
 
 # acquisition_container is Abstract. Its 100 traces are stored nowhere. But they can be accessed:
-print("trace 0:",acquisition_container[0])
-print("trace 10:",acquisition_container[10])
+print("trace 0:", acquisition_container[0])
+print("trace 10:", acquisition_container[10])
 
 
 # But more importantly, acquisition_container can be converted to a Hdf5Container: (the export method takes here all its sense)
 from lascar import Hdf5Container
 
 hdf5_container = Hdf5Container.export(acquisition_container, "tmp.h5")
-print("hdf5_container:",hdf5_container)
-
+print("hdf5_container:", hdf5_container)

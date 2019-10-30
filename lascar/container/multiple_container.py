@@ -28,7 +28,6 @@ from .container import AbstractArray, Container, TraceBatchContainer
 
 
 class MultipleContainer(Container):
-
     def __init__(self, *args, **kwargs):
         """
         Constructor.
@@ -36,20 +35,28 @@ class MultipleContainer(Container):
         """
         self._containers = args
         self.number_of_traces = sum([len(container) for container in args])
-        self.leakages = AbstractArray((self.number_of_traces,) + self._containers[0].leakages.shape[1:],
-                                      self._containers[0].leakages.dtype)
-        self.values = AbstractArray((self.number_of_traces,) + self._containers[0].values.shape[1:],
-                                    self._containers[0].values.dtype)
+        self.leakages = AbstractArray(
+            (self.number_of_traces,) + self._containers[0].leakages.shape[1:],
+            self._containers[0].leakages.dtype,
+        )
+        self.values = AbstractArray(
+            (self.number_of_traces,) + self._containers[0].values.shape[1:],
+            self._containers[0].values.dtype,
+        )
 
         Container.__init__(self, **kwargs)
-        self.logger.debug('Creating MultipleContainer using %d Container.' % len(self._containers))
+        self.logger.debug(
+            "Creating MultipleContainer using %d Container." % len(self._containers)
+        )
 
         # improvement (todo)
         current = 0
         self._t = np.zeros((self.number_of_traces + 1, 2), int)
         for i, container in enumerate(args):
-            self._t[current:current + container.number_of_traces, 0] = i
-            self._t[current:current + container.number_of_traces, 1] = range(container.number_of_traces)
+            self._t[current : current + container.number_of_traces, 0] = i
+            self._t[current : current + container.number_of_traces, 1] = range(
+                container.number_of_traces
+            )
             current += container.number_of_traces
         self._t[current] = i, container.number_of_traces
 
@@ -63,18 +70,24 @@ class MultipleContainer(Container):
         elif isinstance(item, slice):
             # check contiguity:
             if item.step is not None and item.step > 1:
-                raise ValueError("MultipleContainer __getitem__ slice elements must be contiguous")
+                raise ValueError(
+                    "MultipleContainer __getitem__ slice elements must be contiguous"
+                )
             offset_begin = item.start if item.start else 0
             offset_end = item.stop if item.stop else self.number_of_traces
 
         elif isinstance(item, list):
             # check contiguity:
             if np.any(np.diff(np.array(item)) != 1):
-                raise ValueError("MultipleContainer __getitem__ list elements must be contiguous")
+                raise ValueError(
+                    "MultipleContainer __getitem__ list elements must be contiguous"
+                )
             offset_begin = item[0]
             offset_end = item[-1]
         else:
-            raise ValueError("MultipleContainer __getitem__ only accepts int, list and slices (contiguous)")
+            raise ValueError(
+                "MultipleContainer __getitem__ only accepts int, list and slices (contiguous)"
+            )
 
         container_offset_begin, suboffset_offset_begin = self._t[offset_begin]
         container_offset_end, suboffset_offset_end = self._t[offset_end]
@@ -90,18 +103,34 @@ class MultipleContainer(Container):
 
         suboffsets = []
         if container_offset_begin == container_offset_end:
-            suboffsets.append([container_offset_begin, suboffset_offset_begin, suboffset_offset_end])
+            suboffsets.append(
+                [container_offset_begin, suboffset_offset_begin, suboffset_offset_end]
+            )
         else:
-            suboffsets.append([container_offset_begin, suboffset_offset_begin,
-                               self._containers[container_offset_begin].number_of_traces])
+            suboffsets.append(
+                [
+                    container_offset_begin,
+                    suboffset_offset_begin,
+                    self._containers[container_offset_begin].number_of_traces,
+                ]
+            )
             for i in range(container_offset_begin + 1, container_offset_end):
                 suboffsets.append([i, 0, self._containers[i].number_of_traces])
             suboffsets.append([container_offset_end, 0, suboffset_offset_end])
 
-
         # TODO: Find a better solution...
-        leakages = np.concatenate([self._containers[suboffset[0]][suboffset[1]:suboffset[2]].leakages for suboffset in suboffsets] )
-        values = np.concatenate([self._containers[suboffset[0]][suboffset[1]:suboffset[2]].values for suboffset in suboffsets] )
+        leakages = np.concatenate(
+            [
+                self._containers[suboffset[0]][suboffset[1] : suboffset[2]].leakages
+                for suboffset in suboffsets
+            ]
+        )
+        values = np.concatenate(
+            [
+                self._containers[suboffset[0]][suboffset[1] : suboffset[2]].values
+                for suboffset in suboffsets
+            ]
+        )
 
         # leakages = np.zeros((offset_end - offset_begin,) + self._leakage_abstract.shape, self._leakage_abstract.dtype)
         # values = np.zeros((offset_end - offset_begin,) + self._value_abstract.shape, self._value_abstract.dtype)
@@ -186,8 +215,8 @@ class MultipleContainer(Container):
         sum_x = np.zeros((self.leakages.shape[1:]))
         sum_x2 = np.zeros((self.leakages.shape[1:]))
         for c in self._containers:
-            m,v = c.get_leakage_mean_var()
-            sum_x += m*len(c)
-            sum_x2 += (v+m**2)*len(c)
+            m, v = c.get_leakage_mean_var()
+            sum_x += m * len(c)
+            sum_x2 += (v + m ** 2) * len(c)
 
-        return sum_x/len(self), (sum_x2/len(self)) - (sum_x/len(self))**2
+        return sum_x / len(self), (sum_x2 / len(self)) - (sum_x / len(self)) ** 2

@@ -20,9 +20,15 @@ import logging
 from threading import Thread
 import numpy as np
 from .engine import MeanEngine, VarEngine
-from .output import MultipleOutputMethod, DictOutputMethod, OutputMethod, NullOutputMethod
+from .output import (
+    MultipleOutputMethod,
+    DictOutputMethod,
+    OutputMethod,
+    NullOutputMethod,
+)
 
 import progressbar
+
 
 class Session:
     """
@@ -46,9 +52,19 @@ class Session:
     :param progressbar: Will the Session display a progressbar during its
         process.
     """
-    def __init__(self, container, engine=None, engines=None, output_method=None, output_steps=None, name="Session", progressbar=True):
+
+    def __init__(
+        self,
+        container,
+        engine=None,
+        engines=None,
+        output_method=None,
+        output_steps=None,
+        name="Session",
+        progressbar=True,
+    ):
         self.logger = logging.getLogger(__name__)
-        self.logger.debug('Creating Session.')
+        self.logger.debug("Creating Session.")
 
         self.container = container
         self.leakage_shape = container._leakage_abstract.shape
@@ -66,14 +82,14 @@ class Session:
         if engines is not None:
             self.add_engines(engines)
 
-        #output_method: what will I do with my engines results?
+        # output_method: what will I do with my engines results?
         if output_method is not None:
             self.output_method = output_method
         else:
             self.output_method = NullOutputMethod()
 
-        #output_steps: When will OutputMethod will be called?
-        self.output_steps=output_steps
+        # output_steps: When will OutputMethod will be called?
+        self.output_steps = output_steps
 
         self._progressbar = progressbar
 
@@ -82,10 +98,10 @@ class Session:
         return self._output_method
 
     @output_method.setter
-    def output_method(self,output_method):
+    def output_method(self, output_method):
         if isinstance(output_method, OutputMethod):
             self._output_method = output_method
-        elif hasattr(output_method, '__iter__'):
+        elif hasattr(output_method, "__iter__"):
             self._output_method = MultipleOutputMethod(*output_method)
         else:
             self._output_method = OutputMethod()
@@ -97,8 +113,10 @@ class Session:
     @output_steps.setter
     def output_steps(self, output_steps):
         if isinstance(output_steps, int):
-            self._output_steps = list(range(output_steps, self.container.number_of_traces+1, output_steps))
-        elif hasattr(output_steps, '__iter__'):
+            self._output_steps = list(
+                range(output_steps, self.container.number_of_traces + 1, output_steps)
+            )
+        elif hasattr(output_steps, "__iter__"):
             self._output_steps = [i for i in output_steps]
         else:
             self._output_steps = []
@@ -106,7 +124,6 @@ class Session:
         if not self.container.number_of_traces in self._output_steps:
             self._output_steps.append(self.container.number_of_traces)
         self._output_steps.sort()
-
 
     def add_engine(self, engine):
         """
@@ -116,10 +133,12 @@ class Session:
         :return: None
         """
         if engine.name in self.engines:
-            raise ValueError("%s is already an Engine name for this session." % engine.name)
+            raise ValueError(
+                "%s is already an Engine name for this session." % engine.name
+            )
 
         self.engines.update({engine.name: engine})
-        
+
     def add_engines(self, engines):
         """
         Add a list of engines to the session
@@ -129,7 +148,6 @@ class Session:
         """
         for engine in engines:
             self.add_engine(engine)
-
 
     def _generate_batch_offsets(self, batch_size):
         """
@@ -154,12 +172,15 @@ class Session:
 
         for output_step in output_steps:
 
-            for i,offsets in enumerate(batch_offsets):
+            for i, offsets in enumerate(batch_offsets):
                 if offsets[0] < output_step < offsets[1]:
-                    batch_offsets = batch_offsets[:i] + [(offsets[0], output_step), (output_step, offsets[1])] + batch_offsets[i+1:]
+                    batch_offsets = (
+                        batch_offsets[:i]
+                        + [(offsets[0], output_step), (output_step, offsets[1])]
+                        + batch_offsets[i + 1 :]
+                    )
 
         return batch_offsets
-
 
     def run(self, batch_size=100, thread_on_update=True):
         """
@@ -174,12 +195,26 @@ class Session:
 
         [engine.initialize(self) for engine in self.engines.values()]
 
-        self.logger.debug('Process with parameters #%d/%d offsets.' % (self._batch_size, self._thread_on_update))
+        self.logger.debug(
+            "Process with parameters #%d/%d offsets."
+            % (self._batch_size, self._thread_on_update)
+        )
 
         batch_offsets = self._generate_batch_offsets(self._batch_size)
-        self.logger.debug('Session run() will be done in %d batchs' % (len(batch_offsets)))
+        self.logger.debug(
+            "Session run() will be done in %d batchs" % (len(batch_offsets))
+        )
 
-        self.logger.info("Session %s: %d traces, %d engines, batch_size=%d, leakage_shape=%s" % (self.name, self.container.number_of_traces, len(self.engines), self._batch_size, self.leakage_shape))
+        self.logger.info(
+            "Session %s: %d traces, %d engines, batch_size=%d, leakage_shape=%s"
+            % (
+                self.name,
+                self.container.number_of_traces,
+                len(self.engines),
+                self._batch_size,
+                self.leakage_shape,
+            )
+        )
 
         #  ProgressBar:
         if self._progressbar:
@@ -187,9 +222,12 @@ class Session:
 
         for i, offsets in enumerate(batch_offsets):
 
-            self.logger.debug('Processing batch #%d/%d, with trace offsets: %s.' % (i + 1, len(batch_offsets), str(offsets)))
+            self.logger.debug(
+                "Processing batch #%d/%d, with trace offsets: %s."
+                % (i + 1, len(batch_offsets), str(offsets))
+            )
 
-            batch = self.container[offsets[0]: offsets[1]]
+            batch = self.container[offsets[0] : offsets[1]]
 
             if not self._thread_on_update:
                 [engine.update(batch) for engine in self.engines.values()]
@@ -206,12 +244,12 @@ class Session:
 
             #  OutputMethod: Get results:
             if offsets[1] and offsets[1] in self.output_steps:
-                self.logger.debug("Computing results (output step %d)."%offsets[1])
+                self.logger.debug("Computing results (output step %d)." % offsets[1])
                 for engine in self.engines.values():
                     results = engine.finalize()
                     if isinstance(results, np.ndarray):
                         results = np.copy(results)
-                    self.output_method.update(engine,results)
+                    self.output_method.update(engine, results)
 
             if self._progressbar:
                 self_progressbar.update(offsets[1])
@@ -228,11 +266,16 @@ class Session:
 
     def _get_progressbar(self):
         if self._progressbar is not None:
-            widgets = [self.name + ' |',
-                       progressbar.Percentage(),
-                       progressbar.Bar(),
-                       progressbar.FormatLabel('%(value)d trc'),
-                       "/%d |"% (len(self.container)),
-                       " (%d engines, batch_size=%d, leakage_shape=%s) |"%(len(self.engines),self._batch_size, self.leakage_shape),
-                       progressbar.AdaptiveETA()]
-            return progressbar.ProgressBar(widgets=widgets, max_value=len(self.container))
+            widgets = [
+                self.name + " |",
+                progressbar.Percentage(),
+                progressbar.Bar(),
+                progressbar.FormatLabel("%(value)d trc"),
+                "/%d |" % (len(self.container)),
+                " (%d engines, batch_size=%d, leakage_shape=%s) |"
+                % (len(self.engines), self._batch_size, self.leakage_shape),
+                progressbar.AdaptiveETA(),
+            ]
+            return progressbar.ProgressBar(
+                widgets=widgets, max_value=len(self.container)
+            )

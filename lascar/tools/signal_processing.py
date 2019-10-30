@@ -21,7 +21,7 @@ import numpy as np
 from scipy.signal import argrelextrema
 
 
-def find_offsets_inside_rectangle(trace, condition, width, ratio=1., separation=1):
+def find_offsets_inside_rectangle(trace, condition, width, ratio=1.0, separation=1):
     """
     Finds offsets inside trace which fits a condition (boolean function), during a given width.
 
@@ -48,7 +48,7 @@ def find_offsets_inside_rectangle(trace, condition, width, ratio=1., separation=
     return offsets
 
 
-def smooth(x, window_len=11, window='hanning'):
+def smooth(x, window_len=11, window="hanning"):
     """smooth the data using a window with requested size.
 
      From https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
@@ -72,40 +72,45 @@ def smooth(x, window_len=11, window='hanning'):
         raise ValueError("Input vector needs to be bigger than window size.")
     if window_len < 3:
         return x
-    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
+    if not window in ["flat", "hanning", "hamming", "bartlett", "blackman"]:
+        raise ValueError(
+            "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+        )
 
-    s = np.r_[2 * x[0] - x[window_len - 1::-1], x, 2 * x[-1] - x[-1:-window_len:-1]]
-    if window == 'flat':  # moving average
-        w = np.ones(window_len, 'd')
+    s = np.r_[2 * x[0] - x[window_len - 1 :: -1], x, 2 * x[-1] - x[-1:-window_len:-1]]
+    if window == "flat":  # moving average
+        w = np.ones(window_len, "d")
     else:
-        w = eval('np.' + window + '(window_len)')
+        w = eval("np." + window + "(window_len)")
 
-    y = np.convolve(w / w.sum(), s, mode='same')
-    return y[window_len:-window_len + 1]
+    y = np.convolve(w / w.sum(), s, mode="same")
+    return y[window_len : -window_len + 1]
 
 
 def plot_with(trace, idx, plot=True):
     _ = plt.plot(trace)
-    _ = plt.plot(idx, trace[idx], 'rx')
+    _ = plt.plot(idx, trace[idx], "rx")
     if plot:
         plt.show()
 
 
-def get_extrema_window(data, threshold, window_len=None, comparator=np.greater, plot=False):
-    '''
+def get_extrema_window(
+    data, threshold, window_len=None, comparator=np.greater, plot=False
+):
+    """
     extract, from 'data', all the samples where there are local extrema with values > 'threshold'.
     (the comparator can be set with np.greater, np.less,...)
     If 'window_len' is set, will only ouptut the maximum value within '[ extrema - window_len/2, extrema + window_len/2] '
-    '''
+    """
     extrema = argrelextrema(data, comparator)[0]
     extrema_threshold = extrema[np.where(comparator(data[extrema], threshold))]
 
     if window_len and len(extrema_threshold) != 0:
         extrema_threshold_window = [extrema_threshold[0]]
         for i in extrema_threshold:
-            if i - extrema_threshold_window[-1] < window_len and comparator(data[i],
-                                                                            data[extrema_threshold_window[-1]]):
+            if i - extrema_threshold_window[-1] < window_len and comparator(
+                data[i], data[extrema_threshold_window[-1]]
+            ):
                 extrema_threshold_window[-1] = i
             if i - extrema_threshold_window[-1] >= window_len:
                 extrema_threshold_window.append(i)
@@ -114,22 +119,22 @@ def get_extrema_window(data, threshold, window_len=None, comparator=np.greater, 
     if plot:
         plt.subplot(211)
         plot_with(data, extrema_threshold, plot=False)
-        plt.subplot(212);
+        plt.subplot(212)
         plt.title("%d offsets found" % len(extrema_threshold))
-        plt.plot(np.diff(extrema_threshold), '-x')
-        plt.show();
+        plt.plot(np.diff(extrema_threshold), "-x")
+        plt.show()
 
     return extrema_threshold
 
 
 def running_max(x, window=32):
-    '''
+    """
     Returns max of consecutive windows of x, each max repeated window times
-    '''
+    """
     n = x.shape[0]
     L = np.zeros(n, dtype=x.dtype)
     for i in range(0, n - window, window):
-        L[i:i + window] = np.repeat(x[i:i + window].max(), window)
+        L[i : i + window] = np.repeat(x[i : i + window].max(), window)
     leftover = n % window
     if leftover:
         L[-leftover:] = np.repeat(x[-leftover:].max(), leftover)
@@ -137,13 +142,13 @@ def running_max(x, window=32):
 
 
 def running_min(x, window=32):
-    '''
+    """
     Returns min of consecutive windows of x, each max repeated window times
-    '''
+    """
     n = x.shape[0]
     L = np.zeros(n, dtype=x.dtype)
     for i in range(0, n - window, window):
-        L[i:i + window] = np.repeat(x[i:i + window].min(), window)
+        L[i : i + window] = np.repeat(x[i : i + window].min(), window)
     leftover = n % window
     if leftover:
         L[-leftover:] = np.repeat(x[-leftover:].min(), leftover)

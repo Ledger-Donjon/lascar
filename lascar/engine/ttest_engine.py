@@ -42,7 +42,7 @@ class TTestEngine(PartitionerEngine):
         :param partition_function: partition_function that will take trace values as an input and returns 0 or 1
         """
         PartitionerEngine.__init__(self, name, partition_function, range(2), 2)
-        self.logger.debug('Creating TtestEngine  \"%s\". ' % (name))
+        self.logger.debug('Creating TtestEngine  "%s". ' % (name))
 
     def _finalize(self):
         m0 = self._acc_x_by_partition[0, 0] / self._partition_count[0]
@@ -51,8 +51,13 @@ class TTestEngine(PartitionerEngine):
         v0 = (self._acc_x_by_partition[1, 0] / self._partition_count[0]) - m0 ** 2
         v1 = (self._acc_x_by_partition[1, 1] / self._partition_count[1]) - m1 ** 2
 
-        return np.nan_to_num((m0 - m1) / np.sqrt((v0 / self._partition_count[0]) + (v1 / self._partition_count[1])),
-                             False)
+        return np.nan_to_num(
+            (m0 - m1)
+            / np.sqrt(
+                (v0 / self._partition_count[0]) + (v1 / self._partition_count[1])
+            ),
+            False,
+        )
 
 
 def compute_ttest(*containers, batch_size=100):
@@ -62,15 +67,19 @@ def compute_ttest(*containers, batch_size=100):
     :param *containers:
     :return:
     """
-    #first compute each mean/variance:
+    # first compute each mean/variance:
     means = []
     pseudo_vars = []
 
-
-    for i,container in enumerate(containers):
+    for i, container in enumerate(containers):
         mean, var = container.get_leakage_mean_var()
 
-        means.append( mean)
-        pseudo_vars.append( var/len(container))
+        means.append(mean)
+        pseudo_vars.append(var / len(container))
 
-    return np.vstack([(means[i]-means[j]) / np.sqrt(pseudo_vars[i] + pseudo_vars[j]) for i,j in itertools.combinations(range(len(containers)),2)])
+    return np.vstack(
+        [
+            (means[i] - means[j]) / np.sqrt(pseudo_vars[i] + pseudo_vars[j])
+            for i, j in itertools.combinations(range(len(containers)), 2)
+        ]
+    )

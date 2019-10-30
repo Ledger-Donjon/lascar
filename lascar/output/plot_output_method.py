@@ -33,8 +33,16 @@ class MatPlotLibOutputMethod(OutputMethod):
     If a filename is specified, the finalize() method will output all its parsed results inside a txt file.
     """
 
-    def __init__(self, *engines, number_of_columns=None, number_of_rows=None, single_plot=False, display=True,
-                 filename=None, legend=False):
+    def __init__(
+        self,
+        *engines,
+        number_of_columns=None,
+        number_of_rows=None,
+        single_plot=False,
+        display=True,
+        filename=None,
+        legend=False
+    ):
         """
 
         :param engines: engines to be tracked
@@ -54,9 +62,14 @@ class MatPlotLibOutputMethod(OutputMethod):
         self.filename = filename
         self.legend = legend
 
-        if number_of_rows and number_of_columns and len(engines) > number_of_rows * number_of_columns:
+        if (
+            number_of_rows
+            and number_of_columns
+            and len(engines) > number_of_rows * number_of_columns
+        ):
             raise ValueError(
-                "Wrong values for number_of_columns/number_of_rows considering the number of engines to display")
+                "Wrong values for number_of_columns/number_of_rows considering the number of engines to display"
+            )
 
         if number_of_rows and not number_of_columns:
             self.number_of_columns = ceil(len(engines) / number_of_rows)
@@ -65,7 +78,7 @@ class MatPlotLibOutputMethod(OutputMethod):
 
         if not number_of_columns and not number_of_rows:
             self.number_of_columns = min(4, len(engines)) if len(engines) else 4
-            self.number_of_rows = max(1,ceil(len(engines) / 4))
+            self.number_of_rows = max(1, ceil(len(engines) / 4))
 
         self.single_plot = single_plot
         if single_plot:
@@ -90,12 +103,13 @@ class MatPlotLibOutputMethod(OutputMethod):
 
             plt.plot(results.T)
 
-            if hasattr(engine, 'solution') and engine.solution is not None:
-                plt.plot(results[engine.solution], 'r-x', linewidth=2)
+            if hasattr(engine, "solution") and engine.solution is not None:
+                plt.plot(results[engine.solution], "r-x", linewidth=2)
 
         else:
-            self.logger.warning("Engine %s: cannot be used with MatPlotLibOutputMethod" % (
-                engine.name))
+            self.logger.warning(
+                "Engine %s: cannot be used with MatPlotLibOutputMethod" % (engine.name)
+            )
             return
 
         if idx == len(self.engines):
@@ -126,8 +140,17 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
 
     """
 
-    def __init__(self, *engines, number_of_columns=None, number_of_rows=None, single_plot=False, display=True,
-                 filename=None, legend=False, filters=None):
+    def __init__(
+        self,
+        *engines,
+        number_of_columns=None,
+        number_of_rows=None,
+        single_plot=False,
+        display=True,
+        filename=None,
+        legend=False,
+        filters=None
+    ):
         """
 
         :param engines: engines to be tracked
@@ -141,19 +164,29 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
 
         """
 
-        MatPlotLibOutputMethod.__init__(self, *engines, number_of_columns=number_of_columns,
-                                        number_of_rows=number_of_rows, single_plot=single_plot, display=display,
-                                        filename=filename, legend=legend)
+        MatPlotLibOutputMethod.__init__(
+            self,
+            *engines,
+            number_of_columns=number_of_columns,
+            number_of_rows=number_of_rows,
+            single_plot=single_plot,
+            display=display,
+            filename=filename,
+            legend=legend
+        )
 
         self.steps = []
         self.scores = {}
         self.scores_solution = {}
 
-        if filters is None or (isinstance(filters, list) and len(filters) == len(engines) and all(
-                [isinstance(i, list) for i in filters])):
+        if filters is None or (
+            isinstance(filters, list)
+            and len(filters) == len(engines)
+            and all([isinstance(i, list) for i in filters])
+        ):
             self.filters = filters  # filter is a list of len(engines) list...
         else:
-            raise ValueError('filters must be a list of len(engines) list of guesses.')
+            raise ValueError("filters must be a list of len(engines) list of guesses.")
 
     def _update(self, engine, results):
 
@@ -161,7 +194,7 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
         if results_parsed is None:
             return
 
-        if engine.output_parser_mode in ['max', 'argmax']:
+        if engine.output_parser_mode in ["max", "argmax"]:
             if engine._number_of_processed_traces not in self.steps:
                 self.steps.append(engine._number_of_processed_traces)
 
@@ -189,17 +222,34 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
 
             if self.filters is None:
                 for j in range(len(self.scores[engine_name][0])):
-                    plt.plot(self.steps, [self.scores[engine_name][k][j] for k in range(len(self.scores[engine_name]))],
-                             label="%s guess %d" % (engine_name, j))
+                    plt.plot(
+                        self.steps,
+                        [
+                            self.scores[engine_name][k][j]
+                            for k in range(len(self.scores[engine_name]))
+                        ],
+                        label="%s guess %d" % (engine_name, j),
+                    )
                 try:
-                    plt.plot(self.steps, self.scores_solution[engine_name], '-rx', linewidth=2)
+                    plt.plot(
+                        self.steps,
+                        self.scores_solution[engine_name],
+                        "-rx",
+                        linewidth=2,
+                    )
                 except:
                     pass
 
             else:
                 for j in self.filters[i]:
-                    plt.plot(self.steps, [self.scores[engine_name][k][j] for k in range(len(self.scores[engine_name]))],
-                             label="%s guess %d" % (engine_name, j))
+                    plt.plot(
+                        self.steps,
+                        [
+                            self.scores[engine_name][k][j]
+                            for k in range(len(self.scores[engine_name]))
+                        ],
+                        label="%s guess %d" % (engine_name, j),
+                    )
 
             plt.xlabel("number of traces")
             if self.legend:
@@ -222,8 +272,6 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
         return self.scores_solution
 
 
-
-
 class RankProgressionOutputMethod(ScoreProgressionOutputMethod):
     """
     RankProgressionOutputMethod is an OutputMethod that will plot the progression of the ranks for one (or several) GuessEngine, along all output_steps.
@@ -240,7 +288,7 @@ class RankProgressionOutputMethod(ScoreProgressionOutputMethod):
         if results_parsed is None:
             return
 
-        if engine.output_parser_mode in ['max', 'argmax']:
+        if engine.output_parser_mode in ["max", "argmax"]:
             if engine._number_of_processed_traces not in self.steps:
                 self.steps.append(engine._number_of_processed_traces)
 

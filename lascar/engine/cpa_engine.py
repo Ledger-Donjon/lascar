@@ -48,16 +48,22 @@ class CpaEngine(GuessEngine):
         :param solution: if known, indicate the correct guess guess.
         """
         GuessEngine.__init__(self, name, selection_function, guess_range, solution, jit)
-        self.logger.debug('Creating CpaEngine \"%s\" with %d guesses.' % (name, len(guess_range)))
+        self.logger.debug(
+            'Creating CpaEngine "%s" with %d guesses.' % (name, len(guess_range))
+        )
 
         self.output_parser_mode = "argmax"
 
     def _initialize(self):
-        self.size_in_memory += (np.prod(
-            (self._number_of_guesses,) + self._session.leakage_shape) + 2 * self._number_of_guesses) * 8
+        self.size_in_memory += (
+            np.prod((self._number_of_guesses,) + self._session.leakage_shape)
+            + 2 * self._number_of_guesses
+        ) * 8
         self._accM = np.zeros((self._number_of_guesses,), np.double)
         self._accM2 = np.zeros((self._number_of_guesses,), np.double)
-        self._accXM = np.zeros((self._number_of_guesses,) + self._session.leakage_shape, np.double)
+        self._accXM = np.zeros(
+            (self._number_of_guesses,) + self._session.leakage_shape, np.double
+        )
 
     def _update(self, batch):
         m = self._mapfunction(self._guess_range, batch.values)
@@ -67,11 +73,19 @@ class CpaEngine(GuessEngine):
 
     def _finalize(self):
         m, v = self._session["mean"].finalize(), self._session["var"].finalize()
-        numerator = ((self._accXM / self._number_of_processed_traces) - np.outer( self._accM / self._number_of_processed_traces, m))
-        denominator = np.sqrt(np.outer( self._accM2 / self._number_of_processed_traces - (self._accM / self._number_of_processed_traces) ** 2, v)) 
-        mask = v==0.
-        numerator[:, mask] = 0.
-        denominator[:, mask] = 1.
+        numerator = (self._accXM / self._number_of_processed_traces) - np.outer(
+            self._accM / self._number_of_processed_traces, m
+        )
+        denominator = np.sqrt(
+            np.outer(
+                self._accM2 / self._number_of_processed_traces
+                - (self._accM / self._number_of_processed_traces) ** 2,
+                v,
+            )
+        )
+        mask = v == 0.0
+        numerator[:, mask] = 0.0
+        denominator[:, mask] = 1.0
         return np.nan_to_num(numerator / denominator)
 
     def _clean(self):
@@ -99,7 +113,15 @@ class CpaPartitionedEngine(PartitionerEngine, GuessEngine):
     volume 8269 of Lecture Notes in Computer Science, pages 506–525. Springer, 2013.
     """
 
-    def __init__(self, name, partition_function, partition_range, selection_function, guess_range, solution=None):
+    def __init__(
+        self,
+        name,
+        partition_function,
+        partition_range,
+        selection_function,
+        guess_range,
+        solution=None,
+    ):
         """
 
         :param name:
@@ -112,24 +134,40 @@ class CpaPartitionedEngine(PartitionerEngine, GuessEngine):
         """
         PartitionerEngine.__init__(self, name, partition_function, partition_range, 1)
         GuessEngine.__init__(self, name, selection_function, guess_range, solution)
-        self.logger.debug('Creating CpaPartitionedEngine \"%s\" with %d partitions, %d guesses.' % (
-            name, len(self._partition_range), len(guess_range)))
+        self.logger.debug(
+            'Creating CpaPartitionedEngine "%s" with %d partitions, %d guesses.'
+            % (name, len(self._partition_range), len(guess_range))
+        )
 
     def _finalize(self):
-        accXM = np.zeros((self._number_of_guesses,) + self._session.leakage_shape, np.double)
+        accXM = np.zeros(
+            (self._number_of_guesses,) + self._session.leakage_shape, np.double
+        )
         accM = np.zeros((self._number_of_guesses,), np.double)
         accM2 = np.zeros((self._number_of_guesses,), np.double)
 
         for val in range(self._partition_size):
-            models = np.array([self._function(val, guess) for guess in self._guess_range])
+            models = np.array(
+                [self._function(val, guess) for guess in self._guess_range]
+            )
             accXM += np.outer(models, self._acc_x_by_partition[0, val])
             accM += models * self._partition_count[val]
             accM2 += (models ** 2) * self._partition_count[val]
 
         m, v = self._session["mean"].finalize(), self._session["var"].finalize()
-        return np.nan_to_num(((accXM / self._number_of_processed_traces) - np.outer(
-            accM / self._number_of_processed_traces, m)) / np.sqrt(np.outer(
-            accM2 / self._number_of_processed_traces - (accM / self._number_of_processed_traces) ** 2, v)))
+        return np.nan_to_num(
+            (
+                (accXM / self._number_of_processed_traces)
+                - np.outer(accM / self._number_of_processed_traces, m)
+            )
+            / np.sqrt(
+                np.outer(
+                    accM2 / self._number_of_processed_traces
+                    - (accM / self._number_of_processed_traces) ** 2,
+                    v,
+                )
+            )
+        )
 
     def _clean(self):
         del self._accM

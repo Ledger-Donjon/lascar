@@ -33,7 +33,7 @@ import sys
 
 if not len(sys.argv) == 2:
     print("Need to specify the location of ASCAD_DIR.")
-    print("USAGE: python3 %s ASCAD_DIR"% sys.argv[0])
+    print("USAGE: python3 %s ASCAD_DIR" % sys.argv[0])
     exit()
 
 ASCAD_DIR = sys.argv[1]
@@ -45,16 +45,18 @@ The only difference is in the naming of the datasets.
 Instead of (leakages, values), ASCAD uses (traces, metadata).
 """
 
-container = Hdf5Container(filename, leakages_dataset_name="traces", values_dataset_name="metadata")
+container = Hdf5Container(
+    filename, leakages_dataset_name="traces", values_dataset_name="metadata"
+)
 
-trace = container[0] # The first trace
+trace = container[0]  # The first trace
 print(trace)
 
-#container.plot_leakage(range(10)) # plot the 10 first leakages
+# container.plot_leakage(range(10)) # plot the 10 first leakages
 
-poi = range(45400, 46100) # poi for the byte 2 of the AES first round stats
-profiling_index = range(500) # the first 500 traces are used for the profiling traces
-attack_index = range(500,600) # the 100 following traces are used for the attack
+poi = range(45400, 46100)  # poi for the byte 2 of the AES first round stats
+profiling_index = range(500)  # the first 500 traces are used for the profiling traces
+attack_index = range(500, 600)  # the 100 following traces are used for the attack
 # the other traces are ignored for this demo
 
 
@@ -65,34 +67,44 @@ def leakage_desynchro(offset):
     :return: function to be applied on the leakages, for desynchronisation
     """
     if offset == 0:
-        return lambda leakage:leakage
-    return lambda leakage: np.roll(leakage, np.random.randint(-offset//2, offset//2))
-
-for filename, desynchro in [("ASCAD.h5", 0), ("ASCAD_desync50.h5", 50), ("ASCAD_desync100.h5", 100)]: 
-
-    print("\n--- Creating %s ---"%filename)
-
-    profile_container = FilteredContainer(  container, 
-                                            profiling_index, 
-                                            leakage_section=poi, 
-                                            leakage_processing=leakage_desynchro(desynchro)
-                                          )
-
-    Hdf5Container.export(   profile_container,
-                            filename, 
-                            leakages_dataset_name="/Profiling_traces/traces", 
-                            values_dataset_name="/Profiling_traces/metadata"
-                            )
+        return lambda leakage: leakage
+    return lambda leakage: np.roll(
+        leakage, np.random.randint(-offset // 2, offset // 2)
+    )
 
 
-    attack_container = FilteredContainer(   container, 
-                                            attack_index, 
-                                            leakage_section=poi, 
-                                            leakage_processing=leakage_desynchro(desynchro)
-                                            )
+for filename, desynchro in [
+    ("ASCAD.h5", 0),
+    ("ASCAD_desync50.h5", 50),
+    ("ASCAD_desync100.h5", 100),
+]:
 
-    Hdf5Container.export(   attack_container,
-                            filename,
-                            leakages_dataset_name="/Attack_traces/traces", 
-                            values_dataset_name="/Attack_traces/metadata"
-                        )
+    print("\n--- Creating %s ---" % filename)
+
+    profile_container = FilteredContainer(
+        container,
+        profiling_index,
+        leakage_section=poi,
+        leakage_processing=leakage_desynchro(desynchro),
+    )
+
+    Hdf5Container.export(
+        profile_container,
+        filename,
+        leakages_dataset_name="/Profiling_traces/traces",
+        values_dataset_name="/Profiling_traces/metadata",
+    )
+
+    attack_container = FilteredContainer(
+        container,
+        attack_index,
+        leakage_section=poi,
+        leakage_processing=leakage_desynchro(desynchro),
+    )
+
+    Hdf5Container.export(
+        attack_container,
+        filename,
+        leakages_dataset_name="/Attack_traces/traces",
+        values_dataset_name="/Attack_traces/metadata",
+    )

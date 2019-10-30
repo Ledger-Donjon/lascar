@@ -25,8 +25,6 @@ from . import GuessEngine
 from . import PartitionerEngine
 
 
-
-
 class ProfileEngine(PartitionerEngine):
     """
     ProfileEngine is a PartitionerEngine used to mount Profiled Side-Channel Attacks.
@@ -41,8 +39,17 @@ class ProfileEngine(PartitionerEngine):
 
     """
 
-    def __init__(self, name, classifier, partition_function, partition_range, epochs=10, test_size=0.1, verbose=1,
-                 batch_size=128):
+    def __init__(
+        self,
+        name,
+        classifier,
+        partition_function,
+        partition_range,
+        epochs=10,
+        test_size=0.1,
+        verbose=1,
+        batch_size=128,
+    ):
         """
 
         :param name:
@@ -55,17 +62,21 @@ class ProfileEngine(PartitionerEngine):
         :param batch_size: only used when using keras model, will be passed to the keras .fit() method
         """
 
-
         import keras
         import sklearn
 
         if not isinstance(classifier, sklearn.base.ClassifierMixin) and not (
-                isinstance(classifier, keras.Model) and classifier._is_compiled):
-            raise ValueError('Classifier should be a sklearn classifier or a compiled keras model.')
+            isinstance(classifier, keras.Model) and classifier._is_compiled
+        ):
+            raise ValueError(
+                "Classifier should be a sklearn classifier or a compiled keras model."
+            )
 
         PartitionerEngine.__init__(self, name, partition_function, partition_range, 1)
         self._classifier = classifier
-        self.classifier_type = "keras" if isinstance(classifier, keras.Model)  else  "sklearn"
+        self.classifier_type = (
+            "keras" if isinstance(classifier, keras.Model) else "sklearn"
+        )
 
         self.output_parser_mode = None
 
@@ -99,14 +110,21 @@ class ProfileEngine(PartitionerEngine):
     def _update_keras_model(self, batch):
         from keras.utils import to_categorical
 
-        Y = to_categorical(list(map(self._partition_function, batch.values)), self._partition_size)
-        X_train, X_test, Y_train, Y_test = train_test_split(batch.leakages, Y, test_size=self.test_size)
+        Y = to_categorical(
+            list(map(self._partition_function, batch.values)), self._partition_size
+        )
+        X_train, X_test, Y_train, Y_test = train_test_split(
+            batch.leakages, Y, test_size=self.test_size
+        )
 
-        self.history = self._classifier.fit(X_train, Y_train,
-                                            batch_size=self.batch_size,
-                                            epochs=self.epochs,
-                                            verbose=self.verbose,
-                                            validation_data=(X_test, Y_test))
+        self.history = self._classifier.fit(
+            X_train,
+            Y_train,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+            verbose=self.verbose,
+            validation_data=(X_test, Y_test),
+        )
 
         self.score_train = self._classifier.evaluate(X_train, Y_train)
         self.score_test = self._classifier.evaluate(X_test, Y_test)
@@ -124,7 +142,9 @@ class MatchEngine(GuessEngine):
     see examples/attacks/classifier.py for an example.
     """
 
-    def __init__(self, name, classifier, selection_function, guess_range, solution=None):
+    def __init__(
+        self, name, classifier, selection_function, guess_range, solution=None
+    ):
         """
 
         :param name:
@@ -145,7 +165,12 @@ class MatchEngine(GuessEngine):
 
     def _update(self, batch):
 
-        y = np.array([[self._function(d, guess) for guess in self._guess_range] for d in batch.values])
+        y = np.array(
+            [
+                [self._function(d, guess) for guess in self._guess_range]
+                for d in batch.values
+            ]
+        )
 
         if hasattr(self._classifier, "predict_log_proba"):
             log_probas = self._classifier.predict_log_proba(batch.leakages)
@@ -155,7 +180,8 @@ class MatchEngine(GuessEngine):
             log_probas = np.log2(self._classifier.predict(batch.leakages))
         else:
             raise ValueError(
-                'the classifier should have either .predict_proba() or .predict_log_proba() or .predict() method')
+                "the classifier should have either .predict_proba() or .predict_log_proba() or .predict() method"
+            )
 
         log_probas = np.nan_to_num(log_probas, False)
 
@@ -168,23 +194,24 @@ class MatchEngine(GuessEngine):
 
 
 def save_classifier(classifier, filename):
-    if hasattr(classifier, "save"): # keras save
+    if hasattr(classifier, "save"):  # keras save
         classifier.save(filename)
         return
     try:
-        with open(filename, 'wb') as f: # sklearn save
+        with open(filename, "wb") as f:  # sklearn save
             pickle.dump(classifier, f)
         return
     except e:
         pass
 
-    raise ValueError("Classifier cant be saved %s %s."%(classifier,filename))
+    raise ValueError("Classifier cant be saved %s %s." % (classifier, filename))
 
 
 def load_classifier(filename):
     try:  # sklearn load
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             return pickle.load(f)
     except:  # keras load
         from keras.models import load_model
+
         return load_model(filename)

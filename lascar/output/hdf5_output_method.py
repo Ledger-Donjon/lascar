@@ -36,7 +36,7 @@ class Hdf5OutputMethod(OutputMethod):
 
     """
 
-    def __init__(self, filename, *engines, prefix=''):
+    def __init__(self, filename, *engines, prefix=""):
         """
 
         :param filename: the filename for the hdf5 file.
@@ -44,20 +44,26 @@ class Hdf5OutputMethod(OutputMethod):
         """
         OutputMethod.__init__(self, *engines)
         self.file = h5py.File(filename)
-        self.prefix= prefix
+        self.prefix = prefix
 
     def _update(self, engine, results):
 
         try:
-            dset_name = "%s%s/%d" % (self.prefix, engine.name, engine._number_of_processed_traces)
+            dset_name = "%s%s/%d" % (
+                self.prefix,
+                engine.name,
+                engine._number_of_processed_traces,
+            )
             if dset_name in self.file:
                 del self.file[dset_name]
 
             self.file[dset_name] = results
 
         except Exception as e:
-            self.logger.warning("Engine %s with %d traces: cannot be used with Hdf5OutputMethod. %s" % (
-                engine.name, engine._number_of_processed_traces, e))
+            self.logger.warning(
+                "Engine %s with %d traces: cannot be used with Hdf5OutputMethod. %s"
+                % (engine.name, engine._number_of_processed_traces, e)
+            )
 
     def _finalize(self):
         return self.file
@@ -73,6 +79,6 @@ class Hdf5OutputMethod(OutputMethod):
         if len(self.file[item]) > 1:
             return self.file[item]
         elif len(self.file[item]) == 1:
-            return self.file[item][ list(self.file[item])[0] ]
+            return self.file[item][list(self.file[item])[0]]
         else:
-            raise ValueError('%s not set for this output method.'%(item))
+            raise ValueError("%s not set for this output method." % (item))

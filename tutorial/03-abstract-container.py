@@ -28,7 +28,9 @@ You'll see that it consists in an ABstractContainer or which the generate_trace(
 
 from lascar.container import BasicAesSimulationContainer
 
-container = BasicAesSimulationContainer(50, 1.5)  # container with 5 traces, noise set to 1.5
+container = BasicAesSimulationContainer(
+    50, 1.5
+)  # container with 5 traces, noise set to 1.5
 print("aes_simulation:", container)
 print()
 
@@ -52,16 +54,16 @@ In the following example, we use MultipleContainer to concatenate BasicAesSimula
 """
 from lascar import MultipleContainer
 
-#First we c(reate a tuple of 4 containers with the same leakage/value shape. The number of traces can be anything:
-containers_base = [BasicAesSimulationContainer(10, 1,5) for _ in range(3)]
-containers_base += [BasicAesSimulationContainer(20,2)]
+# First we c(reate a tuple of 4 containers with the same leakage/value shape. The number of traces can be anything:
+containers_base = [BasicAesSimulationContainer(10, 1, 5) for _ in range(3)]
+containers_base += [BasicAesSimulationContainer(20, 2)]
 
-#Then we create the MultipleContainer, by passing containers_base as args:
+# Then we create the MultipleContainer, by passing containers_base as args:
 multiple_container = MultipleContainer(*containers_base)
-print("multiple_container:",multiple_container)
+print("multiple_container:", multiple_container)
 print()
 
-#Now we can see that the traces inside multiple_container arise from containers_base, but have not been copied elsewhere:
+# Now we can see that the traces inside multiple_container arise from containers_base, but have not been copied elsewhere:
 for i in range(10):
     assert multiple_container[i] == containers_base[0][i]
     assert multiple_container[10 + i] == containers_base[1][i]
@@ -87,24 +89,23 @@ In the following examples we will use both methods to filter a BasicAesSimulatio
 
 from lascar import FilteredContainer
 
-container = BasicAesSimulationContainer(5000,1)
+container = BasicAesSimulationContainer(5000, 1)
 print("container_base:", container)
 print()
 
-container_filtered_from_list = FilteredContainer(container, range(0,5000,2))
-print("container_filtered_from_list:",container_filtered_from_list)
+container_filtered_from_list = FilteredContainer(container, range(0, 5000, 2))
+print("container_filtered_from_list:", container_filtered_from_list)
 print()
 for i in range(len(container_filtered_from_list)):
-    assert container_filtered_from_list[i] == container[2*i]
+    assert container_filtered_from_list[i] == container[2 * i]
 
 
-#for the filtering from a function, we create a boolean function taking a Trace as input:
-filter_function = lambda trace: trace.value['plaintext'][0] == 0
+# for the filtering from a function, we create a boolean function taking a Trace as input:
+filter_function = lambda trace: trace.value["plaintext"][0] == 0
 
 container_filtered_from_function = FilteredContainer(container, filter_function)
-print("container_filtered_from_function:",container_filtered_from_function)
+print("container_filtered_from_function:", container_filtered_from_function)
 print()
 
 for trace in container_filtered_from_function:
-    assert trace.value['plaintext'][0] == 0
-
+    assert trace.value["plaintext"][0] == 0

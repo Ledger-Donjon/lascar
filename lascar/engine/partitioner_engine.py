@@ -74,15 +74,19 @@ class PartitionerEngine(Engine):
 
         self._partition_range = list(self._partition_range)
         self._partition_size = len(self._partition_range)
-        self._partition_range_to_index = {j: i for i, j in enumerate(self._partition_range)}
+        self._partition_range_to_index = {
+            j: i for i, j in enumerate(self._partition_range)
+        }
         self._order = order
 
         Engine.__init__(self, name)
 
     def _initialize(self):
 
-        self._acc_x_by_partition = np.zeros((self._order, self._partition_size) + self._session.leakage_shape,
-                                            dtype=np.double)
+        self._acc_x_by_partition = np.zeros(
+            (self._order, self._partition_size) + self._session.leakage_shape,
+            dtype=np.double,
+        )
 
         # acc_x_by_partition[i,j,k] = sum( (leakages[k])**i | partition = j)
 
@@ -98,8 +102,9 @@ class PartitionerEngine(Engine):
             # print(i,v)
             self._partition_count[self._partition_range_to_index[v]] += 1
             for o in range(self._order):
-                self._acc_x_by_partition[o, self._partition_range_to_index[v]] += np.power(batch.leakages[i], o + 1,
-                                                                                           dtype=np.double)
+                self._acc_x_by_partition[
+                    o, self._partition_range_to_index[v]
+                ] += np.power(batch.leakages[i], o + 1, dtype=np.double)
 
     def _finalize(self):
         pass
@@ -121,6 +126,6 @@ class PartitionerEngine(Engine):
         acc = np.zeros(self._acc_x_by_partition.shape[1:], np.double)
         for v in self._partition_range:
             i = self._partition_range_to_index[v]
-            acc[i] = (self._acc_x_by_partition[0, i] / self._partition_count[i])
+            acc[i] = self._acc_x_by_partition[0, i] / self._partition_count[i]
 
         return acc
