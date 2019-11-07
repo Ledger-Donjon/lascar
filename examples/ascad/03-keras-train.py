@@ -76,7 +76,7 @@ nn_profile_engine = ProfileEngine(
     partition_values,
     epochs=5,
     batch_size=200,
-    test_size=0,
+    test_size=0.1,
 )
 
 Session(profiling_container, engine=nn_profile_engine).run()
