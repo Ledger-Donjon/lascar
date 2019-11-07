@@ -32,10 +32,10 @@ def find_offsets_inside_rectangle(trace, condition, width, ratio=1.0, separation
     count = 0
     offsets = []
     ratio_width = width * ratio
-    condition_trace = condition(trace)
+    condition_trace = [condition(i) for i in trace]
 
     i = 0
-    while i < condition_trace.size:
+    while i < len(condition_trace):
         if condition_trace[i]:
             count = count + 1
 
