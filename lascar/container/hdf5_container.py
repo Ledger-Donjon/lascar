@@ -177,7 +177,7 @@ class Hdf5Container(Container):
         """
         try:
             mean, var = self.leakages.attrs["mean"], self.leakages.attrs["var"]
-            return self.apply_both_value(mean), self.apply_both_value(var)
+            return self.apply_both_leakage(mean), self.apply_both_leakage(var)
 
         except:
             mean, var = Container.get_leakage_mean_var(self)
