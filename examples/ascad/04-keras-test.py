@@ -78,17 +78,15 @@ nn_match_engine = MatchEngine(
 
 # Now, 5 times in a row we randomly take 2000 traces from attack_container, and compute the mean rank of the correct key, every 10 traces.
 ranks = []
-for i in range(5):
 
-    container = RandomizedContainer(attack_container)
-    container.number_of_traces = 500
+for i,container in enumerate(split_container(attack_container, size_of_splits=2000)[:5]):
 
     session = Session(
         container,
         name="run %d" % i,
         engine=nn_match_engine,
         output_method=RankProgressionOutputMethod(nn_match_engine, display=False),
-        output_steps=range(0, 500, 10),
+        output_steps=range(0, 2000, 10),
     )
     session.run()
 
