@@ -705,7 +705,7 @@ class AcquisitionFromGetters(AbstractContainer):
             self.get_value = lambda: self.value_getter.get()
         else:
             raise ValueError(
-                "value_getter must either be an iterator/generator OR implement a get method"
+                "value_getter must either be an iterator/generator OR implement a get() method"
             )
 
         if hasattr(leakage_getter, "__iter__"):
@@ -714,7 +714,7 @@ class AcquisitionFromGetters(AbstractContainer):
             self.get_leakage = lambda: self.leakage_getter.get()
         else:
             raise ValueError(
-                "leakage_getter must either be an iterator/generator OR implement a get method"
+                "leakage_getter must either be an iterator/generator OR implement a get() method"
             )
 
         AbstractContainer.__init__(self, number_of_traces, **kargs)

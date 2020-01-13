@@ -66,15 +66,22 @@ def main():
     "-v",
     "--value_getter",
     nargs=2,
-    default=[__file__, "dumb_generator"],
-    help="indicate value_getter module_name and object_name",
+    default=None,
+    help="indicate value_getter module_name and object_name (to be used with --leakage_getter option)",
 )
 @click.option(
     "-l",
     "--leakage_getter",
     nargs=2,
-    default=[__file__, "dumb_generator"],
-    help="indicate leakage_getter module_name and object_name",
+    default=None,
+    help="indicate leakage_getter module_name and object_name  (to be used with --value_getter option)",
+)
+@click.option(
+    "-c",
+    "--container",
+    nargs=2,
+    default=[__file__, "BasicAesSimulationContainer"],
+    help="indicate the Container that you want to export  (to be used without --leakage_getter and --value_getter options)",
 )
 @click.option(
     "-o",
@@ -100,7 +107,7 @@ def main():
     help="boolean to plot traces with matplotlib during acquisition",
 )
 def acquisition(
-    number_of_traces, value_getter, leakage_getter, output, batch_size, wait, plot
+    number_of_traces, container, value_getter, leakage_getter, output, batch_size, wait, plot
 ):
     """
     Acquire side-channel data.
@@ -108,12 +115,19 @@ def acquisition(
     Must input number_of_traces and two generators: one leakage_getter, one value_getter
 
     """
-    value_getter = import_object_from_module(*value_getter)
-    leakage_getter = import_object_from_module(*leakage_getter)
+    if value_getter and leakage_getter:
+        
+        value_getter = import_object_from_module(*value_getter)
+        leakage_getter = import_object_from_module(*leakage_getter)
 
-    acquisition_container = AcquisitionFromGetters(
-        number_of_traces, value_getter(), leakage_getter()
-    )
+        acquisition_container = AcquisitionFromGetters(
+            number_of_traces, value_getter(), leakage_getter()
+        )
+    
+    elif container:
+        acquisition_container = import_object_from_module(*container)(number_of_traces)
+    
+    
 
     if output:
         Hdf5Container.export(
@@ -156,7 +170,7 @@ def acquisition(
     help="set the batch_size for lascar session",
 )
 @click.option(
-    "-p", "--plot", is_flag=True, help="boolean to plot traces while acquisition"
+    "-p", "--plot", is_flag=True, help="boolean to plot processed traces (for debug/test purpose)"
 )
 @click.option(
     "-n",
@@ -234,8 +248,8 @@ def run(name_in, module, engines, output_method, batch_size, number_of_traces):
     """
     Run a lascar session on a container.
     
-    Must specify:
-    - name_in : the name of the container file (hdf5 for now)
+    Must specify:\n
+    - name_in : the name of the container file (hdf5 for now)\n
     - module : path to a python module containing engines/output_method definition
     """
     container = load_container(*name_in)

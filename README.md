@@ -90,6 +90,11 @@ Created in 2018, Ledger Donjon (Ledger security team) regroups experts in securi
 
 
 
+## Command-line tool
+
+Use `lascarctl`, *lascar* command line tool.
+For documentation, [see here](LASCARCTL.md)
+
 ## Acknowledgerments
 
 Ledger's Donjon would like to thank the people behind [ASCAD](https://github.com/ANSSI-FR/ASCAD), for making available real side-channel traces and scripts for analysis.
