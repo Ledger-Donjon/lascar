@@ -84,16 +84,15 @@ The [tutorial](tutorial/) folder contains commented scripts to understand how to
 
 See [examples.md](examples/examples.md)
 
-
-## ![Ledger Donjon Logo](images/logo_donjon) About Ledger Donjon ![Ledger Donjon Logo](images/logo_donjon)
-Created in 2018, Ledger Donjon (Ledger security team) regroups experts in security with a wide range of expertise (such as software, perturbation and side-channel attacks, secured development, reverse engineering, ...). Based in Paris, Ledger's Donjon tends to shift the paradigm of security through obscurity. Take a look at our [blogposts](https://www.ledger.fr/category/security/) and the [detailed introduction](https://www.ledger.fr/2018/11/12/introducing-ledger-donjon/)!
-
-
-
 ## Command-line tool
 
 Use `lascarctl`, *lascar* command line tool.
 For documentation, [see here](LASCARCTL.md)
+
+
+## ![Ledger Donjon Logo](images/logo_donjon) About Ledger Donjon ![Ledger Donjon Logo](images/logo_donjon)
+Created in 2018, Ledger Donjon (Ledger security team) regroups experts in security with a wide range of expertise (such as software, perturbation and side-channel attacks, secured development, reverse engineering, ...). Based in Paris, Ledger's Donjon tends to shift the paradigm of security through obscurity. Take a look at our [blogposts](https://www.ledger.fr/category/security/) and the [detailed introduction](https://www.ledger.fr/2018/11/12/introducing-ledger-donjon/)!
+
 
 ## Acknowledgerments
 

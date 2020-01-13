@@ -181,7 +181,7 @@ I have to create a python module, say `bar.py`, that defines:
 - `output_method`: how the `Session` will output the results of the `engines`
 
 
-"""
+```
 from lascar import *
 
 engines = [  #define all your engines here:
@@ -190,7 +190,7 @@ engines = [  #define all your engines here:
     ]
 
 output_method = MatPlotLibOutputMethod(*engines) # define your output_method here
-"""
+```
 
 Now the command 
 ```
