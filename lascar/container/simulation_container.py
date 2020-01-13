@@ -99,7 +99,8 @@ class BasicAesSimulationContainer(AbstractContainer):
 
 class AesSimulationContainer(AbstractContainer):
     """
-    aes
+    AesSimulationContainer is an AbstractContainer used to 
+    simulate traces during all the round function of an AES.
     """
 
     def __init__(
@@ -155,15 +156,14 @@ class AesSimulationContainer(AbstractContainer):
         value["plaintext"] = np.random.randint(0, 256, (16,), np.uint8)
         value["key"] = self.key
 
-        leakage = Aes.encrypt_keep_iv(value["plaintext"], value["key"])
-
+        leakage = Aes.encrypt_keep_iv(value["plaintext"], Aes.key_schedule(value["key"]))
         value["ciphertext"] = leakage[-16:]
-        leakage += np.random.normal(0, self.noise, (len(leakage),))
+
+        leakage = np.array([self.leakage_model(i) for i in leakage]) # leakage model
+        leakage = leakage + np.random.normal(0, self.noise, (len(leakage),)) # noise
 
         return Trace(leakage, value)
 
-
-#
 # class FromFunctionSimulationContainer(AbstractContainer):
 #     """
 #     FromFunctionSimulationContainer is a SimulationContainer which use a function to generate its trace.

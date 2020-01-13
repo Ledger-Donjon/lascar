@@ -30,6 +30,7 @@ from .filtered_container import split_container
 from .hdf5_container import Hdf5Container
 from .multiple_container import MultipleContainer
 from .simulation_container import BasicAesSimulationContainer
+from .simulation_container import AesSimulationContainer
 from .container import Trace
 
 from .npy_container import NpyContainer

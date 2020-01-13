@@ -2166,6 +2166,8 @@ class Aes(object):
 
     """
 
+    nr = {176:10}
+
     @staticmethod
     def xor(s1, s2):
         return tuple(a ^ b for a, b in zip(s1, s2))
@@ -2292,7 +2294,7 @@ class Aes(object):
         :param key_scheduled:
         :return:
         """
-        nr = int(len(key_scheduled) / 16)
+        nr = Aes.nr[len(key_scheduled)]
 
         res = []
 
