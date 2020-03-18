@@ -83,7 +83,8 @@ def parse_output_max(results, guesses):
         scores = results
 
     tmp = sorted(zip(guesses, scores), key=lambda x: x[1], reverse=True)
-    return [(s[0], s[1], rank + 1) for rank, s in enumerate(tmp)]
+    tmp2 = [(s[0], s[1], rank + 1) for rank, s in enumerate(tmp)]
+    return sorted(tmp2, key=lambda x: x[0])
 
 
 def parse_output_argmax(results, guesses):
@@ -108,4 +109,5 @@ def parse_output_argmax(results, guesses):
         scores = np.abs(results)
 
     tmp = sorted(zip(guesses, scores), key=lambda x: x[1], reverse=True)
-    return [(s[0], s[1], rank + 1) for rank, s in enumerate(tmp)]
+    tmp2 = [(s[0], s[1], rank + 1) for rank, s in enumerate(tmp)]
+    return sorted(tmp2, key=lambda x: x[0])
