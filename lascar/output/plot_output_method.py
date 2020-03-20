@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 
 from . import OutputMethod
 from .parse_results import apply_parse
+from .rank_estimation import RankEstimation
 
 import numpy as np
 
@@ -41,7 +42,8 @@ class MatPlotLibOutputMethod(OutputMethod):
         single_plot=False,
         display=True,
         filename=None,
-        legend=False
+        legend=False,
+        solution_only=False
     ):
         """
 
@@ -52,6 +54,7 @@ class MatPlotLibOutputMethod(OutputMethod):
         :param display: if true, display the plot on the screen
         :param filename: it set, save the figure to filename
         :param legend: it set, displays thee legend on the figure
+        :param solution_only: if set, only the solution gets plotted
         """
         OutputMethod.__init__(self, *engines)
 
@@ -61,6 +64,7 @@ class MatPlotLibOutputMethod(OutputMethod):
         self.display = display
         self.filename = filename
         self.legend = legend
+        self.solution_only = solution_only
 
         if (
             number_of_rows
@@ -97,11 +101,12 @@ class MatPlotLibOutputMethod(OutputMethod):
             plt.title(engine.name)
 
         if isinstance(results, np.ndarray) and len(results.shape) == 1:
-            plt.plot(results, label=engine.name)
+            if not self.solution_only:
+                plt.plot(results, label=engine.name)
 
         elif isinstance(results, np.ndarray) and len(results.shape) == 2:
-
-            plt.plot(results.T)
+            if not self.solution_only:
+                plt.plot(results.T)
 
             if hasattr(engine, "solution") and engine.solution is not None:
                 plt.plot(results[engine.solution], "r-x", linewidth=2)
@@ -149,7 +154,8 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
         display=True,
         filename=None,
         legend=False,
-        filters=None
+        filters=None,
+        solution_only=False
     ):
         """
 
@@ -161,7 +167,7 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
         :param filename: if set, save the figure to filename
         :param legend: if set, displays thee legend on the figure
         :param filters: if set, specify which guess is displayed for each attack. filters must be a list of len(engines) list of guesses
-
+        :param solution_only: if set, only the solution gets plotted
         """
 
         MatPlotLibOutputMethod.__init__(
@@ -172,7 +178,8 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
             single_plot=single_plot,
             display=display,
             filename=filename,
-            legend=legend
+            legend=legend,
+            solution_only=solution_only
         )
 
         self.steps = []
@@ -208,7 +215,6 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
                 self.scores_solution[engine.name].append(results_parsed[engine.solution][1])
 
     def _finalize(self):
-
         if not self.filename and not self.display:
             return self.steps, self.scores, self.scores_solution
 
@@ -219,15 +225,16 @@ class ScoreProgressionOutputMethod(MatPlotLibOutputMethod):
                 plt.title(engine_name)
 
             if self.filters is None:
-                for j in range(len(self.scores[engine_name][0])):
-                    plt.plot(
-                        self.steps,
-                        [
-                            self.scores[engine_name][k][j]
-                            for k in range(len(self.scores[engine_name]))
-                        ],
-                        label="%s guess %d" % (engine_name, j),
-                    )
+                if not self.solution_only:
+                    for j in range(len(self.scores[engine_name][0])):
+                        plt.plot(
+                            self.steps,
+                            [
+                                self.scores[engine_name][k][j]
+                                for k in range(len(self.scores[engine_name]))
+                            ],
+                            label="%s guess %d" % (engine_name, j),
+                        )
                 try:
                     plt.plot(
                         self.steps,
@@ -298,3 +305,81 @@ class RankProgressionOutputMethod(ScoreProgressionOutputMethod):
 
             if engine.solution is not None:
                 self.scores_solution[engine.name].append(results_parsed[engine.solution][2])
+
+class FullRankProgressionOutputMethod(ScoreProgressionOutputMethod):
+    """
+    FullRankProgressionOutputMethod is an OutputMethod that will plot the progression of the estimated total rank for GroupedEngines containing engines.
+    It will actually plot 3 lines. One for the estimated rank, together with an upper and a lower bound.
+    Right now argmax mode is assumed for all the subengines.
+
+    """
+
+    def __init__(
+        self,
+        *engines,
+        number_of_columns=None,
+        number_of_rows=None,
+        single_plot=False,
+        display=True,
+        filename=None,
+        legend=False,
+        bin_width=0.01
+    ):
+        """
+
+        :param engines: engines to be tracked
+        :param number_of_columns: number of columns for multiplot
+        :param number_of_rows: number of lines for multiplot
+        :param single_plot: if True, all results are  on the same plot
+        :param display: if true, display the plot on the screen
+        :param filename: if set, save the figure to filename
+        :param legend: if set, displays thee legend on the figure
+        :param filters: if set, specify which guess is displayed for each attack. filters must be a list of len(engines) list of guesses
+
+        """
+
+        ScoreProgressionOutputMethod.__init__(
+            self,
+            *engines,
+            number_of_columns=number_of_columns,
+            number_of_rows=number_of_rows,
+            single_plot=single_plot,
+            display=display,
+            filename=filename,
+            legend=legend,
+            solution_only=False
+        )
+
+        self.bin_width = bin_width
+
+    def _update(self, engine, results):
+
+        #right now it assumes that engine is of type 'argmax'
+        if len(results.shape) == 3:
+            scores = np.abs(results).max(2)
+        else:
+            scores = np.abs(results)
+
+        #in case that all scores have value 0 for an engine, add a constant,
+        #so normalizaion won't fail
+        for i in range(results.shape[0]):
+            if np.all(scores[i]==0):
+                scores[i]+=1
+
+        #normalize, so the guesses will sum up to one
+        probabilities = np.nan_to_num(scores/np.expand_dims(scores.sum(1),1))
+
+        # maybe the code above should be moved to parse_results.py
+
+
+        rank_est = RankEstimation(probabilities, [subengine.solution for subengine in engine.engines], self.bin_width)
+        results_parsed = list(np.log2(np.array(rank_est)+1))
+
+        if engine._number_of_processed_traces not in self.steps:
+            self.steps.append(engine._number_of_processed_traces)
+
+        if not engine.name in self.scores:
+            self.scores[engine.name] = []
+            self.scores_solution[engine.name] = []
+
+        self.scores[engine.name].append(results_parsed)

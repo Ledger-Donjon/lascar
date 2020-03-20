@@ -25,3 +25,5 @@ from .pickle_output_method import DictOutputMethod
 from .plot_output_method import MatPlotLibOutputMethod
 from .plot_output_method import ScoreProgressionOutputMethod
 from .plot_output_method import RankProgressionOutputMethod
+from .plot_output_method import FullRankProgressionOutputMethod
+from .rank_estimation import RankEstimation
