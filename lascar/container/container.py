@@ -523,11 +523,9 @@ class AbstractContainer(Container):
 
             trace_batch = self.generate_trace_batch(offset_begin, offset_end)
 
-            for i, j in enumerate(range(offset_begin, offset_end)):
-                leakages[i] = self.apply_both_leakage(trace_batch.leakages[i : i + 1])[
-                    0
-                ]
-                values[i] = self.apply_both_value(trace_batch.values[i : i + 1])[0]
+            leakages = self.apply_both_leakage(trace_batch.leakages)
+            values = self.apply_both_value(trace_batch.values)
+
             return TraceBatchContainer(leakages, values)
 
         except:
