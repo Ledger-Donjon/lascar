@@ -11,6 +11,7 @@ In this folder we show how to use lascar to mount basics side-channel analysis. 
 - [cpa-with-partition.py](base/cpa-with-partition.py): Same as cpa, but with a computational trick
 - [profiled-attack.py](base/profiled-attack.py): perform a profiled attack using  both sklearn statistical classifiers and keras neural networks.
 - [cpa-second-order.py](base/cpa-second-order.py): perform second order Correlation Power Analysis Attack on masked AES sbox simulation.
+- [cpa-full-ranks.py](base/cpa-full-ranks.py): perform a cpa and plot the estimated rank of the complete key.
 
 ## ASCAD
 
@@ -22,12 +23,12 @@ In this folder, we use real traces of a secure AES implementation on a on the AT
 - [03-keras-train.py](ascad/03-keras-train.py): Launch the profiling phase using keras neural network (first step of a profiling attack)
 - [04-keras-test.py](ascad/04-keras-test.py): Launch the matching phase using keras neural network (second step of a profiling attack)
 - [05-cpa-high-order.py](ascad/05-cpa-high-order.py): Perform a 2nd order CPA on ASCAD traces for a key recovery.
- 
+
 ## rainbow
 
 In this folder we use [rainbow](https://github.com/Ledger-Donjon/rainbow), our code emulation tool to emulate side-channel traces from a arm compiled .elf file.
 
 
-## scaffold 
+## scaffold
 
 TBP

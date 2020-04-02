@@ -223,7 +223,7 @@ class ContainerDumpEngine(Engine):
 
 class PearsonCorrelationEngine(Engine):
     """
-    PearsonCorrelationEngine is an engine whose role is compute the Pearson Correlation coefficient between 
+    PearsonCorrelationEngine is an engine whose role is compute the Pearson Correlation coefficient between
     the observed trace leakages and a model function applied to the trace values
 
     The model function is a function who takes "value" as input and output a scalar.
