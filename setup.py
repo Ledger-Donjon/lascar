@@ -39,7 +39,8 @@ setup(
     author="Charles Guillemet, Manuel San Pedro, Victor Servant",
     author_email="charles@ledger.fr, manuel.sanpedro@ledger.fr, victor.servant@ledger.fr",
     install_requires=[
-        "numpy",
+        "click",
+        "numpy>=1.17",
         "h5py",
         "matplotlib",
         "vispy",
