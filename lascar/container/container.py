@@ -243,7 +243,7 @@ class Container:
         if self.leakage_processing is None:
             return leakages
         if self._leakage_section_abstract.shape == ():  # 0D leakage
-            return self.leakage_processing(leakages)
+            return np.array([self.leakage_processing(l) for l in leakages])
         return np.apply_along_axis(self.leakage_processing, 1, leakages)
 
     def apply_both_leakage(self, leakages):
@@ -332,7 +332,7 @@ class Container:
         if self.value_processing is None:
             return values
         if self._value_section_abstract.shape == ():  # 0D value
-            return self.value_processing(values)
+            return np.array([self.value_processing(v) for v in values])
         return np.apply_along_axis(self.value_processing, 1, values)
 
     def apply_both_value(self, values):
