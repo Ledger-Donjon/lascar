@@ -461,10 +461,8 @@ class AbstractContainer(Container):
 
         for i, j in enumerate(range(idx_begin, idx_end)):
             leakage, value = self.generate_trace(j)
-            leakages[i] = self.apply_both_leakage(
-                leakage.reshape((1,) + leakage.shape)
-            )[0]
-            values[i] = self.apply_both_value(value.reshape((1,) + value.shape))[0]
+            leakages[i] = leakage
+            values[i] = value
 
         return TraceBatchContainer(leakages, values)
 
@@ -660,7 +658,7 @@ class AbstractArray:
     :class:`lascar.container.container.AbstractContainer`)
     It simply emulates a few methods needed by other classes (such as
     :class:`lascar.session.Session`)
-    
+
     :param shape: the shape of your leakages (or values)
     :param dtype: the dtype of your leakages (or values)
     """
