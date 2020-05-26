@@ -243,7 +243,7 @@ class Container:
         if self.leakage_processing is None:
             return leakages
         if self._leakage_section_abstract.shape == ():  # 0D leakage
-            return self.leakage_processing(leakages)
+            return np.array([self.leakage_processing(l) for l in leakages])
         return np.apply_along_axis(self.leakage_processing, 1, leakages)
 
     def apply_both_leakage(self, leakages):
@@ -332,7 +332,7 @@ class Container:
         if self.value_processing is None:
             return values
         if self._value_section_abstract.shape == ():  # 0D value
-            return self.value_processing(values)
+            return np.array([self.value_processing(v) for v in values])
         return np.apply_along_axis(self.value_processing, 1, values)
 
     def apply_both_value(self, values):
@@ -461,10 +461,8 @@ class AbstractContainer(Container):
 
         for i, j in enumerate(range(idx_begin, idx_end)):
             leakage, value = self.generate_trace(j)
-            leakages[i] = self.apply_both_leakage(
-                leakage.reshape((1,) + leakage.shape)
-            )[0]
-            values[i] = self.apply_both_value(value.reshape((1,) + value.shape))[0]
+            leakages[i] = leakage
+            values[i] = value
 
         return TraceBatchContainer(leakages, values)
 
@@ -525,11 +523,9 @@ class AbstractContainer(Container):
 
             trace_batch = self.generate_trace_batch(offset_begin, offset_end)
 
-            for i, j in enumerate(range(offset_begin, offset_end)):
-                leakages[i] = self.apply_both_leakage(trace_batch.leakages[i : i + 1])[
-                    0
-                ]
-                values[i] = self.apply_both_value(trace_batch.values[i : i + 1])[0]
+            leakages = self.apply_both_leakage(trace_batch.leakages)
+            values = self.apply_both_value(trace_batch.values)
+
             return TraceBatchContainer(leakages, values)
 
         except:
@@ -660,7 +656,7 @@ class AbstractArray:
     :class:`lascar.container.container.AbstractContainer`)
     It simply emulates a few methods needed by other classes (such as
     :class:`lascar.session.Session`)
-    
+
     :param shape: the shape of your leakages (or values)
     :param dtype: the dtype of your leakages (or values)
     """
