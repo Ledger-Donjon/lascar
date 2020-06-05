@@ -97,7 +97,7 @@ class Hdf5Container(Container):
         :return: an empty Hdf5Container
         """
         try:  # if file exists
-            file = h5py.File(filename)
+            file = h5py.File(filename,"a")
             if leakages_dataset_name in file:
                 del file[leakages_dataset_name]
             if values_dataset_name in file:

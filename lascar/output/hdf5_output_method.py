@@ -43,7 +43,7 @@ class Hdf5OutputMethod(OutputMethod):
         :param engines: the engines to be tracked
         """
         OutputMethod.__init__(self, *engines)
-        self.file = h5py.File(filename)
+        self.file = h5py.File(filename,'a')
         self.prefix = prefix
 
     def _update(self, engine, results):
