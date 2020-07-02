@@ -2324,6 +2324,35 @@ class Aes(object):
         return res
 
     @staticmethod
+    def decrypt(input, key):
+        """
+        decrypt and keep all intermediate values
+
+        :param input:
+        :param key_scheduled:
+        :return:
+        """
+
+        nr = 6 + 2 * (len(key) // 8)
+
+        key_scheduled = Aes.key_schedule(key)
+        state = [i for i in input]
+        state = Aes.add_round_key(state, key_scheduled[-16:])
+
+        for i in range(nr - 1, 0, -1):
+            state = Aes.inverse_sub_bytes(state)
+            state = Aes.inverse_shift_rows(state)
+            state = Aes.add_round_key(state, key_scheduled[i * 16 : (i + 1) * 16])
+            state = Aes.inverse_mix_columns(state)
+            
+        state = Aes.inverse_sub_bytes(state)
+        state = Aes.inverse_shift_rows(state)
+        state = Aes.add_round_key(state, key_scheduled[:16])
+
+        return state
+
+
+    @staticmethod
     def decrypt_keep_iv(input, key_scheduled):
         """
         decrypt and keep all intermediate values
@@ -2347,9 +2376,9 @@ class Aes(object):
             res += list(state)
             state = Aes.inverse_shift_rows(state)
             res += list(state)
-            state = Aes.inverse_mix_columns(state)
-            res += list(state)
             state = Aes.add_round_key(state, key_scheduled[i * 16 : (i + 1) * 16])
+            res += list(state)
+            state = Aes.inverse_mix_columns(state)
             res += list(state)
 
         state = Aes.inverse_sub_bytes(state)
@@ -2358,5 +2387,5 @@ class Aes(object):
         res += list(state)
         state = Aes.add_round_key(state, key_scheduled[:16])
         res += list(state)
-
+        
         return res
