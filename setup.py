@@ -22,12 +22,8 @@ Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS -
 from setuptools import setup, find_packages
 import sys
 
-if sys.version_info[0] < 3:
-    sys.exit("Sorry, only Python 3.x is supported ")
-
 with open("README.md", "r") as fh:
     long_description = fh.read()
-
 
 setup(
     name="lascar",
@@ -52,6 +48,7 @@ setup(
         "numba",
     ],  ## PyQt5 is here as a backend for vispy, this might change in the future
     packages=find_packages(),
+    python_requires='>=3.0',
     setup_requires=["pytest-runner",],
     tests_require=["pytest"],
     entry_points={"console_scripts": ["lascarctl=scripts.lascarctl:main"],},
