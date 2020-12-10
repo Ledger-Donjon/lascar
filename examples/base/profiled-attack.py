@@ -22,7 +22,7 @@ Specifically it needs:
 - a "number_of_partitions" to indicate the number of possible classes for the partition_function
 
 
-The ProfileEngine is actually a GuessEngine (such as CpaHypothesisEngine)
+The MatchEngine is actually a GuessEngine (such as CpaHypothesisEngine)
 Specifically it needs:
 - a classifier which has been already trained (with ProfileEngine)
 - a selection function (under guess hypothesis) on the sensitive value (here the output of the sbox at first round)

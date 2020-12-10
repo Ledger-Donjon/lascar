@@ -54,7 +54,7 @@ class PartitionerEngine(Engine):
     0 <= partition_value < partition_size
     """
 
-    def __init__(self, name, partition_function, partition_range, order):
+    def __init__(self, name, partition_function, partition_range, order, jit=True):
         """
         PartitionEngine
         :param name: the name chosen for the Engine
@@ -65,20 +65,30 @@ class PartitionerEngine(Engine):
 
         """
 
-        self._partition_function = lambda x: int(partition_function(x))
-
         if isinstance(partition_range, int):
             self._partition_range = range(partition_range)
         else:
             self._partition_range = partition_range
 
-        self._partition_range = list(self._partition_range)
+        self._partition_range = np.array(self._partition_range, dtype=np.uint32)
         self._partition_size = len(self._partition_range)
-        self._partition_range_to_index = {
-            j: i for i, j in enumerate(self._partition_range)
-        }
+        self._partition_range_to_index = np.zeros((self._partition_range.max()+1,), dtype=np.uint32)
+        for i,j in enumerate(self._partition_range):
+            self._partition_range_to_index[j] = i
+
         self._order = order
 
+        self.jit = jit
+        if jit:
+            try:
+                from numba import jit
+            except Exception:
+                raise Exception(
+                    "Cannot jit without Numba. Please install Numba or consider turning off the jit option"
+                )
+            self._partition_function = jit(nopython=True)(partition_function)
+        else:
+            self._partition_function = partition_function
         Engine.__init__(self, name)
 
     def _initialize(self):
@@ -94,16 +104,40 @@ class PartitionerEngine(Engine):
 
         self.size_in_memory += self._acc_x_by_partition.nbytes
         self.size_in_memory += self._partition_count.nbytes
+        if self.jit:
+            from numba import jit
 
-    def _update(self, batch):
+            @jit(nopython=True)
+            def jitted_update(batchvalues, batchleakages, pfunc = self._partition_function, psize = self._partition_size, rng2idx = self._partition_range_to_index, order = self._order):
+                pcount = np.zeros((psize,), dtype=np.uint32)
+                acc_x = np.zeros((order, psize, batchleakages.shape[1]), dtype=np.double)
 
+                for pv in np.arange(batchvalues.shape[0]):
+                    idx = rng2idx[pfunc(batchvalues[pv])]
+                    pcount[idx] += 1
+                    acc_x[0, idx] += batchleakages[pv]
+                    for o in range(1,order):
+                        acc_x[o, idx] += np.power(batchleakages[pv], o + 1)
+                
+                return pcount, acc_x
+
+            def new_update(batch):
+                pcount, acc_x = jitted_update(batch.values, batch.leakages)
+                self._partition_count += pcount
+                self._acc_x_by_partition += acc_x
+
+            self._update = new_update 
+        else:
+            self._update = self._base_update
+
+    def _base_update(self, batch):
         partition_values = list(map(self._partition_function, batch.values))
         for i, v in enumerate(partition_values):
-            # print(i,v)
-            self._partition_count[self._partition_range_to_index[v]] += 1
-            for o in range(self._order):
+            idx = self._partition_range_to_index[v]
+            self._partition_count[idx] += 1
+            for o in range(0, self._order):
                 self._acc_x_by_partition[
-                    o, self._partition_range_to_index[v]
+                    o, idx
                 ] += np.power(batch.leakages[i], o + 1, dtype=np.double)
 
     def _finalize(self):
