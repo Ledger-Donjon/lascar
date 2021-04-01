@@ -1,12 +1,12 @@
 """
-When performing side-channel Analysis, an user will seek to store its data for further usages.
-To our knowledge, every lab has its own format for storing side channel traces.
+When performing side-channel analysis, a user will seek to store its data for further usages.
+To our knowledge, every lab has its own format for storing side-channel traces.
 
 We, at Ledger, store our traces using hdf5 file format (Hierarchical Data Format: https://www.hdfgroup.org/HDF5/)
 For each set of traces, a single hdf5 file is created, implementing 2 datasets: one for leakages, one for values.
 
 We provide within lascar the class Hdf5Container, allowing to transparently handle this format.
-This class allows to handle traces without having to load them all in your memory (as a TraceBatchContainer would do)
+This class allows to handle traces without having to load them all in your memory (as a TraceBatchContainer would do).
 
 Hdf5Container implements an export() method, used to convert ANY Container into a Hdf5Container (ie by creating a file containing all its traces)
 

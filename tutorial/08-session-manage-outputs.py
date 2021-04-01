@@ -2,7 +2,7 @@
 
 In side-channel, ouptut managment is crucial.
 
-You process large ammount of data, compute statistics on them, and then ...
+You process large amount of data, compute statistics on them, and then ...
 
 Then ... what to do with the results?
 - extract only the most substantial info (ie the secret key)
@@ -31,7 +31,7 @@ We will here demonstrate how to use:
 - RankProgressionOutputMethod: the results are parsed, and the rank of the best scores are extracted, and displayed in function of the number of trace
 
 using the previous script of a DPA on simulated AES traces.
-This time we will perform 2 DPA in //: one on the lsb of the output of the 3rd sbox, the other on the msb
+This time we will perform 2 DPA in //: one on the lsb of the output of the 3rd sbox, the other on the msb.
 
 """
 
@@ -158,12 +158,12 @@ session = Session(
 hdf5_output_method_bis = Hdf5OutputMethod.load(
     "hdf5_output.h5"
 )  # Hdf5OutputMethod has a static method to load a hdf5_output_method
-assert np.all(hdf5_output_method_bis["dpa_lsb/500"].value == dpa_lsb_engine.finalize())
+assert np.all(hdf5_output_method_bis["dpa_lsb/500"][()] == dpa_lsb_engine.finalize())
 
 
 """
 
-Arround MatPlotLibOutputMethod
+Around MatPlotLibOutputMethod
 
 """
 
@@ -189,7 +189,7 @@ session = Session(
 
 """
 
-Arround ScoreProgressionOutputMethod and ScoreProgressionOutputMethod
+Around ScoreProgressionOutputMethod and ScoreProgressionOutputMethod
  
 We monitor the progression of the scores of our 2 attacks, every 10 traces: 
  
@@ -251,5 +251,5 @@ session = Session(
 
 """
 The tutorial is for now done.
-Take a look at the examples/ folder
+Take a look at the examples/ folder.
 """

@@ -47,7 +47,7 @@ the correct methods, who will represent your data who will be accessed by lascar
 
 In lascar, there are different classes inheriting from Container.
  
-But the more important is TraceBatchContainer, which actualy stores in RAM both the leakages and values as np.arrays (sharing the same first dimension: the number of traces of the Container
+But the more important is TraceBatchContainer, which actually stores in RAM both the leakages and values as np.arrays (sharing the same first dimension: the number of traces of the Container.
 
 In the following, we build a TraceBatchContainer from two np.arrays: 'leakages' and 'values':
 """
@@ -65,9 +65,9 @@ print("trace_batch =", trace_batch)
 print()
 
 """
-Containers implements a getter which will return either a Trace, or a TraceBatchContainer (if several Traces are asked)
+Containers implements a getter which will return either a Trace, or a TraceBatchContainer (if several Traces are asked).
 
-A TraceBatchContainer is also iterable
+A TraceBatchContainer is also iterable.
 """
 
 print("trace_batch[0] =", trace_batch[0])
@@ -83,7 +83,7 @@ print()
 
 
 """
-In lascar, all Containers childs implement a logger (from the logging module). 
+In lascar, all Containers children implement a logger (from the logging module). 
 By default, the loglevel is set to INFO. But it can be set at any time, to display more or less informations: 
 (other lascar traces implement a logger: Session, Engine, OutputMethod)
 """
@@ -98,7 +98,7 @@ In lascar Containers offer different mechanisms to modify the data.
 leakage_section, value_section
 leakage_processing, value_processing
 
-leakage_section (resp value section) is an attribute of the Container that will select the specified samples from the original leakage (resp value).
+leakage_section (resp value_section) is an attribute of the Container that will select the specified samples from the original leakage (resp value).
 It is supposed to minimize the reading part, by specifying points of interests for instance.
 """
 
@@ -125,7 +125,7 @@ print()
 leakage_processing  (resp value_processing) is a Container attribute, under the form of a function that will be applied on the leakage (resp value) after leakage_section (resp value_section)
 
 leakage_processing will be used, among other thing:
-- for side-channel trace synchonisation
+- for side-channel trace synchronisation
 - for leakage modification: see lascar/tools/processing for a list of existing processing
 """
 from lascar.tools.processing import *

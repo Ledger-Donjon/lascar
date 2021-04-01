@@ -1,12 +1,12 @@
 """
 
-We now how to build Containers and Session, and now we will mount a classical Differential Power Attack (DPA) using lascar.
+We know how to build Containers and Session, and now we will mount a classical Differential Power Attack (DPA) using lascar.
 
 (see https://www.paulkocher.com/doc/DifferentialPowerAnalysis.pdf)
 
 For that, we will build a DpaEngine, and register it to a Session.
 
-(The folder lascar/examples/base contains examples for different kind of side-channel attacks/characterization)
+(The folder lascar/examples/base contains examples for different kinds of side-channel attacks/characterization)
 
 """
 
@@ -22,7 +22,7 @@ Then we build the DpaEngine.
 
 If you take a look at the help for DpaEngine, you'll see that it needs 3 things to be instanciated:
 - a name for the engine ("dpa" in our case)
-- a selection function (under guess hypothesis): this function will separate the traces into two sets, depending on a hypothesisis: "guess". This function will be applied on every trace values, for every possible guess.
+- a selection function (under guess hypothesis): this function will separate the traces into two sets, depending on a hypothesis: "guess". This function will be applied on every trace values, for every possible guess.
 - a guess_range: what are the guesses you want to test?
 
 In this example, we will focus on the LSB bit of the 3rd AES sbox. This value is conditioned by a single key byte (256 guesses)

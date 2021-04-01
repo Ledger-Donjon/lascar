@@ -1,12 +1,12 @@
 """
-In this script we will show how to set up an AbstractContainer, dedicated to emulate an (dummy) side-channel acquisition setup.
+In this script we will show how to set up an AbstractContainer, dedicated to emulate a (dummy) side-channel acquisition setup.
 
 The context here is the use of lascar for the acquisition phase.
 
 Say we are targeting a device running an AES, that we can drive through a python class Dut (for Device Under Test).
 This class has a method that commands the device to run the targeted operation, and returns the plaintext/ciphertext.
 
-Beside, we have an Oscilloscope class, which returns the power measurment of the device through the method.
+Beside, we have an Oscilloscope class, which returns the power measurement of the device through the method.
 
 We create a class AcquisitionSetup, inheriting from AbstractContainer, and override the generate_trace() method which will request both device and oscilloscope.
 
@@ -17,7 +17,7 @@ import numpy as np
 # First the Device Under Test (Dut):
 class Dut:
     def __init__(self):
-        # ...dummy initialisation, put here all the communication objects, constants etc...
+        # ...dummy initialisation, put here all the communication objects, constants etc.
         self.foo = "foo"
         self.dumb = "dumb"
         # ...
@@ -39,13 +39,13 @@ class Dut:
 # Then the Oscilloscope:
 class Oscilloscope:
     def __init__(self):
-        # ...dummy initialisation, put here all the communication objects, constants etc...
+        # ...dummy initialisation, put here all the communication objects, constants etc.
         self.bar = "bar"
         self.dumb = "dumb"
         # ...
 
     def get_trace(self):
-        # return the side channel leakage: here a vector of 100 float
+        # return the side-channel leakage: here a vector of 100 floats
         return np.random.rand(100)
 
 

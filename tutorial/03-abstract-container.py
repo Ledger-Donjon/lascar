@@ -5,10 +5,10 @@ AbstractContainer is a Container for which every trace is generated from a funct
 
 Here is a list of some children implemented in lascar:
 
-- BasicAesSimulationContainer : generate simulated traces of the first round of an AES
+- BasicAesSimulationContainer: generate simulated traces of the first round of an AES
 - MultipleContainer: Container that will 'concatenate' Containers
-- FilteredContainer : Container that will select traces from an initial Container
-- RandomizedContainer: Container that will randomize the indexes of traces of an initial Container
+- FilteredContainer: Container that will select traces from an initial Container
+- RandomizedContainer: Container that will randomize the indices of traces of an initial Container
 
 """
 
@@ -17,13 +17,13 @@ Here is a list of some children implemented in lascar:
 Part 1: BasicAesSimulationContainer
 
 BasicAesSimulationContainer is an AbstractContainer designed to generate simulated side-channel traces during the first SubBytes function of an AES128.
-The first 16 time samples of the leakage represent the noisy hamming weigth at the ouput of the first SubBytes function.
+The first 16 time samples of the leakage represent the noisy Hamming weight at the output of the first SubBytes function.
 The other time samples are just noise
 For further information about BasicAesSimulationContainer, or AbstractContainer in general, see [...]
 
 
-If tou want to implement your own SimulationContainer, take a look at the code of BasicAesSimuationContainer at lascar/container/simulation_container.py
-You'll see that it consists in an ABstractContainer or which the generate_trace() method has been overridden.
+If you want to implement your own SimulationContainer, take a look at the code of BasicAesSimulationContainer at lascar/container/simulation_container.py
+You'll see that it consists in an AbstractContainer whose generate_trace() method has been overridden.
 """
 
 from lascar.container import BasicAesSimulationContainer
@@ -37,7 +37,7 @@ print()
 trace = container[0]  # getting the first trace of the container
 print(trace)
 print()
-trace_batch = container[0:3]  # getting the 3 fist traces as a TraceBatch
+trace_batch = container[0:3]  # getting the first 3 traces as a TraceBatch
 print(trace_batch)
 print()
 
@@ -46,7 +46,7 @@ print()
 Part 2: MultipleContainer
 
 MultipleContainer is used to concatenate Containers.
-(It is particulary useful when you have stored your traces in different files, and you want to merge them for you analysis)
+(It is particularly useful when you have stored your traces in different files, and you want to merge them for your analysis)
 
 In the following example, we use MultipleContainer to concatenate BasicAesSimulationContainer. 
 (it doesnt make much sense, but it applies with any type of Container)
@@ -54,8 +54,8 @@ In the following example, we use MultipleContainer to concatenate BasicAesSimula
 """
 from lascar import MultipleContainer
 
-# First we c(reate a tuple of 4 containers with the same leakage/value shape. The number of traces can be anything:
-containers_base = [BasicAesSimulationContainer(10, 1, 5) for _ in range(3)]
+# First we create a tuple of 4 containers with the same leakage/value shape. The number of traces can be anything:
+containers_base = [BasicAesSimulationContainer(10, 1.5) for _ in range(3)]
 containers_base += [BasicAesSimulationContainer(20, 2)]
 
 # Then we create the MultipleContainer, by passing containers_base as args:
@@ -77,9 +77,9 @@ for i in range(20):
 Part 3: FilteredContainer
 
 Used to filter a Container, by selecting only some traces.
-Two way of setting up a FilterContainer:
+Two ways of setting up a FilteredContainer:
 - using an iterable (tuple, range,...) to indicate directly which traces to keep/throw
-- using a boolean function that will be applied on each trace (downside:each trace will be read with this method)
+- using a boolean function that will be applied on each trace (downside: each trace will be read with this method)
 
 In the following examples we will use both methods to filter a BasicAesSimulationContainer:
 - with a list, taking the traces with index even
