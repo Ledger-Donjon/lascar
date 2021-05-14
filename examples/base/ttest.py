@@ -15,7 +15,7 @@ container = BasicAesSimulationContainer(
 def partition_function(
     value,
 ):  # partition_function must take 1 argument: the value returned by the container at each trace
-    return value["plaintext"][3] == 0  # "plaintext[3] == 0" versus "all other values"
+    return int(value["plaintext"][3] == 0)  # "plaintext[3] == 0" versus "all other values"
 
 
 ttest_engine = TTestEngine("ttest", partition_function)
@@ -36,12 +36,12 @@ We choose here to display the 16 curves on the same plot
 
 def get_partition_function(byte):
     def partition_function(value):
-        return value["plaintext"][byte] == 0
+        return int(value["plaintext"][byte] == 0)
 
     return partition_function
 
 
-number_of_partitions = 256  # number of possible classes (~output of the partiton_function) for the partition_function
+number_of_partitions = 2  # number of possible classes (~output of the partiton_function) for the partition_function
 ttest_engines = [
     TTestEngine("ttest_plaintext_%d" % i, get_partition_function(i)) for i in range(16)
 ]
