@@ -16,6 +16,7 @@
 #
 # Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS - manuel.sanpedro@ledger.fr, victor.servant@ledger.fr, charles@ledger.fr
 
+import psutil
 import logging
 from threading import Thread
 import numpy as np
@@ -182,6 +183,20 @@ class Session:
 
         return batch_offsets
 
+    def _find_optimal_batch_size(self, trace_dtype, trace_length):
+        """ From the data type of the trace, and it length, 
+            compute the optimal batch size that can fit in memory 
+        """
+        threshold = 0.9 # we arbitrarily take 90% of the available memory
+        
+        sz = trace_dtype.itemsize
+        trace_size = trace_length * sz
+        available_memory = psutil.virtual_memory().free
+
+        optimal_batch_size = int((threshold * available_memory)/trace_size)
+
+        return optimal_batch_size
+
     def run(self, batch_size=100, thread_on_update=True):
         """
         Core function of Session: read all traces from the container, and distibute them to the engines, and manage results
@@ -190,7 +205,13 @@ class Session:
         :param thread_on_update: will the engine be updated on different threads?
         :return:
         """
-        self._batch_size = batch_size
+        if batch_size == "auto":
+            self._batch_size = self._find_optimal_batch_size(self.container.leakages.dtype,self.container.leakages.shape[1])
+        else:
+            self._batch_size = batch_size
+        print("========================================")
+        print("Debug:")
+        print(self._batch_size)
         self._thread_on_update = thread_on_update
 
         [engine.initialize(self) for engine in self.engines.values()]
