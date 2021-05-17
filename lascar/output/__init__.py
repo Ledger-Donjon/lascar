@@ -27,3 +27,4 @@ from .plot_output_method import ScoreProgressionOutputMethod
 from .plot_output_method import RankProgressionOutputMethod
 from .plot_output_method import FullRankProgressionOutputMethod
 from .rank_estimation import RankEstimation
+from .table_output_method import TableOutputMethod
