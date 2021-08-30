@@ -2265,32 +2265,38 @@ def encrypt_keep_iv(input, key_scheduled):
     :param key_scheduled:
     :return:
     """
-    nr = nr[len(key_scheduled)]
-
-    res = []
-
+    nr = int(len(key_scheduled) / 16)-1
+    res = np.empty((1+(nr-1)*4+3+1,16),dtype=np.uint8) #states in the array: P, {ARK,SB,SR,MC}*(nr-1), {ARK,SB,SR}, ARK=C
+    idx = 0
     state = [i for i in input]
-    res += state
-
+    res[idx] = state
+    idx += 1
+    
     state = add_round_key(state, key_scheduled[:16])
-    res += state
-
+    res[idx] = state
+    idx += 1
     for i in range(1, nr):
         state = sub_bytes(state)
-        res += list(state)
+        res[idx] = state
+        idx += 1
         state = shift_rows(state)
-        res += list(state)
+        res[idx] = state
+        idx += 1
         state = mix_columns(state)
-        res += list(state)
+        res[idx] = state
+        idx += 1
         state = add_round_key(state, key_scheduled[i * 16 : (i + 1) * 16])
-        res += list(state)
+        res[idx] = state
+        idx += 1
 
     state = sub_bytes(state)
-    res += state
+    res[idx] = state
+    idx += 1
     state = shift_rows(state)
-    res += list(state)
+    res[idx] = state
+    idx += 1
     state = add_round_key(state, key_scheduled[-16:])
-    res += list(state)
+    res[idx] = state
 
     return res
 
@@ -2326,29 +2332,37 @@ def decrypt_keep_iv(input, key_scheduled):
     """
 
     nr = int(len(key_scheduled) / 16)
-    res = []
+    res = np.empty((1+(nr-1)*4+3+1,16),dtype=np.uint8) #states in the array: P, {ARK,SB,SR,MC}*(nr-1), {ARK,SB,SR}, ARK=C
 
+    idx = 0
     state = [i for i in input]
-    res += state
+    res[idx] = state
+    idx += 1
 
     state = add_round_key(state, key_scheduled[-16:])
     res += state
 
     for i in range(nr - 1, 0, -1):
         state = inverse_sub_bytes(state)
-        res += list(state)
+        res[idx] = state
+        idx += 1
         state = inverse_shift_rows(state)
-        res += list(state)
+        res[idx] = state
+        idx += 1
         state = add_round_key(state, key_scheduled[i * 16 : (i + 1) * 16])
-        res += list(state)
+        res[idx] = state
+        idx += 1
         state = inverse_mix_columns(state)
-        res += list(state)
+        res[idx] = state
+        idx += 1
 
     state = inverse_sub_bytes(state)
-    res += state
+    res[idx] = state
+    idx += 1
     state = inverse_shift_rows(state)
-    res += list(state)
+    res[idx] = state
+    idx += 1
     state = add_round_key(state, key_scheduled[:16])
-    res += list(state)
+    res[idx] = state
 
     return res
