@@ -36,7 +36,7 @@ setup(
     author_email="charles@ledger.fr, manuel.sanpedro@ledger.fr, victor.servant@ledger.fr",
     install_requires=[
         "click",
-        "numpy>=1.17",
+        "numpy>=1.17,<1.21",
         "h5py",
         "matplotlib",
         "vispy",
