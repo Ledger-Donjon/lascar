@@ -3,14 +3,14 @@ import sys
 
 import h5py
 import numpy as np
-from keras.callbacks import ModelCheckpoint
-from keras.layers import Flatten, Dense, Input, Conv1D, AveragePooling1D
-from keras.models import Model, Sequential
-from keras.models import load_model
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.layers import Flatten, Dense, Input, Conv1D, AveragePooling1D
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.models import load_model
 
-# from keras.applications.imagenet_utils import _obtain_input_shape
-from keras.optimizers import RMSprop
-from keras.utils import to_categorical
+# from tensorflow.keras.applications.imagenet_utils import _obtain_input_shape
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.utils import to_categorical
 
 
 def check_file_exists(file_path):

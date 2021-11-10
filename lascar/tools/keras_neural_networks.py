@@ -23,9 +23,9 @@ https://github.com/ANSSI-FR/ASCAD/blob/master/ASCAD_train_models.py
 
 """
 
-from keras.layers import Flatten, Dense, Input, Conv1D, AveragePooling1D, Dropout
-from keras.models import Model, Sequential
-from keras.optimizers import RMSprop
+from tensorflow.keras.layers import Flatten, Dense, Input, Conv1D, AveragePooling1D, Dropout
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.optimizers import RMSprop
 
 
 #### MLP Best model (6 layers of 200 units)

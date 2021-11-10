@@ -13,7 +13,7 @@ Objective in this script:
 import sys
 from lascar import *
 from lascar.tools.aes import sbox
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 
 if not len(sys.argv) == 3:

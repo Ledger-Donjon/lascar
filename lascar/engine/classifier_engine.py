@@ -108,7 +108,7 @@ class ProfileEngine(PartitionerEngine):
         self._classifier.fit(batch.leakages, partition_values)
 
     def _update_keras_model(self, batch):
-        from keras.utils import to_categorical
+        from tensorflow.keras.utils import to_categorical
 
         Y = to_categorical(
             list(map(self._partition_function, batch.values)), self._partition_size
@@ -212,6 +212,6 @@ def load_classifier(filename):
         with open(filename, "rb") as f:
             return pickle.load(f)
     except:  # keras load
-        from keras.models import load_model
+        from tensorflow.keras.models import load_model
 
         return load_model(filename)
