@@ -36,14 +36,14 @@ class SnrEngine(PartitionerEngine):
     It needs a partition_function that will take trace values as an input and returns output within partition_range.
     """
 
-    def __init__(self, name, partition_function, partition_range):
+    def __init__(self, name, partition_function, partition_range, jit = True):
         """
         
         :param name: 
         :param partition_function: function that will take trace values as an input and returns output within partition_range.
         :param partition_range: possible values for the partitioning.
         """
-        PartitionerEngine.__init__(self, name, partition_function, partition_range, 2)
+        PartitionerEngine.__init__(self, name, partition_function, partition_range, 2, jit)
         self.logger.debug(
             'Creating SnrEngine  "%s" with %d classes.' % (name, len(partition_range))
         )

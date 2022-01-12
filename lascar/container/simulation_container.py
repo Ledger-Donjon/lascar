@@ -19,10 +19,6 @@
 """
 simulation_container.py
 """
-
-"""
-simulation_container.py
-"""
 import numpy as np
 
 from lascar.tools.aes import sbox, Aes
@@ -158,6 +154,7 @@ class AesSimulationContainer(AbstractContainer):
 
         leakage = Aes.encrypt_keep_iv(value["plaintext"], Aes.key_schedule(value["key"]))
         value["ciphertext"] = leakage[-16:]
+
 
         leakage = np.array([self.leakage_model(i) for i in leakage]) # leakage model
         leakage = leakage + np.random.normal(0, self.noise, (len(leakage),)) # noise

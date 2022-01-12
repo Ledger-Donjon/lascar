@@ -133,7 +133,7 @@ class Hdf5Container(Container):
         It creates a session and use a ContainerDumpEngine to recopy the traces delivered by the original container.
 
         :param container: container to be exported
-        :param filename: name of the Hdf5Container to vuild
+        :param filename: name of the Hdf5Container to build
         :param leakages_dataset_name:
         :param values_dataset_name:
         :param batch_size:

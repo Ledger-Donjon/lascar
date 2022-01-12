@@ -65,6 +65,7 @@ This library requires the following packages:
 - progressbar2
 - pytest
 - numba
+- PyQt5
 
 ## Tutorial
 

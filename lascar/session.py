@@ -209,9 +209,7 @@ class Session:
             self._batch_size = self._find_optimal_batch_size(self.container.leakages.dtype,self.container.leakages.shape[1])
         else:
             self._batch_size = batch_size
-        print("========================================")
-        print("Debug:")
-        print(self._batch_size)
+     
         self._thread_on_update = thread_on_update
 
         [engine.initialize(self) for engine in self.engines.values()]
