@@ -35,13 +35,13 @@ class DomEngine(PartitionerEngine):
 
     """
 
-    def __init__(self, name, partition_function):
+    def __init__(self, partition_function, name=None):
         """
 
         :param name:
         :param partition_function: partition_function that will take trace values as an input and returns 0 or 1
         """
-        PartitionerEngine.__init__(self, name, partition_function, range(2), 2)
+        PartitionerEngine.__init__(self, partition_function, range(2), 2, name=name)
         self.logger.debug('Creating DomEngine  "%s". ' % (name))
 
     def _finalize(self):

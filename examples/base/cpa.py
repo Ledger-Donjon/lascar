@@ -30,7 +30,7 @@ guess_range = range(
     256
 )  # the guess values: here we make hypothesis on a key byte, hence range(256)
 
-cpa_engine = CpaEngine("cpa_plaintext_3", selection_function, guess_range)
+cpa_engine = CpaEngine(selection_function, guess_range)
 
 session = Session(
     container, engine=cpa_engine, output_method=MatPlotLibOutputMethod(cpa_engine)
@@ -56,7 +56,6 @@ def generate_selection_function(byte):
 
 cpa_engines = [
     CpaEngine(
-        "cpa_%02d" % i,
         generate_selection_function(i),
         guess_range,
         solution=container.key[i],

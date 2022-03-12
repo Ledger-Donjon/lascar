@@ -34,7 +34,7 @@ class GuessEngine(Engine):
     In the case where the solution is known, it can be passed as an argument.
     """
 
-    def __init__(self, name, selection_function, guess_range, solution=None, jit=True):
+    def __init__(self, selection_function, guess_range, name=None, solution=None, jit=True):
         """
 
         :param name:
@@ -42,7 +42,7 @@ class GuessEngine(Engine):
         :param guess_range:
         :param solution:
         """
-        Engine.__init__(self, name)
+        Engine.__init__(self, name=name)
         self._function = selection_function
         self._guess_range = list(guess_range)
         self._number_of_guesses = len(guess_range)

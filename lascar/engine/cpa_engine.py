@@ -39,7 +39,7 @@ class CpaEngine(GuessEngine):
     and the corresponding leakages.
     """
 
-    def __init__(self, name, selection_function, guess_range, solution=None, jit=True):
+    def __init__(self, selection_function, guess_range, name=None, solution=None, jit=True):
         """
 
         :param name:
@@ -47,7 +47,9 @@ class CpaEngine(GuessEngine):
         :param guess_range: what are the values for the guess guess
         :param solution: if known, indicate the correct guess guess.
         """
-        GuessEngine.__init__(self, name, selection_function, guess_range, solution, jit)
+        if name is None:
+            name = "cpa"
+        GuessEngine.__init__(self, selection_function, guess_range, solution=solution, name=name, jit=jit)
         self.logger.debug(
             'Creating CpaEngine "%s" with %d guesses.' % (name, len(guess_range))
         )
@@ -115,11 +117,11 @@ class CpaPartitionedEngine(PartitionerEngine, GuessEngine):
 
     def __init__(
         self,
-        name,
         partition_function,
         partition_range,
         selection_function,
         guess_range,
+        name=None,
         solution=None,
     ):
         """
@@ -132,8 +134,10 @@ class CpaPartitionedEngine(PartitionerEngine, GuessEngine):
         :param leakage_model:
         :param solution:
         """
-        PartitionerEngine.__init__(self, name, partition_function, partition_range, 1)
-        GuessEngine.__init__(self, name, selection_function, guess_range, solution)
+        if name is None:
+            name = "partitioned_cpa"
+        PartitionerEngine.__init__(self, partition_function, partition_range, 1, name=name)
+        GuessEngine.__init__(self, selection_function, guess_range, name=name, solution=solution)
         self.logger.debug(
             'Creating CpaPartitionedEngine "%s" with %d partitions, %d guesses.'
             % (name, len(self._partition_range), len(guess_range))

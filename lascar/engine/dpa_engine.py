@@ -37,7 +37,7 @@ class DpaEngine(GuessEngine):
 
     """
 
-    def __init__(self, name, selection_function, guess_range, solution=None):
+    def __init__(self, selection_function, guess_range, name=None, solution=None):
         """
 
         :param name:
@@ -45,7 +45,9 @@ class DpaEngine(GuessEngine):
         :param guess_range: what are the values for the guess guess
         :param solution: if known, indicate the correct guess guess.
         """
-        GuessEngine.__init__(self, name, selection_function, guess_range, solution)
+        if name is None:
+            name = "dpa"
+        GuessEngine.__init__(self, selection_function, guess_range, solution=solution, name=name)
         self.output_parser_mode = "max"
         self.logger.debug(
             'Creating DpaEngine "%s" with %d guesses.', name, len(guess_range)

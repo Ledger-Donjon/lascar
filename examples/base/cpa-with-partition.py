@@ -34,7 +34,7 @@ container = BasicAesSimulationContainer(
 )  # We use the BasicAesSimulationContainer with 2000 traces
 
 attack = CpaPartitionedEngine(
-    "cpa_partitioned", partition, partition_size, guess_function, guess_range
+    partition, partition_size, guess_function, guess_range 
 )
 
 session = Session(container)

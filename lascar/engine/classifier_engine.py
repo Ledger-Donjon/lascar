@@ -41,7 +41,6 @@ class ProfileEngine(PartitionerEngine):
 
     def __init__(
         self,
-        name,
         classifier,
         partition_function,
         partition_range,
@@ -49,13 +48,14 @@ class ProfileEngine(PartitionerEngine):
         test_size=0.1,
         verbose=1,
         batch_size=128,
+        name=None
     ):
         """
 
-        :param name:
         :param classifier: instantieted sklearn classifier or compiled keras model
         :param partition_function:
         :param partition_range:
+        :param name:
         :param epochs: only used when using keras model, will be passed to the keras .fit() method
         :param test_size: only used when using keras model, will be passed to the keras .fit() method
         :param verbose: only used when using keras model, will be passed to the keras .fit() method
@@ -72,7 +72,7 @@ class ProfileEngine(PartitionerEngine):
                 "Classifier should be a sklearn classifier or a compiled keras model."
             )
 
-        PartitionerEngine.__init__(self, name, partition_function, partition_range, 1)
+        PartitionerEngine.__init__(self, partition_function, partition_range, 1, name=name)
         self._classifier = classifier
         self.classifier_type = (
             "keras" if isinstance(classifier, keras.Model) else "sklearn"
@@ -143,7 +143,7 @@ class MatchEngine(GuessEngine):
     """
 
     def __init__(
-        self, name, classifier, selection_function, guess_range, solution=None
+        self, classifier, selection_function, guess_range, name=None, solution=None
     ):
         """
 
@@ -153,8 +153,9 @@ class MatchEngine(GuessEngine):
         :param guess_range:
         :param solution:
         """
-
-        GuessEngine.__init__(self, name, selection_function, guess_range, solution)
+        if name is None:
+            name = "match_engine"
+        GuessEngine.__init__(self, selection_function, guess_range, name=name, solution=solution)
         self._classifier = classifier
         self.output_parser_mode = "max"
 

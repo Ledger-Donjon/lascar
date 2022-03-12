@@ -73,9 +73,9 @@ But in this simple case, we know exactly when occurs the relevant events ([5] an
 container.leakage_processing = CenteredProductProcessing(container, ([5], [10]))
 
 cpa_engine = CpaEngine(
-    "cpa-high-order",
     lambda value, guess: hamming(sbox[value["y"] ^ guess]),
     range(256),
+    name="cpa-high-order",
     solution=42,
 )
 
