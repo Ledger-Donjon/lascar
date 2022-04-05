@@ -62,7 +62,7 @@ class ProfileEngine(PartitionerEngine):
         :param batch_size: only used when using keras model, will be passed to the keras .fit() method
         """
 
-        import keras
+        import tensorflow.keras as keras
         import sklearn
 
         if not isinstance(classifier, sklearn.base.ClassifierMixin) and not (
