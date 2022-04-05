@@ -24,7 +24,6 @@ import numpy as np
 
 from . import PartitionerEngine
 
-
 class SnrEngine(PartitionerEngine):
     """
     SnrEngine is a PartitionerEngine used to compute the Signal-to-Noise-Ratio on Side-Channel Traces.
@@ -38,39 +37,39 @@ class SnrEngine(PartitionerEngine):
 
     def __init__(self, name, partition_function, partition_range, jit = True):
         """
-        
         :param name: 
         :param partition_function: function that will take trace values as an input and returns output within partition_range.
         :param partition_range: possible values for the partitioning.
         """
-        PartitionerEngine.__init__(self, name, partition_function, partition_range, 2, jit)
+        
+        PartitionerEngine.__init__(self, name, partition_function, partition_range, 1, jit)
         self.logger.debug(
             'Creating SnrEngine  "%s" with %d classes.' % (name, len(partition_range))
         )
 
     def _finalize(self):
-
-        acc = np.zeros(self._acc_x_by_partition.shape[2:])  # for mean of means
-        acc2 = np.zeros(self._acc_x_by_partition.shape[2:])  # for var of means
-        acc3 = np.zeros(self._acc_x_by_partition.shape[2:])  # for mean of vars
-
+        """
+        SNR = V[E[L|X]] / E[V[L|X]]
+        Note that E[V[L|X]] + V[E[L|X]] = V[L] (law of total variance)
+        We can hence compute SNR using only one accumulator + the variance
+        Note that we should beware of ponderation during the computations of conditional expressions
+        """
+        
+        acc = np.zeros(self._acc_x_by_partition.shape[2:], np.double)
+        
         number_of_partitions = 0
+        total_nb_of_traces = self._partition_count.sum()
         for v in self._partition_range:
             i = self._partition_range_to_index[v]
             if not self._partition_count[i]:
                 continue
 
-            acc += self._acc_x_by_partition[0, i] / self._partition_count[i]
-            acc2 += (self._acc_x_by_partition[0, i] / self._partition_count[i]) ** 2
-            acc3 += (
-                (self._acc_x_by_partition[1, i] * self._partition_count[i])
-                - self._acc_x_by_partition[0, i] ** 2
-            ) / (self._partition_count[i] ** 2)
+            # we will do the division by total number once at the end
+            acc += (self._acc_x_by_partition[0, i]**2) / self._partition_count[i]
 
-            number_of_partitions += 1
-
+        V_E_cond = ((acc / total_nb_of_traces) - (self._session["mean"].finalize()) ** 2)
         return np.nan_to_num(
-            ((acc2 / number_of_partitions) - (acc / number_of_partitions) ** 2)
-            / (acc3 / number_of_partitions),
+            1./(self._session["var"].finalize() / V_E_cond -1),
             False,
         )
+        
