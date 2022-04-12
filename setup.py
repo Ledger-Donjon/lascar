@@ -46,6 +46,7 @@ setup(
         "progressbar2",
         "pytest",
         "numba",
+        "psutil",
     ],  ## PyQt5 is here as a backend for vispy, this might change in the future
     packages=find_packages(),
     python_requires='>=3.0',
