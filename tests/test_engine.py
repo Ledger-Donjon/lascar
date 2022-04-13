@@ -87,15 +87,17 @@ class TestNonRegressionPartitionerEngine:
         vars = np.zeros(
             (len(partition_range),) + container_bis.leakages.shape[1:], dtype=np.double
         )
-
+        nums =[]
+        denom =[]
         for i, val in enumerate(partition_range):
             idx = np.where(
                 np.apply_along_axis(partition, 1, container_bis.values) == val
             )[0]
             means[i] = container_bis.leakages[idx].mean(0)
             vars[i] = container_bis.leakages[idx].var(0)
-
-        snr_numpy = means.var(0) / vars.mean(0)
+            nums += [means[i]]*len(idx)
+            denom += [vars[i]]*len(idx)
+        snr_numpy = np.array(nums).var(0) / np.array(denom).mean(0)
 
         assert np.all(np.isclose(snr_numpy, engine.finalize()))
 
@@ -110,18 +112,19 @@ class TestNonRegressionPartitionerEngine:
         session.run()
 
         container_bis = container[:]
-        nicv_numpy = np.vstack(
-            [
-                container_bis.leakages[
-                    np.where(
-                        np.apply_along_axis(partition, 1, container_bis.values) == val
-                    )[0]
-                ].mean(0)
-                for val in partition_range
-            ]
-        ).var(0) / container_bis.leakages.var(
-            0
-        )  # oui oui, promis
+        means = np.zeros(
+            (len(partition_range),) + container_bis.leakages.shape[1:], dtype=np.double
+        )
+
+        nums =[]
+        for i, val in enumerate(partition_range):
+            idx = np.where(
+                np.apply_along_axis(partition, 1, container_bis.values) == val
+            )[0]
+            means[i] = container_bis.leakages[idx].mean(0)
+            
+            nums += [means[i]]*len(idx)
+        nicv_numpy = np.array(nums).var(0)/ container_bis.leakages.var(0)
 
         assert np.all(np.isclose(nicv_numpy, engine.finalize()))
 
