@@ -30,7 +30,7 @@ class TTestEngine(PartitionerEngine):
     attack testing workshop, 2011. http://csrc.nist.gov/news_events/
     non-invasive-attack-testing-workshop/papers/08_Goodwill.pdf.)
 
-    It needs as en input a partition_function that will take trace values as an input and returns 0 or 1
+    It needs as input a partition_function that will take trace values as an input and returns 0 or 1
     (2 partitions_values).
 
     """

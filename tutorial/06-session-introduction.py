@@ -43,9 +43,9 @@ Engines are classes dedicated to compute stuffs from side-channel traces. The Se
 Here a list of Engines already implemented in lascar:
 - MeanEngine: compute the mean of all the traces leakages
 - VarEngine: compute the varianc of all the traces leakages
-- SnrEngine: compute Signal-to-Noise-Ratio from the traces leakages and a partitioning function appllied to the values.
-- CpaEngine: compute Correlation Power Analysis from the traces leakages and a guess function appllied to the values.
-- TTestEngine: compute Welch's T-Test from the traces leakages and a partitioning function appllied to the value
+- SnrEngine: compute Signal-to-Noise-Ratio from the traces leakages and a partitioning function applied to the values.
+- CpaEngine: compute Correlation Power Analysis from the traces leakages and a guess function applied to the values.
+- TTestEngine: compute Welch's T-Test from the traces leakages and a partitioning function applied to the value
 - ...
 
 
