@@ -1,5 +1,5 @@
 
-[![Ledger Logo](images/logo_ledger)](https://www.ledger.com/)&emsp;[![Ledger Logo](images/logo_donjon_l)](https://www.ledger.fr/tag/donjon/)
+[![Ledger Logo](images/ledger_logo_grey.png)](https://www.ledger.com/)&emsp;[![Ledger-Donjon Logo](images/logo_donjon_l)](https://blog.ledger.com/tag/donjon/)
 
 [![Join the chat at https://gitter.im/Ledger-Donjon/lascar](https://badges.gitter.im/Ledger-Donjon/lascar.svg)](https://gitter.im/Ledger-Donjon/lascar?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
