@@ -54,9 +54,8 @@ class Chi2TestEngine(PartitionerEngine):
     def _initialize(self):
         PartitionerEngine._initialize(self)
         self._histogram = np.zeros((self._partition_size,)+self._session.leakage_shape+(len(self._bin_starts),), dtype=np.dtype("uint32"))
-        self._update = self._chi2_update
 
-    def _chi2_update(self, batch):
+    def update(self, batch):
         partition_values = list(map(self._partition_function, batch.values))
         for i, v in enumerate(partition_values):
             idx_part = self._partition_range_to_index[v]
