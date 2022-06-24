@@ -4,22 +4,22 @@ from lascar import *
 from lascar.tools.aes import sbox
 import tempfile
 
-leakages = np.random.rand(100, 20)
-values = np.random.randint(0, 256, (100, 2)).astype(np.uint8)
+leakages = np.random.rand(300, 20)
+values = np.random.randint(0, 256, (300, 2)).astype(np.uint8)
 
 trace_batch_container = TraceBatchContainer(leakages, values)
 hdf5_container = Hdf5Container.export(
     trace_batch_container, tempfile.mkdtemp() + "/tmp.h5"
 )
 multiple_container = MultipleContainer(
-    TraceBatchContainer(leakages[:10], values[:10]),
-    TraceBatchContainer(leakages[10:50], values[10:50]),
-    TraceBatchContainer(leakages[50:], values[50:]),
+    TraceBatchContainer(leakages[:30], values[:30]),
+    TraceBatchContainer(leakages[30:150], values[30:150]),
+    TraceBatchContainer(leakages[150:], values[150:]),
 )
 
 randomized_container = RandomizedContainer(trace_batch_container)
 simulator_container = BasicAesSimulationContainer(
-    100, 2, value_section="plaintext", additional_time_samples=4, seed=2
+    300, 2, value_section="plaintext", additional_time_samples=4, seed=2
 )
 npy_container = NpyContainer.export(
     trace_batch_container,
