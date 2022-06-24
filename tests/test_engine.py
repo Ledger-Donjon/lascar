@@ -154,6 +154,59 @@ class TestNonRegressionPartitionerEngine:
 
         assert np.all(np.isclose(ttest_numpy, engine.finalize()))
 
+    @pytest.mark.parametrize(
+        "container,partition", [(c, f[0]) for c in containers for f in functions_ttest]
+    )
+    def test_ttest_higher_order_engine(self, container, partition):
+        for d in range(1, 6):
+            print(f"{d = }")
+            if d == 1:
+                self.test_ttest_engine(container, partition)
+                continue
+
+            session = Session(container)
+            engine = TTestEngine("ttest_higher_order", partition, analysis_order=d)
+            session.add_engine(engine)
+            session.run()
+
+            container_bis = container[:]
+            indexes = [
+                np.where(np.apply_along_axis(partition, 1, container_bis.values) == val)[0]
+                for val in range(2)
+            ]
+
+            l0 = container_bis.leakages[indexes[0]]
+            l1 = container_bis.leakages[indexes[1]]
+            # Compute mean (used for preprocessing traces)
+            m0 = l0.mean(0)
+            m1 = l1.mean(0)
+
+            if d == 2:
+                # Preprocess traces at order 2: p = (X-m)**2 (almost the variance)
+                p0 = np.power(l0 - m0, 2)
+                p1 = np.power(l1 - m1, 2)
+            else:
+                # Variance of original traces (used to preprocess traces for d > 2)
+                v0 = l0.var(0)
+                v1 = l1.var(0)
+
+                # Preprocess traces at order d > 2: p = ((X - m)/s)**d
+                # with s the standard deviation
+                p0 = np.power((l0 - m0) / np.sqrt(v0), d)
+                p1 = np.power((l1 - m1) / np.sqrt(v1), d)
+
+            # Compute ttest using preprocessed traces
+            true_m0 = p0.mean(0)
+            true_m1 = p1.mean(0)
+
+            true_v0 = p0.var(0)
+            true_v1 = p1.var(0)
+
+            ttest_numpy = (true_m0 - true_m1) / np.sqrt(
+                    (true_v0 / len(indexes[0])) + (true_v1 / len(indexes[1]))
+                    )
+
+            assert np.all(np.isclose(ttest_numpy, engine.finalize()))
 
 functions = [
     lambda value: hamming(value[0]),
