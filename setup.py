@@ -40,7 +40,7 @@ setup(
         "h5py",
         "matplotlib",
         "vispy",
-        "sklearn",
+        "scikit-learn",
         "scipy",
         "keras",
         "progressbar2",
