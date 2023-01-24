@@ -10,7 +10,7 @@ Welcome to lascar's documentation!
    :maxdepth: 4
    :caption: Contents:
 
-   lascar
+   lascar.rst
 
 
 Indices and tables
