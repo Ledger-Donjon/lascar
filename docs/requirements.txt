@@ -8,3 +8,4 @@ keras
 progressbar2
 pytest
 numba
+psutil
