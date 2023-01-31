@@ -1,5 +1,5 @@
-lascar.plotting.plot module
-===========================
+Plotting
+========
 
 .. automodule:: lascar.plotting.plot
     :members:
