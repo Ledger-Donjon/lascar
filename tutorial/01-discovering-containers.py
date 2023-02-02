@@ -1,151 +1,132 @@
 from lascar.container import Trace, TraceBatchContainer
 import numpy as np
 
-"""
-In lascar, side-channel data are represented within a class: Trace .
+# In lascar, side-channel data are stored within `Trace` instances. This class
+# is a named tuple with two attributes:
+#
+# - The first item is `leakage` and represents the observable side-channel, such
+#   as a power trace.
+# - The second item is `value` and represents the handled values during the
+#   observation of "leakage".
+#
+# Both attributes must always be `numpy.ndarray` of any shape.
+#
+# The `__str__` method of Trace displays the `shape` and `dtype` for both
+# leakage and value.
+#
+# The following creates a trace with (fake) side channel leakage and associated
+# data. The leakage is a vector of 10 time samples, stored in a `np.ndarray`.
+# The value is an array of 16 bytes, which can represent for instance a key.
 
-A side-channel trace (Trace in lascar), is a couple of two items:
-- The first item is "leakage" and represents the side-channel observable
-- The second item is "value" and represents the handled values during the observation of "leakage".
-
-The only restriction here is that "leakage" and "data" must be numpy.arrays of any shape.
-
-trace = (leakage, value) where leakage and value are numpy.arrays
-
-The __str__ method of Trace displays the shape and dtype for both leakage and value.
-
-"""
+leakage = np.random.rand(100)
+value = np.random.randint(0, 256, (16,), dtype=np.uint8)
+trace = Trace(leakage, value)
+print("Trace:", trace)
 
 
-leakage = np.random.rand(
-    10
-)  # fake side-channel leakage as a vector of 10 time samples: as a np.ndarray
-value = np.random.randint(
-    0, 256, (16,), dtype=np.uint8
-)  # the value associated, as 16 uint8: as a np.ndarray
+# Most of time, side-channel analysis requires multiple traces. In Lascar,
+# containers are used to group all the traces as a collection. Side-channel data
+# can arises from:
+#
+# - a measurement device coupled to the device under test,
+# - an acquisition campaign already saved on hard drive,
+# - the simulation of an algorithm on a device,
+# - or any other source of leakage information.
+#
+# The `Container` class provides an interface for accessing the traces (leakage
+# and values). A class may implement this interface to adapt to any source of
+# leakage and provide the traces when requested by the *Lascar* processing
+# pipeline.
+#
+# Lascar already defines multiple `Container` implementations, and the most
+# important is `TraceBatchContainer`, which stores in RAM both the leakages and
+# values as `numpy.ndarray`, sharing the same first dimension: the number of
+# traces in the container.
+#
+# In the following, a `TraceBatchContainer` is instanciated from two
+# `numpy.ndarray`: `leakages` and `values`.
 
-trace = Trace(leakage, value)  # the corresponding Trace
-print("Trace example: ", trace)
+leakages = np.random.rand(10, 100)  # 10 leakages, 100 time samples each.
+values = np.random.randint(0, 256, (10, 16))  # 10 associated values, 16 bytes each.
+batch = TraceBatchContainer(leakages, values)
+print("Batch container:", batch)
+
+
+# Containers implement the index operator, which returns either a `Trace` when
+# an index is given, or a `TraceBatchContainer` with multiple traces when a
+# slice is given. Furthermore, containers are iterable.
+
+print("batch[0]:", batch[0])
+print("batch[:5]:", batch[:5])
+print("batch[range(3)]:", batch[range(3)])
+
+for trace in batch:
+    print("Batch iteration:", trace)
+
 print()
 
 
-"""
+# Containers offer different mechanisms to limit the data to subsets.
+# `leakage_section` (resp. `value_section`) is a `Container` attribute
+# that will select the specified samples from the original leakage
+# (resp. `value`). It is supposed to minimize the reading part, by specifying
+# points of interests for instance.
 
-Now we introduce the notion of Container:
-In lascar, a Container is an object whose main role will be to deliver side-channel data.
+print("Leakage section example:")
+# To work only on leakage sample 10 and 15:
+batch.leakage_section = [10, 15]
+print(batch)
 
-Most of the time, side-channel data arises from:
-- a measurement device coupled to the DUT (a 'classical' acquisition setup)
-- an acquisition campaign already saved on hard drive
-- simulation of an algorithm on a device (simulated traces)
-- arrays of data
-- ...
+# To work only with the first 10 samples:
+batch.leakage_section = range(10)
+print(batch)
 
-The idea with Container class is to make abstraction of the origin of the side-channel data, provided that you implement
-the correct methods, who will represent your data who will be accessed by lascar during the side-channel analysis.
+# To work with only with one tenth of the sample:
+batch.leakage_section = range(0, 100, 10)
+print(batch)
 
-
-In lascar, there are different classes inheriting from Container.
- 
-But the more important is TraceBatchContainer, which actually stores in RAM both the leakages and values as np.arrays (sharing the same first dimension: the number of traces of the Container.
-
-In the following, we build a TraceBatchContainer from two np.arrays: 'leakages' and 'values':
-"""
-
-print("TraceBatchContainer example of a batch with 10 traces:")
-leakages = np.random.rand(
-    10, 100
-)  # 10 fake side-channel leakages, each one with 10 time samples: as a np.ndarray
-values = np.random.randint(
-    0, 256, (10, 16,)
-)  # the 10 values associated, each one of as 16 uint8: as a np.ndarray
-
-trace_batch = TraceBatchContainer(leakages, values)  # The corresponding TraceBatch
-print("trace_batch =", trace_batch)
-print()
-
-"""
-Containers implements a getter which will return either a Trace, or a TraceBatchContainer (if several Traces are asked).
-
-A TraceBatchContainer is also iterable.
-"""
-
-print("trace_batch[0] =", trace_batch[0])
-print("trace_batch[:5] =", trace_batch[:5])
-print("trace_batch[range(3)] =", trace_batch[range(3)])
-print()
-
-for (
-    trace
-) in trace_batch:  # a container is iterable (it delivers its traces during iteration)
-    print("iteration, trace =", trace)
+# To cancel `leakage_section`:
+batch.leakage_section = None  # cancelling leakage_section
+print(batch)
 print()
 
 
-"""
-In lascar, all Containers children implement a logger (from the logging module). 
-By default, the loglevel is set to INFO. But it can be set at any time, to display more or less informations: 
-(other lascar traces implement a logger: Session, Engine, OutputMethod)
-"""
-trace_batch.logger.setLevel("DEBUG")
-print(trace_batch[::2])
-trace_batch.logger.setLevel("INFO")
+# `leakage_processing` (resp. `value_processing`) is a `Container` attribute,
+# which can be a function that will be applied on the leakage (resp. value)
+# after `leakage_section` (resp. value_section).
+#
+# Leakage processing can be used for instance for side-channel trace
+# resynchronisation, signal filtering, etc.
+#
+# See lascar/tools/processing for a list of existing processing.
 
-
-""" 
-In lascar Containers offer different mechanisms to modify the data. 
-
-leakage_section, value_section
-leakage_processing, value_processing
-
-leakage_section (resp value_section) is an attribute of the Container that will select the specified samples from the original leakage (resp value).
-It is supposed to minimize the reading part, by specifying points of interests for instance.
-"""
-
-print("leakage_section:")
-trace_batch.leakage_section = [
-    10,
-    15,
-]  # if you want to work only on leakage sample 10 and 15
-print(trace_batch)
-trace_batch.leakage_section = range(
-    10
-)  # if you want to work only with the first 10 samples
-print(trace_batch)
-trace_batch.leakage_section = range(
-    0, 100, 10
-)  # if you want to work only with one tenth of the sample
-print(trace_batch)
-trace_batch.leakage_section = None  # cancelling leakage_section
-print(trace_batch)
-print()
-
-
-"""
-leakage_processing  (resp value_processing) is a Container attribute, under the form of a function that will be applied on the leakage (resp value) after leakage_section (resp value_section)
-
-leakage_processing will be used, among other thing:
-- for side-channel trace synchronisation
-- for leakage modification: see lascar/tools/processing for a list of existing processing
-"""
 from lascar.tools.processing import *
 
-print("leakage_processing:")
-trace_batch.leakage_processing = (
-    lambda leakage: leakage ** 2
-)  # any function or callable will be accepted, provided it fits with the original leakage shape
-print(trace_batch)
-trace_batch.leakage_processing = None  # cancelling leakage_procesing
-trace_batch.leakage_processing = CenteredProductProcessing(
-    trace_batch, [[0, 1, 2], [3, 4, 5]]
-)  # CenteredProduct for high-order side-channel-attacks: recombine samples [0,1,2] with [3,4,5]
-print(trace_batch)
-trace_batch.leakage_processing = None  # cancelling leakage_procesing
-trace_batch.leakage_processing = PcaProcessing(
-    trace_batch, 3
-)  # Principal component analysis on leakage with 3 components.
-print(trace_batch)
+print("Leakage processing example:")
+# Any function or callable is accepted, provided it fits with the original
+# leakage shape.
+batch.leakage_processing = lambda leakage: leakage**2
+print(batch)
+
+# Centered product for high-order side-channel attacks: recombine samples
+# [0, 1, 2] with [3, 4, 5]
+batch.leakage_processing = CenteredProductProcessing(batch, [[0, 1, 2], [3, 4, 5]])
+print(batch)
+
+# Principal component analysis on leakage with 3 components
+batch.leakage_processing = PcaProcessing(trace_batch, 3)
+print(batch)
+
+# No leakage processing
+batch.leakage_processing = None
 print()
-trace_batch.leakage_processing = None  # cancelling leakage_procesing
-print(trace_batch)
-print()
+
+# All container children implement a logger (from the logging module).
+# By default, the loglevel is set to `INFO`, but it can be set at any time to
+# display more or less informations.
+# Note: other lascar classes implement a logger as well: Session, Engine,
+# OutputMethod.
+
+batch.logger.setLevel("DEBUG")
+print(batch[::2])
+batch.logger.setLevel("INFO")

@@ -20,6 +20,7 @@ side-channel evaluation.
    :caption: Contents:
 
    Installation <installation.rst>
+   Tutorials <tutorials.rst>
    API Reference <api.rst>
 
 
