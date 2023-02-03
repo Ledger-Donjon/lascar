@@ -6,3 +6,4 @@ Tutorials
    :caption: Contents:
 
    Discovering containers <tutorial_01_discovering_containers.rst>
+   Store containers <tutorial_02_store_containers.rst>

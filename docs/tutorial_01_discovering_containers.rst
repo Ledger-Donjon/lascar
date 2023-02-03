@@ -89,7 +89,7 @@ Indexing and iteration
 ----------------------
 
 Containers implement the index operator, which returns either a
-:class:`Trace <lascar.container.container.Trace` when an index is given, or a
+:class:`Trace <lascar.container.container.Trace>` when an index is given, or a
 :class:`TraceBatchContainer <lascar.container.container.TraceBatchContainer>`
 with multiple traces when a slice is given. Furthermore, containers are
 iterable.
