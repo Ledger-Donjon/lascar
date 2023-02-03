@@ -1,13 +1,13 @@
-Store containers
-================
+HDF5 container
+==============
 
 When performing side-channel analysis, a user will seek to store its data for
 further usages. To our knowledge, every lab has its own format for storing
 side-channel traces.
 
 The probably most popular traces storage file format is
-`hdf5 (Hierarchical Data Format) <https://www.hdfgroup.org/HDF5/>`_. For each
-set of traces, a single hdf5 file is created, implementing two datasets: the
+`HDF5 (Hierarchical Data Format) <https://www.hdfgroup.org/HDF5/>`_. For each
+set of traces, a single HDF5 file is created, implementing two datasets: the
 first one for leakages, and the second for values.
 
 *Lascar* provides the class
