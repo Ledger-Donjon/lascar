@@ -8,6 +8,7 @@ Tutorials
    Discovering containers <tutorial_01_discovering_containers.rst>
    HDF5 containers <tutorial_02_hdf5_container.rst>
    Abstract containers <tutorial_03_abstract_containers.rst>
+   Acquisition setup example <tutorial_04_acquisition_setup_example.rst>
 
 .. note::
 
