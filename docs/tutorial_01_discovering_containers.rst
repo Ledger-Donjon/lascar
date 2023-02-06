@@ -4,9 +4,6 @@ Discovering containers
 This tutorial will introduce traces and containers, which are base classes used
 to store the experimental measurement in *Lascar*.
 
-The complete source of this tutorial is available at
-`01-discovering-containers.py <https://github.com/Ledger-Donjon/lascar/blob/master/tutorial/01-discovering-containers.py>`_.
-
 Trace
 -----
 
