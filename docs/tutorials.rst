@@ -10,6 +10,7 @@ Tutorials
    Abstract containers <tutorial_03_abstract_containers.rst>
    Acquisition setup example <tutorial_04_acquisition_setup_example.rst>
    Synchronization <tutorial_05_synchronization.rst>
+   Session introduction <tutorial_06_session_introduction.rst>
 
 .. note::
 
