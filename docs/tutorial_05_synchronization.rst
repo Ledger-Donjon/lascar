@@ -47,6 +47,11 @@ expected.
    container = SimulatedContainer(100)
    container.plot_leakage(range(3))
 
+.. figure:: pictures/tutorial-05-non-aligned-traces.png
+   :align: center
+
+   Non aligned traces
+
 Now the synchronisation process.
 :attr:`leakage_procesing <lascar.container.container.Container.leakage_processing>`
 will be used, so we need to design a function, that takes a leakage as input and
@@ -75,6 +80,11 @@ is not the point here.
            # We need to find the peak in each leakage, and roll it to match the ref_peak
            peak_offset = leakage.argmax()
            return np.roll(leakage, self.ref_offset - peak_offset)
+
+.. figure:: pictures/tutorial-05-aligned-traces.png
+   :align: center
+
+   Aligned traces
 
 Now we can instantiate a :class:`Synchronisation`, using the leakage of the
 first trace as a reference. As seen in the first tutorial, we just have to set
