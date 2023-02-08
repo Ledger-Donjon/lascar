@@ -12,6 +12,7 @@ Tutorials
    Synchronization <tutorial_05_synchronization.rst>
    Session introduction <tutorial_06_session_introduction.rst>
    Differential Power Analysis example <tutorial_07_dpa_example.rst>
+   Session outputs <tutorial_08_session_outputs.rst>
 
 .. note::
 
