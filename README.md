@@ -37,35 +37,30 @@ The [tutorial](tutorial/)/[examples](examples/) folders of the library provide b
 
 ## Installation
 
-Clone the repository then use the setup.py file, based on setuptools:
+*Lascar* can be installed with pip3:
 
 ```
-python3 setup.py install --user
-```
-
-Build the doc:
-
-```
-cd docs/
-make html
+pip3 install "git+https://github.com/Ledger-Donjon/lascar.git"
 ```
 
 ## Requirements
 
 This library requires the following packages:
 
-- numpy
-- scipy
-- matplotlib: for curve visualization
-- vispy: for curve visualization
-- sklearn: for machine learning
-- keras: for deep learning
-- tensorflow: keras backend
-- h5py: for data storage
+- click
+- h5py
+- [keras](https://keras.io/) - for machine learning
+- [matplotlib](https://matplotlib.org/) - for curve visualization
+- [numba](https://numba.pydata.org/) - for python JIT code compilation
+- [numpy](https://numpy.org/>`)
 - progressbar2
+- psuti
 - pytest
-- numba
 - PyQt5
+- [scikit-learn](https://scikit-learn.org/) - for machine learning
+- [scipy](https://scipy.org/)
+- [tensorflow](https://www.tensorflow.org/) - keras backend
+- [vispy](https://vispy.org/) - for curve visualization
 
 ## Tutorial
 
