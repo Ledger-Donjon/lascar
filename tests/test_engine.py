@@ -165,7 +165,7 @@ class TestNonRegressionPartitionerEngine:
                 continue
 
             session = Session(container)
-            engine = TTestEngine("ttest_higher_order", partition, analysis_order=d)
+            engine = TTestEngine(partition, analysis_order=d)
             session.add_engine(engine)
             session.run()
 
