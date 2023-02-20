@@ -14,7 +14,7 @@ def generate_guess_function(byte):
         return hamming(sbox[value.plaintext[byte]^guess])
     return guess_function
 
-CPAengs = [CpaEngine("CpaSbox{}".format(byte), generate_guess_function(byte), range(256), solution=container.key[byte]) for byte in range(16) ]
+CPAengs = [CpaEngine(generate_guess_function(byte), range(256), name="CpaSbox{}".format(byte), solution=container.key[byte]) for byte in range(16) ]
 engGroup = GroupedEngines('CPAgroup', *CPAengs)
 CPAsession = Session(
     container,

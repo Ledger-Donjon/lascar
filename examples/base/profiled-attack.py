@@ -75,14 +75,14 @@ classifier_keras = mlp_best(
 
 
 classifier_profile_engine_qda = ProfileEngine(
-    "profile qda", classifier_qda, partition_function, number_of_partitions
+    classifier_qda, partition_function, number_of_partitions, name="profile qda"
 )
 classifier_profile_engine_keras = ProfileEngine(
-    "profile keras",
     classifier_keras,
     partition_function,
     number_of_partitions,
     epochs=20,
+    name="profile keras",
 )
 
 session = Session(
@@ -119,17 +119,17 @@ classifier_qda = load_classifier(
 classifier_keras = load_classifier("classifier_keras.save")
 
 classifier_match_engine_qda = MatchEngine(
-    "match qda",
     classifier_qda,
     sensitive_value_with_guess,
     guess_range,
+    name="match qda",
     solution=container_attack.key[byte],
 )
 classifier_match_engine_keras = MatchEngine(
-    "match keras",
     classifier_keras,
     sensitive_value_with_guess,
     guess_range,
+    name="match keras",
     solution=container_attack.key[byte],
 )
 

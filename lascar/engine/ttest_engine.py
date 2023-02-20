@@ -36,13 +36,15 @@ class TTestEngine(PartitionerEngine):
 
     """
 
-    def __init__(self, name, partition_function, analysis_order=1):
+    def __init__(self, partition_function, analysis_order=1, name=None):
         """
 
         :param name:
         :param partition_function: partition_function that will take trace values as an input and returns 0 or 1
         """
-        PartitionerEngine.__init__(self, name, partition_function, range(2), 2)
+        if name is None:
+            name = "t-test"
+        PartitionerEngine.__init__(self, partition_function, range(2), 2, name=name)
         self.logger.debug('Creating TtestEngine  "%s". ' % (name))
         self._analysis_order = analysis_order
 

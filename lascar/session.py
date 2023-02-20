@@ -134,9 +134,7 @@ class Session:
         :return: None
         """
         if engine.name in self.engines:
-            raise ValueError(
-                "%s is already an Engine name for this session." % engine.name
-            )
+            engine.name += str(len(self.engines) - 2) # minus Mean and Var Engines which are here by default
 
         self.engines.update({engine.name: engine})
 

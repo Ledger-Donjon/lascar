@@ -27,7 +27,7 @@ def partition_function(
 
 number_of_partitions = 256  # number of possible classes (~output of the partiton_function) for the partition_function
 snr_engine = SnrEngine(
-    "snr_plaintext_3", partition_function, range(number_of_partitions)
+     partition_function, range(number_of_partitions), name="snr_plaintext_3"
 )
 
 # We choose here to plot the resulting curve
@@ -58,7 +58,7 @@ def get_partition_function(byte):
 number_of_partitions = 256  # number of possible classes (~output of the partiton_function) for the partition_function
 snr_engines = [
     SnrEngine(
-        "snr_plaintext_%d" % i, get_partition_function(i), range(number_of_partitions)
+        get_partition_function(i), range(number_of_partitions), name="snr_plaintext_%d" % i
     )
     for i in range(16)
 ]

@@ -75,7 +75,7 @@ class TestNonRegressionPartitionerEngine:
     def test_snr_engine(self, container, partition, partition_range):
 
         session = Session(container)
-        engine = SnrEngine("snr", partition, partition_range)
+        engine = SnrEngine(partition, partition_range)
         session.add_engine(engine)
         session.run()
 
@@ -107,7 +107,7 @@ class TestNonRegressionPartitionerEngine:
     )
     def test_nicv_engine(self, container, partition, partition_range):
         session = Session(container)
-        engine = NicvEngine("nicv", partition, partition_range)
+        engine = NicvEngine(partition, partition_range)
         session.add_engine(engine)
         session.run()
 
@@ -133,7 +133,7 @@ class TestNonRegressionPartitionerEngine:
     )
     def test_ttest_engine(self, container, partition):
         session = Session(container)
-        engine = TTestEngine("ttest", partition)
+        engine = TTestEngine(partition)
         session.add_engine(engine)
         session.run()
 
@@ -165,7 +165,7 @@ class TestNonRegressionPartitionerEngine:
                 continue
 
             session = Session(container)
-            engine = TTestEngine("ttest_higher_order", partition, analysis_order=d)
+            engine = TTestEngine(partition, analysis_order=d)
             session.add_engine(engine)
             session.run()
 
@@ -241,7 +241,7 @@ class TestNonRegressionCpa:
     def test_cpa_engine(self, container, guess_function, guess_range, jitv):
 
         session = Session(container)
-        engine = CpaEngine("cpa", guess_function, guess_range, jit=jitv)
+        engine = CpaEngine(guess_function, guess_range, jit=jitv)
         session.add_engine(engine)
         session.run()
 
@@ -283,7 +283,7 @@ class TestNonRegressionCpa:
 
         f = lambda v, s: leakage_model(guess_function(v, s))
         session = Session(container)
-        engine = CpaPartitionedEngine("cpa", partition, partition_size, f, guess_range,)
+        engine = CpaPartitionedEngine(partition, partition_size, f, guess_range,)
         session.add_engine(engine)
         session.run()
 

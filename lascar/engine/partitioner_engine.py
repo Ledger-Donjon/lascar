@@ -54,7 +54,7 @@ class PartitionerEngine(Engine):
     0 <= partition_value < partition_size
     """
 
-    def __init__(self, name, partition_function, partition_range, order, jit=True):
+    def __init__(self, partition_function, partition_range, order, name=None, jit=True):
         """
         PartitionEngine
         :param name: the name chosen for the Engine

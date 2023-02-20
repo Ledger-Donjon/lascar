@@ -18,7 +18,7 @@ def partition_function(
     return int(value["plaintext"][3] == 0)  # "plaintext[3] == 0" versus "all other values"
 
 
-ttest_engine = TTestEngine("ttest", partition_function)
+ttest_engine = TTestEngine(partition_function)
 
 # We choose here to plot the resulting curve
 plot_output = MatPlotLibOutputMethod(ttest_engine)
@@ -43,7 +43,7 @@ def get_partition_function(byte):
 
 number_of_partitions = 2  # number of possible classes (~output of the partiton_function) for the partition_function
 ttest_engines = [
-    TTestEngine("ttest_plaintext_%d" % i, get_partition_function(i)) for i in range(16)
+    TTestEngine(get_partition_function(i)) for i in range(16)
 ]
 
 session = Session(
