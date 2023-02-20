@@ -31,7 +31,9 @@ from .dpa_engine import DpaEngine
 from .nicv_engine import NicvEngine
 from .snr_engine import SnrEngine
 from .ttest_engine import TTestEngine
+from .chi2test_engine import Chi2TestEngine
 from .ttest_engine import compute_ttest
+from .lra_engine import LraEngine
 
 from .classifier_engine import MatchEngine
 from .classifier_engine import ProfileEngine

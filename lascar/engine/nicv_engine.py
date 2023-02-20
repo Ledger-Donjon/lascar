@@ -52,25 +52,27 @@ class NicvEngine(PartitionerEngine):
         )
 
     def _finalize(self):
+        """
+        NICV =  V[E[L|X]] / V[X]
+        computing V[E[L|X]] needs to be done by taking into account probabilities on X.
+        V[E[L|X]] = E[E[L|X]^2] - (E[E[L|X]])^2
+        """
 
         acc = np.zeros(self._acc_x_by_partition.shape[2:], np.double)
-        acc2 = np.zeros(self._acc_x_by_partition.shape[2:], np.double)
-
+        
         number_of_partitions = 0
+        total_nb_of_traces = self._partition_count.sum()
         for v in self._partition_range:
             i = self._partition_range_to_index[v]
             if not self._partition_count[i]:
                 continue
 
-            # tmp = self._acc_x_by_partition[0, i] / self._partition_count[i]
-            acc += self._acc_x_by_partition[0, i] / self._partition_count[i]
-            acc2 += (self._acc_x_by_partition[0, i] / self._partition_count[i]) ** 2
-            # acc += tmp
-            # acc2 += tmp * tmp
+            # we will do the division by total number once at the end
+            acc += (self._acc_x_by_partition[0, i]**2) / self._partition_count[i]
             number_of_partitions += 1
 
         return np.nan_to_num(
-            ((acc2 / number_of_partitions) - (acc / number_of_partitions) ** 2)
+            ((acc / total_nb_of_traces) - (self._session["mean"].finalize()) ** 2)
             / self._session["var"].finalize(),
             False,
         )

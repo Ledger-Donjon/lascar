@@ -4,22 +4,22 @@ from lascar import *
 from lascar.tools.aes import sbox
 import tempfile
 
-leakages = np.random.rand(100, 20)
-values = np.random.randint(0, 256, (100, 2)).astype(np.uint8)
+leakages = np.random.rand(300, 20)
+values = np.random.randint(0, 256, (300, 2)).astype(np.uint8)
 
 trace_batch_container = TraceBatchContainer(leakages, values)
 hdf5_container = Hdf5Container.export(
     trace_batch_container, tempfile.mkdtemp() + "/tmp.h5"
 )
 multiple_container = MultipleContainer(
-    TraceBatchContainer(leakages[:10], values[:10]),
-    TraceBatchContainer(leakages[10:50], values[10:50]),
-    TraceBatchContainer(leakages[50:], values[50:]),
+    TraceBatchContainer(leakages[:30], values[:30]),
+    TraceBatchContainer(leakages[30:150], values[30:150]),
+    TraceBatchContainer(leakages[150:], values[150:]),
 )
 
 randomized_container = RandomizedContainer(trace_batch_container)
 simulator_container = BasicAesSimulationContainer(
-    100, 2, value_section="plaintext", additional_time_samples=4, seed=2
+    300, 2, value_section="plaintext", additional_time_samples=4, seed=2
 )
 npy_container = NpyContainer.export(
     trace_batch_container,
@@ -87,15 +87,17 @@ class TestNonRegressionPartitionerEngine:
         vars = np.zeros(
             (len(partition_range),) + container_bis.leakages.shape[1:], dtype=np.double
         )
-
+        nums =[]
+        denom =[]
         for i, val in enumerate(partition_range):
             idx = np.where(
                 np.apply_along_axis(partition, 1, container_bis.values) == val
             )[0]
             means[i] = container_bis.leakages[idx].mean(0)
             vars[i] = container_bis.leakages[idx].var(0)
-
-        snr_numpy = means.var(0) / vars.mean(0)
+            nums += [means[i]]*len(idx)
+            denom += [vars[i]]*len(idx)
+        snr_numpy = np.array(nums).var(0) / np.array(denom).mean(0)
 
         assert np.all(np.isclose(snr_numpy, engine.finalize()))
 
@@ -110,18 +112,19 @@ class TestNonRegressionPartitionerEngine:
         session.run()
 
         container_bis = container[:]
-        nicv_numpy = np.vstack(
-            [
-                container_bis.leakages[
-                    np.where(
-                        np.apply_along_axis(partition, 1, container_bis.values) == val
-                    )[0]
-                ].mean(0)
-                for val in partition_range
-            ]
-        ).var(0) / container_bis.leakages.var(
-            0
-        )  # oui oui, promis
+        means = np.zeros(
+            (len(partition_range),) + container_bis.leakages.shape[1:], dtype=np.double
+        )
+
+        nums =[]
+        for i, val in enumerate(partition_range):
+            idx = np.where(
+                np.apply_along_axis(partition, 1, container_bis.values) == val
+            )[0]
+            means[i] = container_bis.leakages[idx].mean(0)
+            
+            nums += [means[i]]*len(idx)
+        nicv_numpy = np.array(nums).var(0)/ container_bis.leakages.var(0)
 
         assert np.all(np.isclose(nicv_numpy, engine.finalize()))
 
@@ -151,6 +154,59 @@ class TestNonRegressionPartitionerEngine:
 
         assert np.all(np.isclose(ttest_numpy, engine.finalize()))
 
+    @pytest.mark.parametrize(
+        "container,partition", [(c, f[0]) for c in containers for f in functions_ttest]
+    )
+    def test_ttest_higher_order_engine(self, container, partition):
+        for d in range(1, 6):
+            print(f"{d = }")
+            if d == 1:
+                self.test_ttest_engine(container, partition)
+                continue
+
+            session = Session(container)
+            engine = TTestEngine("ttest_higher_order", partition, analysis_order=d)
+            session.add_engine(engine)
+            session.run()
+
+            container_bis = container[:]
+            indexes = [
+                np.where(np.apply_along_axis(partition, 1, container_bis.values) == val)[0]
+                for val in range(2)
+            ]
+
+            l0 = container_bis.leakages[indexes[0]]
+            l1 = container_bis.leakages[indexes[1]]
+            # Compute mean (used for preprocessing traces)
+            m0 = l0.mean(0)
+            m1 = l1.mean(0)
+
+            if d == 2:
+                # Preprocess traces at order 2: p = (X-m)**2 (almost the variance)
+                p0 = np.power(l0 - m0, 2)
+                p1 = np.power(l1 - m1, 2)
+            else:
+                # Variance of original traces (used to preprocess traces for d > 2)
+                v0 = l0.var(0)
+                v1 = l1.var(0)
+
+                # Preprocess traces at order d > 2: p = ((X - m)/s)**d
+                # with s the standard deviation
+                p0 = np.power((l0 - m0) / np.sqrt(v0), d)
+                p1 = np.power((l1 - m1) / np.sqrt(v1), d)
+
+            # Compute ttest using preprocessed traces
+            true_m0 = p0.mean(0)
+            true_m1 = p1.mean(0)
+
+            true_v0 = p0.var(0)
+            true_v1 = p1.var(0)
+
+            ttest_numpy = (true_m0 - true_m1) / np.sqrt(
+                    (true_v0 / len(indexes[0])) + (true_v1 / len(indexes[1]))
+                    )
+
+            assert np.all(np.isclose(ttest_numpy, engine.finalize()))
 
 functions = [
     lambda value: hamming(value[0]),

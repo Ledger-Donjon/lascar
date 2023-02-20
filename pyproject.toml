@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lascar"
+version = "1.1"
+authors = [
+    { name="Manuel San Pedro", email="manuel.sanpedro@ledger.fr" },
+    { name="Victor Servant", email="victor.servant@ledger.fr" },
+    { name="Charles Guillemet", email="charles@ledger.fr" },
+]
+description = "Toolsuite for side-channel acquisition, container and analysis"
+readme = "README.md"
+requires-python = ">=3.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Ledger-Donjon/lascar"
+"Bug Tracker" = "https://github.com/Ledger-Donjon/lascar/issues"
