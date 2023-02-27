@@ -390,6 +390,25 @@ class Container:
         session = Session(self).run()
         return session["mean"].finalize(), session["var"].finalize()
 
+    def sliced(self, start: int, stop: int) -> Slice:
+        """
+        Wraps the current container in a :class:`Slice` to select a slice of the
+        traces.
+
+        :param start: Start index
+        :param stop: End index, excluded.
+        """
+        return Slice(self, start, stop)
+
+    def limited(self, count: int) -> Slice:
+        """
+        Wraps the current container in a :class:`Slice` to limit the number of
+        traces.
+
+        :param count: Number of traces limit.
+        """
+        return Slice(self, 0, count)
+
 
 # def to_trace(func):
 #     def wrapper(*args, **kwargs):

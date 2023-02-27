@@ -36,7 +36,7 @@ filename = ASCAD_DIR + "/ASCAD_data/ASCAD_databases/ATMega8515_raw_traces.h5"
 container = Hdf5Container(
     filename, leakages_dataset_name="traces", values_dataset_name="metadata"
 )
-container = Slice(container, 0, 5000) # only 5000 traces used over the 60000 available
+container = container.limited(5000)  # Only 5000 traces used over the 60000 available
 
 
 """

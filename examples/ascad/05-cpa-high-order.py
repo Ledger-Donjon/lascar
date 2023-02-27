@@ -40,7 +40,7 @@ container = Hdf5Container(
     leakage_section=poi,
 )
 
-container = Slice(container, 0, 500)
+container = container.limited(500)
 
 # Then we make a container that will apply a CenteredProduct to recombine all the points of interest.
 container.leakage_processing = CenteredProductProcessing(container)
