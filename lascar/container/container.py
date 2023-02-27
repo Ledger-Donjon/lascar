@@ -390,7 +390,7 @@ class Container:
         session = Session(self).run()
         return session["mean"].finalize(), session["var"].finalize()
 
-    def sliced(self, start: int, stop: int) -> Slice:
+    def sliced(self, start: int, stop: int) -> "Slice":
         """
         Wraps the current container in a :class:`Slice` to select a slice of the
         traces.
@@ -400,7 +400,7 @@ class Container:
         """
         return Slice(self, start, stop)
 
-    def limited(self, count: int) -> Slice:
+    def limited(self, count: int) -> "Slice":
         """
         Wraps the current container in a :class:`Slice` to limit the number of
         traces.
