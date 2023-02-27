@@ -138,15 +138,15 @@ instance.
    
    # To work only with the first 10 samples:
    batch.leakage_section = range(10)
-   print(trace_batch)
+   print(batch)
    
    # To work with only with one tenth of the sample:
    batch.leakage_section = range(0, 100, 10)
-   print(trace_batch)
+   print(batch)
    
    # To cancel `leakage_section`:
    batch.leakage_section = None  # cancelling leakage_section
-   print(trace_batch)
+   print(batch)
 
 This will output:
 
@@ -185,7 +185,7 @@ See :code:`lascar/tools/processing` for a list of existing processing.
    )
 
    # Principal component analysis on leakage with 3 components
-   batch.leakage_processing = PcaProcessing(trace_batch, 3)
+   batch.leakage_processing = PcaProcessing(batch, 3)
 
    # No leakage processing
    batch.leakage_processing = None

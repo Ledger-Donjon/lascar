@@ -109,10 +109,10 @@ class Container:
 
     Where both leakage and value can be represented as a numpy array.
 
-    The role of the Container class is to be overloaded so that it can deliver traces, stored as a specified format.
-    Mostly, the __getitem__/__setitem__ have to be overloaded when user want to write its own Container format class.
-
-    :param number_of_traces:
+    The role of the Container class is to be overloaded so that it can deliver traces,
+    stored as a specified format. Mostly, the `__getitem__`, `__setitem__` and
+    `__len__` methods have to be overloaded when user want to write its own Container
+    format class.
     """
 
     def __init__(self, **kwargs):
@@ -149,9 +149,6 @@ class Container:
         )
         self._value_abstract = AbstractArray(self.values.shape[1:], self.values.dtype)
 
-        self.number_of_traces = kwargs.get(
-            "number_of_traces", self.number_of_traces_max
-        )
         self.leakage_section = kwargs.get("leakage_section", None)
         self.value_section = kwargs.get("value_section", None)
         self.leakage_processing = kwargs.get("leakage_processing", None)
@@ -345,9 +342,6 @@ class Container:
 
         plot([self[i].leakage for i in key])
 
-    def __len__(self):
-        return self.number_of_traces
-
     def __iter__(self):
         """
         Container is iterable
@@ -359,7 +353,7 @@ class Container:
             yield self[i]
 
     def __str__(self):
-        res = "Container with %d traces. " % (self.number_of_traces)
+        res = f"Container with {len(self)} traces. "
         res += "leakages: %s, values: %s. " % (
             self._leakage_abstract,
             self._value_abstract,
@@ -423,7 +417,7 @@ class AbstractContainer(Container):
 
     def __init__(self, number_of_traces, **kwargs):
         self.logger = logging.getLogger(__name__)
-
+        self.number_of_traces = number_of_traces
         trace = self.generate_trace(0)
         self.leakages = AbstractArray(
             (number_of_traces,) + trace.leakage.shape, trace.leakage.dtype
@@ -431,8 +425,7 @@ class AbstractContainer(Container):
         self.values = AbstractArray(
             (number_of_traces,) + trace.value.shape, trace.value.dtype
         )
-
-        Container.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     def generate_trace(self, idx):
         """
@@ -465,6 +458,9 @@ class AbstractContainer(Container):
             values[i] = value
 
         return TraceBatchContainer(leakages, values)
+
+    def __len__(self):
+        return self.number_of_traces
 
     def __getitem__(self, key):
         """
@@ -576,6 +572,9 @@ class TraceBatchContainer(Container):
 
         self.leakages[key] = value.leakage if isinstance(key, int) else value.leakages
         self.values[key] = value.value if isinstance(key, int) else value.values
+
+    def __len__(self):
+        return len(self.leakages)
 
     def save(self, filename):
         """
@@ -722,3 +721,38 @@ class AcquisitionFromGetters(AbstractContainer):
         leakage = self.get_leakage()
 
         return Trace(leakage, value)
+
+
+class Slice:
+    def __init__(self, base: Container, start: int, stop: int):
+        """
+        Container which is a slice of a parent container, in order to reduce the
+        number of traces.
+
+        :param base: Base container
+        :param start: Start index
+        :param stop: End index, excluded.
+        """
+        self.base = base
+        if stop < start:
+            raise ValueError("Slice stop must be >= start")
+        self.start = start
+        self.stop = stop
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            if key < self.start or key >= self.stop:
+                raise IndexError()
+            return self.base[key]
+        elif isinstance(key, slice):
+            if key.start < self.start or key.stop > self.stop:
+                raise IndexError()
+            return self.base[key]
+        elif isinstance(key, list):
+            for i in key:
+                if i < self.start or i >= self.stop:
+                    raise IndexError()
+            return self.base[key]
+
+    def __len__(self):
+        return self.stop - self.start

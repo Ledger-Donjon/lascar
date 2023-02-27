@@ -18,14 +18,8 @@ partition_size = 256
 guess_range = range(256)
 
 leakage_model = HammingPrecomputedModel()
-
-container = BasicAesSimulationContainer(
-    5000, 0
-)  
-
-attack = LraEngine(
-    "lra", partition, partition_size, guess_function, guess_range
-)
+container = BasicAesSimulationContainer(5000, 0)
+attack = LraEngine("lra", partition, partition_size, guess_function, guess_range)
 
 session = Session(container)
 session.add_engine(attack)

@@ -44,7 +44,7 @@ class MultipleContainer(Container):
             self._containers[0].values.dtype,
         )
 
-        Container.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.logger.debug(
             "Creating MultipleContainer using %d Container." % len(self._containers)
         )
@@ -53,12 +53,11 @@ class MultipleContainer(Container):
         current = 0
         self._t = np.zeros((self.number_of_traces + 1, 2), int)
         for i, container in enumerate(args):
-            self._t[current : current + container.number_of_traces, 0] = i
-            self._t[current : current + container.number_of_traces, 1] = range(
-                container.number_of_traces
-            )
-            current += container.number_of_traces
-        self._t[current] = i, container.number_of_traces
+            l = len(container)
+            self._t[current : current + l, 0] = i
+            self._t[current : current + l, 1] = range(l)
+            current += l
+        self._t[current] = i, l
 
     def __getitem__(self, item):
 
@@ -111,11 +110,11 @@ class MultipleContainer(Container):
                 [
                     container_offset_begin,
                     suboffset_offset_begin,
-                    self._containers[container_offset_begin].number_of_traces,
+                    len(self._containers[container_offset_begin]),
                 ]
             )
             for i in range(container_offset_begin + 1, container_offset_end):
-                suboffsets.append([i, 0, self._containers[i].number_of_traces])
+                suboffsets.append([i, 0, len(self._containers[i])])
             suboffsets.append([container_offset_end, 0, suboffset_offset_end])
 
         # TODO: Find a better solution...
@@ -157,6 +156,12 @@ class MultipleContainer(Container):
         #     values[i:i + len(batch)] = batch.values
         #     i += len(batch)
         return TraceBatchContainer(leakages, values)
+
+    def __len__(self):
+        acc = 0
+        for container in self._containers:
+            acc += len(container)
+        return acc
 
     @property
     def leakage_section(self):

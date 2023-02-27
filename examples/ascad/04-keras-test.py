@@ -71,15 +71,15 @@ def guess_function(value, guess):
 guess_range = range(256)  # The possbles value for the guess
 
 # An engine has to be created, dedicated to use a classifier (here a keras neural network nn) with Side-Channel Traces.
-nn_match_engine = MatchEngine(
-    "nn_match", nn, guess_function, guess_range, solution=solution
-)
+nn_match_engine = MatchEngine(nn, guess_function, guess_range, solution=solution, name="nn_match")
 
 
 # Now, 5 times in a row we randomly take 2000 traces from attack_container, and compute the mean rank of the correct key, every 10 traces.
 ranks = []
 
-for i,container in enumerate(split_container(attack_container, size_of_splits=2000)[:5]):
+for i, container in enumerate(
+    split_container(attack_container, size_of_splits=2000)[:5]
+):
 
     session = Session(
         container,

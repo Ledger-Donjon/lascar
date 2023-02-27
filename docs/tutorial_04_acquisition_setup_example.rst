@@ -45,9 +45,9 @@ oscilloscope.
            """
            :param number_of_traces: Number of traces in the container
            """
-           super().__init__(self, number_of_traces)
            self.dut = Dut()
            self.oscilloscope = Oscilloscope()
+           super().__init__(number_of_traces)
 
        def generate_trace(self, index: int):
            """

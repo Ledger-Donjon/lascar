@@ -114,7 +114,7 @@ batch.leakage_processing = CenteredProductProcessing(batch, [[0, 1, 2], [3, 4, 5
 print(batch)
 
 # Principal component analysis on leakage with 3 components
-batch.leakage_processing = PcaProcessing(trace_batch, 3)
+batch.leakage_processing = PcaProcessing(batch, 3)
 print(batch)
 
 # No leakage processing

@@ -71,6 +71,9 @@ class Hdf5Container(Container):
     def __setitem__(self, key, value):
         TraceBatchContainer.__setitem__(self, key, value)
 
+    def __len__(self):
+        return len(self.leakages)
+
     @staticmethod
     def void_container(
         filename,
@@ -143,7 +146,7 @@ class Hdf5Container(Container):
         leakage, value = container[0]
         out = Hdf5Container.void_container(
             filename,
-            container.number_of_traces,
+            len(container),
             leakage.shape,
             leakage.dtype,
             value.shape,

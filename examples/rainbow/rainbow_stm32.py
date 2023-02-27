@@ -111,7 +111,6 @@ if __name__ == "__main__":
 
     container = RainbowSubBytesContainer(250)
     engine = CpaEngine(
-        "cpa byte 5",
         lambda value, secret: sbox[value["plaintext"][5] ^ secret],
         range(256),
         solution=42,

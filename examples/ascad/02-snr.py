@@ -36,7 +36,7 @@ filename = ASCAD_DIR + "/ASCAD_data/ASCAD_databases/ATMega8515_raw_traces.h5"
 container = Hdf5Container(
     filename, leakages_dataset_name="traces", values_dataset_name="metadata"
 )
-container.number_of_traces = 5000  # only 5000 traces used over the 60000 available
+container = Slice(container, 0, 5000) # only 5000 traces used over the 60000 available
 
 
 """
@@ -47,33 +47,33 @@ For each one we specify:
 - the partition_values (range(256) for all of them, since we look at byte values)
 """
 snr_1_engine = SnrEngine(
-    "SNR1: unmasked sbox output",
     lambda value: sbox[value["plaintext"][3] ^ value["key"][3]],  # sbox(p[3] ⊕ k[3])
     range(256),
+    name="SNR1: unmasked sbox output"
 )
 
 snr_2_engine = SnrEngine(
-    "SNR2: masked sbox output",
     lambda value: sbox[value["plaintext"][3] ^ value["key"][3]]
     ^ value["masks"][15],  # sbox(p[3] ⊕ k[3]) ⊕ rout
     range(256),
+    name="SNR2: masked sbox output"
 )
 
 snr_3_engine = SnrEngine(
-    "SNR3: common output mask out", lambda value: value["masks"][15], range(256)  # rout
+    lambda value: value["masks"][15], range(256), name="SNR3: common output mask out"  # rout
 )
 
 snr_4_engine = SnrEngine(
-    "SNR4: masked sbox output in linear parts",
     lambda value: sbox[value["plaintext"][3] ^ value["key"][3]]
     ^ value["masks"][1],  # sbox(p[3] ⊕ k[3]) ⊕ r[3]
     range(256),
+    name="SNR4: masked sbox output in linear parts"
 )
 
 snr_5_engine = SnrEngine(
-    "SNR5: sbox output mask in linear parts",
     lambda value: value["masks"][1],  # r[3]
     range(256),
+    name="SNR5: sbox output mask in linear parts"
 )
 
 engines = [snr_1_engine, snr_2_engine, snr_3_engine, snr_4_engine, snr_5_engine]
