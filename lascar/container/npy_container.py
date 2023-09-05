@@ -55,6 +55,9 @@ class NpyContainer(Container):
     def __setitem__(self, key, value):
         TraceBatchContainer.__setitem__(self, key, value)
 
+    def __len__(self):
+        return len(self.leakages)
+
     def _void_container(
         leakages_filename,
         values_filename,
@@ -108,7 +111,7 @@ class NpyContainer(Container):
         out = NpyContainer._void_container(
             leakages_filename,
             values_filename,
-            container.number_of_traces,
+            len(container),
             leakage.shape,
             leakage.dtype,
             value.shape,

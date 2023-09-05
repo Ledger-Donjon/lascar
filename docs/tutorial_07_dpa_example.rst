@@ -43,7 +43,7 @@ conditioned by a single key byte (256 guesses).
        return sbox[value["plaintext"][3] ^ guess] & 1
 
    guess_range = range(256)
-   dpa_engine = DpaEngine("dpa", selection_function, guess_range)
+   dpa_engine = DpaEngine(selection_function, guess_range)
 
 We can now create a :class:`Session <lascar.session.Session>`, register the
 :code:`dpa_lsb_engine`, and run it:

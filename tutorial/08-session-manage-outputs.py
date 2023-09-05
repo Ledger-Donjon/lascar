@@ -56,10 +56,10 @@ def selection_function_msb(value, guess):
 
 
 dpa_lsb_engine = DpaEngine(
-    "dpa_lsb", selection_function_lsb, guess_range, solution=container.key[3]
+    selection_function_lsb, guess_range, solution=container.key[3], name="dpa_lsb"
 )
 dpa_msb_engine = DpaEngine(
-    "dpa_msb", selection_function_lsb, guess_range, solution=container.key[3]
+    selection_function_msb, guess_range, solution=container.key[3], name="dpa_msb"
 )
 
 # DictOutputMethod:

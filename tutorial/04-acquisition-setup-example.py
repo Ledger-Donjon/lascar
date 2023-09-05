@@ -42,9 +42,9 @@ class AcquisitionSetup(AbstractContainer):
         """
         :param number_of_traces: Number of traces in the container
         """
-        super().__init__(self, number_of_traces)
         self.dut = Dut()
         self.oscilloscope = Oscilloscope()
+        super().__init__(number_of_traces)
 
     def generate_trace(self, index: int):
         """
@@ -66,8 +66,8 @@ acquisition = AcquisitionSetup(100)
 
 # This container is Abstract. Its 100 traces are stored nowhere, yet they can be
 # accessed:
-print("trace 0:", acquisition_container[0])
-print("trace 10:", acquisition_container[10])
+print("trace 0:", acquisition[0])
+print("trace 10:", acquisition[10])
 
 # More importantly, this container can be converted to a Hdf5Container, so the
 # traces get saved to the disk. The export method takes here all its sense.

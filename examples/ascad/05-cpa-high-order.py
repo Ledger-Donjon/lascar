@@ -40,7 +40,7 @@ container = Hdf5Container(
     leakage_section=poi,
 )
 
-container.number_of_traces = 500
+container = container.limited(500)
 
 # Then we make a container that will apply a CenteredProduct to recombine all the points of interest.
 container.leakage_processing = CenteredProductProcessing(container)
@@ -48,10 +48,10 @@ container.leakage_processing = CenteredProductProcessing(container)
 
 # Now a classical CPA, targetting the output of the 3rd Sbox:
 cpa_engine = CpaEngine(
-    "cpa-high-order",
     lambda value, guess: hamming(sbox[value["plaintext"][3] ^ guess]),
     range(256),
     solution=container[0].value["key"][3],
+    name="cpa-high-order",
     jit=False,
 )
 

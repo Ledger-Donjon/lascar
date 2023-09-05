@@ -76,7 +76,7 @@ class CenteredProductProcessing(Processing):
         session = Session(container, name="CenteredProduct:")
         session.run(batch_size)
         self.mean = session["mean"].finalize()
-        number_of_leakage_samples = container._leakage_abstract.shape[0]
+        number_of_leakage_samples = container[0][0].shape[0]
 
         if rois is None:
             self.order = order
@@ -119,7 +119,7 @@ class PcaProcessing(Processing):
         self._pca = PCA(n_components=number_of_components, random_state=random_state)
 
         # compute pca:
-        batch = container[: container.number_of_traces]
+        batch = container[: len(container)]
         self._pca.fit(batch.leakages)
 
         self.post_section = post_section
@@ -156,7 +156,7 @@ class IcaProcessing(Processing):
         )
 
         # compute ica:
-        batch = container[: container.number_of_traces]
+        batch = container[: len(container)]
         self._ica.fit(batch.leakages)
 
         self.post_section = post_section
