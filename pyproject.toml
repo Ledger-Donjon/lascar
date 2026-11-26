@@ -13,11 +13,28 @@ authors = [
 description = "Toolsuite for side-channel acquisition, container and analysis"
 readme = "README.md"
 requires-python = ">=3.0"
+dependencies = [
+    "click",
+    "numpy>=1.17",
+    "h5py",
+    "matplotlib",
+    "vispy",
+    "scikit-learn",
+    "scipy",
+    "keras",
+    "progressbar2",
+    "pytest",
+    "numba",
+    "psutil",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Operating System :: OS Independent",
 ]
+
+[project.scripts]
+lascarctl = "scripts.lascarctl:main"
 
 [project.urls]
 "Homepage" = "https://github.com/Ledger-Donjon/lascar"
