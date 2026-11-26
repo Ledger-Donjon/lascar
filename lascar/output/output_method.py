@@ -47,7 +47,7 @@ class OutputMethod:
         :param results: its result
         :return: None
         """
-        if self.engines is ():
+        if not self.engines:
             self.engines = list(engine._session.engines)
 
         if not (
