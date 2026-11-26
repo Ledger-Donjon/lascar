@@ -72,8 +72,8 @@ class LraEngine(PartitionerEngine,GuessEngine):
         :param regression_order: the regression order (by default =1)
         :param size_target_value: the number of bits of the target value, that we are regressing (by default = 8). 
         """
-        PartitionerEngine.__init__(self, name, partition_function, partition_range, 2)
-        GuessEngine.__init__(self, name, selection_function, guess_range, solution)
+        PartitionerEngine.__init__(self, partition_function, partition_range, 2, name=name)
+        GuessEngine.__init__(self, selection_function, guess_range, solution=solution, name=name)
         self.logger.debug(
             'Creating LraEngine "%s" with %d partitions, %d guesses.'
             % (name, len(self._partition_range), len(guess_range))

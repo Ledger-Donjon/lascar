@@ -41,7 +41,6 @@ def get_partition_function(byte):
     return partition_function
 
 
-number_of_partitions = 2  # number of possible classes (~output of the partiton_function) for the partition_function
 ttest_engines = [
     TTestEngine(get_partition_function(i)) for i in range(16)
 ]

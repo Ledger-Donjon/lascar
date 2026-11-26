@@ -69,10 +69,10 @@ of the output of the 3rd sbox, the other on the MSB.
        return (sbox[value["plaintext"][3] ^ guess] >> 7) & 1
 
    dpa_lsb_engine = DpaEngine(
-       "dpa_lsb", selection_function_lsb, guess_range, solution=container.key[3]
+       selection_function_lsb, guess_range, solution=container.key[3], name="dpa_lsb"
    )
    dpa_msb_engine = DpaEngine(
-       "dpa_msb", selection_function_lsb, guess_range, solution=container.key[3]
+       selection_function_msb, guess_range, solution=container.key[3], name="dpa_msb"
    )
 
 Dictionnary output

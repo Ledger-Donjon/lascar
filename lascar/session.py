@@ -68,8 +68,10 @@ class Session:
         self.logger.debug("Creating Session.")
 
         self.container = container
-        self.leakage_shape = container._leakage_abstract.shape
-        self.value_shape = container._value_abstract.shape
+
+        leakage_0, value_0 = container[0]
+        self.leakage_shape = leakage_0.shape
+        self.value_shape = value_0.shape
 
         self.name = name
 
@@ -115,15 +117,15 @@ class Session:
     def output_steps(self, output_steps):
         if isinstance(output_steps, int):
             self._output_steps = list(
-                range(output_steps, self.container.number_of_traces + 1, output_steps)
+                range(output_steps, len(self.container) + 1, output_steps)
             )
         elif hasattr(output_steps, "__iter__"):
             self._output_steps = [i for i in output_steps]
         else:
             self._output_steps = []
 
-        if not self.container.number_of_traces in self._output_steps:
-            self._output_steps.append(self.container.number_of_traces)
+        if not len(self.container) in self._output_steps:
+            self._output_steps.append(len(self.container))
         self._output_steps.sort()
 
     def add_engine(self, engine):
@@ -159,9 +161,9 @@ class Session:
         batch_offsets = []
         offset = 0
 
-        while offset < self.container.number_of_traces:
-            if offset + batch_size > self.container.number_of_traces:
-                batch_offsets.append((offset, self.container.number_of_traces))
+        while offset < len(self.container):
+            if offset + batch_size > len(self.container):
+                batch_offsets.append((offset, len(self.container)))
 
             else:
                 batch_offsets.append((offset, offset + batch_size))
@@ -226,7 +228,7 @@ class Session:
             "Session %s: %d traces, %d engines, batch_size=%d, leakage_shape=%s"
             % (
                 self.name,
-                self.container.number_of_traces,
+                len(self.container),
                 len(self.engines),
                 self._batch_size,
                 self.leakage_shape,

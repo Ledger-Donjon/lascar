@@ -73,7 +73,7 @@ class RandomizedContainer(FilteredContainer):
 
     def __init__(self, container, **kwargs):
         FilteredContainer.__init__(
-            self, container, np.random.permutation(container.number_of_traces), **kwargs
+            self, container, np.random.permutation(len(container)), **kwargs
         )
 
 
@@ -84,7 +84,7 @@ def split_container(container, random=True, **kwargs):
     :param kwargs: specify either the number of splits (number_of_splits), or the size of each split (size_of_splits)
     :return: a list of number_of_splits containers OR a list of containers of size_of_splits each.
     """
-    n = container.number_of_traces
+    n = len(container)
     if random:
         indexes = np.random.permutation(n)
     else:

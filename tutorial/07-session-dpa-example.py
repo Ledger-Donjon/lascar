@@ -33,7 +33,7 @@ def selection_function(value, guess):
 
 
 guess_range = range(256)
-dpa_engine = DpaEngine("dpa", selection_function, guess_range)
+dpa_engine = DpaEngine(selection_function, guess_range)
 
 # We can now create a Session, register the dpa_lsb_engine, and run it.
 

@@ -70,13 +70,12 @@ partition_values = range(256)  # The range for the labels.
 
 # An engine has to be created, dedicated to the profiling of a classifier (here a keras neural network) with leakages/labels.
 nn_profile_engine = ProfileEngine(
-    "nn_profile",
     nn,
     partition_function,
     partition_values,
     epochs=5,
     batch_size=200,
-    test_size=0.1,
+    test_size=0.1
 )
 
 Session(profiling_container, engine=nn_profile_engine).run()

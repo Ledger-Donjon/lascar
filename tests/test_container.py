@@ -112,7 +112,7 @@ class TestContainerLeakageProcessing:
         leakage_processing = StandardScalerProcessing(container)
         container.leakage_processing = leakage_processing
 
-        batch = container[: container.number_of_traces]
+        batch = container[: len(container)]
         leakages_centered_reduced = (leakages - leakages.mean(0)) / leakages.std(0)
         assert np.all(np.isclose(batch.leakages, leakages_centered_reduced))
 
@@ -143,7 +143,7 @@ class TestContainerLeakageProcessing:
         container.leakage_processing = leakage_processing
         leakages_centered = leakages - leakages.mean(0)
 
-        batch = container[: container.number_of_traces]
+        batch = container[: len(container)]
         for i, combination in enumerate(leakage_processing.combinations):
             assert np.all(
                 batch.leakages[:, i]

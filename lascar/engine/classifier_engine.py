@@ -87,8 +87,7 @@ class ProfileEngine(PartitionerEngine):
         self.batch_size = batch_size
 
     def _initialize(self):
-
-        self._session._batch_size = self._session.container.number_of_traces
+        self._session._batch_size = len(self._session.container)
         self._session._thread_on_update = False
         if self.classifier_type == "keras":
             self._session._progressbar = None
@@ -161,7 +160,7 @@ class MatchEngine(GuessEngine):
 
     def _initialize(self):
         self._log_probas = np.zeros((self._number_of_guesses,))
-        self._session._batch_size = self._session.container.number_of_traces
+        self._session._batch_size = len(self._session.container)
         self._session._thread_on_update = False
 
     def _update(self, batch):

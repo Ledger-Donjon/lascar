@@ -24,6 +24,7 @@ Various format, mechanisms to read, write, acquire, simulate side channel data.
 from .container import AbstractContainer
 from .container import Container
 from .container import TraceBatchContainer
+from .container import Slice 
 from .filtered_container import FilteredContainer
 from .filtered_container import RandomizedContainer
 from .filtered_container import split_container
