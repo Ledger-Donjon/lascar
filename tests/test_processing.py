@@ -36,7 +36,7 @@ def test_centered_product(container, roi):
     container.leakage_processing = lambda x: x
     centered_product = CenteredProductProcessing(container, roi)
 
-    filename = tempfile.mkdtemp() + "/tmp.pickle"
+    filename = tempfile.mkdtemp() + "/tmp.skops"
     centered_product.save(filename)
     centered_product_bis = Processing.load(filename)
 
@@ -60,7 +60,7 @@ def test_pca(container, n):
     container.leakage_processing = lambda x: x
     pca_processing = PcaProcessing(container, n)
 
-    filename = tempfile.mkdtemp() + "/tmp.pickle"
+    filename = tempfile.mkdtemp() + "/tmp.skops"
 
     pca_processing.save(filename)
     pca_processing_bis = Processing.load(filename)
@@ -82,7 +82,7 @@ def test_ica(container, n):
     container.leakage_processing = lambda x: x
     ica_processing = IcaProcessing(container, n)
 
-    filename = tempfile.mkdtemp() + "/tmp.pickle"
+    filename = tempfile.mkdtemp() + "/tmp.skops"
 
     ica_processing.save(filename)
     ica_processing_bis = Processing.load(filename)
@@ -99,7 +99,7 @@ def test_standard_scaler(container):
     container.leakage_processing = lambda x: x
     standard_scaler = StandardScalerProcessing(container)
 
-    filename = tempfile.mkdtemp() + "/tmp.pickle"
+    filename = tempfile.mkdtemp() + "/tmp.skops"
     standard_scaler.save(filename)
     standard_scaler_bis = Processing.load(filename)
 
@@ -108,24 +108,3 @@ def test_standard_scaler(container):
 
         x = (leakages[i] - leakages.mean(0)) / leakages.std(0)
         assert np.all(np.isclose(standard_scaler_bis(trace.leakage), x))
-
-
-# processings = []
-# processings += [CenteredProductProcessing(container, roi) for roi in rois]
-#
-#
-#
-#
-# @pytest.mark.parametrize('container,processing', [(container,p) for p in processings])
-# def test_load_save(container,processing):
-#
-#     container.leakage_processing = lambda x:x
-#     filename = tempfile.mkdtemp() + "/tmp.pickle"
-#     processing.save(filename)
-#
-#     processing_bis = Processing.load(filename)
-#
-#     for i, trace in enumerate(container):
-#         assert np.all(np.isclose(processing(trace.leakage), processing_bis(trace.leakage)))
-#
-#

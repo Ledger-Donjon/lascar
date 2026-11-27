@@ -615,7 +615,7 @@ class TraceBatchContainer(Container):
         :param filename:
         :return:
         """
-        tmp = np.load(filename)
+        tmp = np.load(filename, allow_pickle=False)
         return TraceBatchContainer(tmp["leakages"], tmp["values"])
 
     pass

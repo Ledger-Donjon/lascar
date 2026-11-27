@@ -26,7 +26,8 @@ Requirements
 - PyQt5
 - `scikit-learn <https://scikit-learn.org/>`_ - for machine learning
 - `scipy <https://scipy.org/>`_
-- `tensorflow <https://www.tensorflow.org/>`_ - keras backend
+- `skops <https://skops.readthedocs.io/>`_ - for saving scikit-learn objects without pickle
+- `tensorflow <https://www.tensorflow.org/>`_ - keras backend (2.16 or later)
 - `vispy <https://vispy.org/>`_ - for curve visualization
 
 Building the documentation

@@ -49,7 +49,7 @@ def mlp_best(
             model.add(Dropout(dropout))
 
     model.add(Dense(number_of_classes, activation="softmax"))
-    optimizer = RMSprop(lr=lr)
+    optimizer = RMSprop(learning_rate=lr)
     model.compile(
         loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
     )
@@ -86,7 +86,7 @@ def cnn_best(input_shape=(700, 1), number_of_classes=256, lr=0.01):
     inputs = img_input
     # Create model.
     model = Model(inputs, x, name="cnn_best")
-    optimizer = RMSprop(lr=lr)
+    optimizer = RMSprop(learning_rate=lr)
     model.compile(
         loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
     )

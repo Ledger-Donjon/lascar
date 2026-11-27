@@ -25,7 +25,7 @@ filename = ASCAD_DIR + "/ASCAD_data/ASCAD_databases/ATMega8515_raw_traces.h5"
 # poi = Points Of Interest.
 # We use the SNRs computed before to extract time samples where both mask and masked sensitive variable are used.
 snrs = DictOutputMethod.load(
-    "SNR.pickle"
+    "SNR.npz"
 )  # we load the snr results computed at 02-snr.py
 poi = []
 poi += [snrs["SNR4: masked sbox output in linear parts"][5000].argmax()]

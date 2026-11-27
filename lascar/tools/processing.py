@@ -20,9 +20,9 @@
 processing.py
 """
 import itertools
-import pickle
 
 import numpy as np
+import skops.io
 from sklearn.decomposition import FastICA
 from sklearn.decomposition import PCA
 
@@ -33,6 +33,10 @@ class Processing:
 
     A Processing can be seen as an object whose role is to modify leakages (or values).
     It has to be callable, and offer some save/load mechanisms.
+
+    Processings are saved with skops (.skops files). When loading, only lascar's own
+    processing classes are trusted: any other type found in the file (for instance a
+    user-defined Processing subclass) must be explicitly listed in the trusted argument.
     """
 
     def __init__(self, filename=None):
@@ -43,11 +47,15 @@ class Processing:
         return leakage
 
     def save(self, filename):
-        pickle.dump(self, open(filename, "wb"))
+        skops.io.dump(self, filename)
 
     @staticmethod
-    def load(filename):
-        return pickle.load(open(filename, "rb"))
+    def load(filename, trusted=None):
+        """
+        :param filename: the .skops file to load
+        :param trusted: optional, list of additional type names (such as "mymodule.MyProcessing") to trust
+        """
+        return skops.io.load(filename, trusted=_DEFAULT_TRUSTED + list(trusted or []))
 
 
 class CenteredProductProcessing(Processing):
@@ -211,3 +219,19 @@ class CascadedProcessing(Processing):
 
     def add_processing(self, processing):
         self.processings.append(processing)
+
+
+_DEFAULT_TRUSTED = [
+    "%s.%s" % (cls.__module__, cls.__qualname__)
+    for cls in [
+        Processing,
+        CenteredProductProcessing,
+        PcaProcessing,
+        IcaProcessing,
+        StandardScalerProcessing,
+        ReshapeProcessing,
+        CascadedProcessing,
+        PCA,
+        FastICA,
+    ]
+]

@@ -13,7 +13,7 @@ Objective in this script:
 import sys
 from lascar import *
 from lascar.tools.aes import sbox
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
 
 if not len(sys.argv) == 3:
@@ -38,7 +38,7 @@ elif sys.argv[2] == "cnn":
     )
 
 
-nn = load_model(model_name)
+nn = load_model(model_name, safe_mode=True)
 
 """
 When building the attack_container, take special care of the kind of neural network used.

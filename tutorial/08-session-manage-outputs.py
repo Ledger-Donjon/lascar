@@ -26,7 +26,7 @@
 # tutorial (and in the examples/ folder):
 #
 # - `DictOutputMethod`: results are all stored inside a python dictionnary, with
-#   the possibility to save it using pickle.
+#   the possibility to save it to a numpy .npz file.
 # - `Hdf5OutputMethod`: results are stored inside a hdf5 file, all attacks are
 #   groups, and datasets for each output step.
 # - `MatPlotLibOutputMethod`: results are displayed on a matplotlib plot, with
@@ -66,9 +66,9 @@ dpa_msb_engine = DpaEngine(
 
 # Accepts any number of engine arguments
 dict_output_method = DictOutputMethod(dpa_lsb_engine, dpa_msb_engine)
-# If a filename is specified, DictOutputMethod will save them using pickle
+# If a filename is specified, DictOutputMethod will save them to a numpy .npz file
 dict_output_method = DictOutputMethod(
-    dpa_lsb_engine, dpa_msb_engine, filename="dict_output_method.pickle"
+    dpa_lsb_engine, dpa_msb_engine, filename="dict_output_method.npz"
 )
 
 session = Session(
@@ -82,9 +82,9 @@ session = Session(
 assert np.all(dict_output_method["dpa_lsb"] == dpa_lsb_engine.finalize())
 assert np.all(dict_output_method["dpa_msb"] == dpa_msb_engine.finalize())
 
-# Results have also been saved to an output pickle file:
+# Results have also been saved to an output .npz file:
 assert np.all(
-    DictOutputMethod.load("dict_output_method.pickle")["dpa_lsb"]
+    DictOutputMethod.load("dict_output_method.npz")["dpa_lsb"]
     == dpa_lsb_engine.finalize()
 )
 

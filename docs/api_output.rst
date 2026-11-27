@@ -1,6 +1,12 @@
 Output
 ======
 
+.. note::
+
+   Since lascar 2.0, pickle is no longer used: loading a pickle file can execute arbitrary code.
+   :class:`DictOutputMethod <lascar.output.pickle_output_method.DictOutputMethod>` saves its results
+   to a numpy ``.npz`` file instead. Old ``.pickle`` files can no longer be loaded.
+
 .. automodule:: lascar.output.output_method
     :members:
     :undoc-members:

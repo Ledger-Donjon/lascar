@@ -27,7 +27,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="lascar",
-    version="1.1",
+    version="2.0",
     description="Ledger's Advanced Side-Channel Analysis Repository - Toolsuite for side-channel acquisition, container and analysis by Ledger.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -42,14 +42,15 @@ setup(
         "vispy",
         "scikit-learn",
         "scipy",
-        "keras",
+        "skops>=0.13.0",
+        "keras>=3.12.1,!=3.13.0,!=3.13.1",
         "progressbar2",
         "pytest",
         "numba",
         "psutil",
     ],  ## PyQt5 is here as a backend for vispy, this might change in the future
     packages=find_packages(),
-    python_requires='>=3.0',
+    python_requires='>=3.10',
     setup_requires=["pytest-runner",],
     tests_require=["pytest"],
     entry_points={"console_scripts": ["lascarctl=scripts.lascarctl:main"],},

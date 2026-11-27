@@ -91,9 +91,9 @@ session = Session(
 ).run()
 
 save_classifier(
-    classifier_qda, "classifier_qda.save"
+    classifier_qda, "classifier_qda.skops"
 )  # The classifier can be saved for further usage
-save_classifier(classifier_keras, "classifier_keras.save")
+save_classifier(classifier_keras, "classifier_keras.keras")
 
 
 """
@@ -114,9 +114,9 @@ container_attack = BasicAesSimulationContainer(
 container_attack.leakage_section = [byte]  # Same POI-selection than for profiling phase
 
 classifier_qda = load_classifier(
-    "classifier_qda.save"
+    "classifier_qda.skops"
 )  # the classifier is imported from a file
-classifier_keras = load_classifier("classifier_keras.save")
+classifier_keras = load_classifier("classifier_keras.keras")
 
 classifier_match_engine_qda = MatchEngine(
     classifier_qda,

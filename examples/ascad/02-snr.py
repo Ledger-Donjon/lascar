@@ -80,11 +80,11 @@ engines = [snr_1_engine, snr_2_engine, snr_3_engine, snr_4_engine, snr_5_engine]
 
 
 output = [
-    DictOutputMethod(*engines, filename="SNR.pickle"),
+    DictOutputMethod(*engines, filename="SNR.npz"),
     MatPlotLibOutputMethod(*engines, single_plot=True, legend=True),
 ]
 
 session = Session(
     container, name="SNRs computing", engines=engines, output_method=output
-)  # the results are saved in 'SNR.pickle'
+)  # the results are saved in 'SNR.npz'
 session.run(100)

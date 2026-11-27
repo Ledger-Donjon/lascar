@@ -36,7 +36,7 @@ folder):
 
 - :class:`DictOutputMethod <lascar.output.pickle_output_method.DictOutputMethod>`:
   results are all stored inside a python dictionnary, with the possibility to
-  save it using pickle.
+  save it to a numpy .npz file.
 - :class:`Hdf5OutputMethod <lascar.output.hdf5_output_method.Hdf5OutputMethod>`:
   results are stored inside a hdf5 file, all attacks are groups, and datasets
   for each output step.
@@ -80,14 +80,14 @@ Dictionnary output
 
 :class:`DictOutputMethod <lascar.output.pickle_output_method.DictOutputMethod>`
 accepts any number of engine arguments. If a filename is specified, the results
-are exported in pickle format.
+are exported in numpy .npz format.
 
 .. code-block:: python
 
    dict_output_method = DictOutputMethod(dpa_lsb_engine, dpa_msb_engine)
-   # If a filename is specified, DictOutputMethod will save them using pickle
+   # If a filename is specified, DictOutputMethod will save them to a numpy .npz file
    dict_output_method = DictOutputMethod(
-       dpa_lsb_engine, dpa_msb_engine, filename="dict_output_method.pickle"
+       dpa_lsb_engine, dpa_msb_engine, filename="dict_output_method.npz"
    )
 
    session = Session(
@@ -104,12 +104,12 @@ engines, which can be verified like this:
    assert np.all(dict_output_method["dpa_lsb"] == dpa_lsb_engine.finalize())
    assert np.all(dict_output_method["dpa_msb"] == dpa_msb_engine.finalize())
 
-Results have also been saved to an output pickle file:
+Results have also been saved to an output .npz file:
 
 .. code-block:: python
 
    assert np.all(
-       DictOutputMethod.load("dict_output_method.pickle")["dpa_lsb"]
+       DictOutputMethod.load("dict_output_method.npz")["dpa_lsb"]
        == dpa_lsb_engine.finalize()
    )
 

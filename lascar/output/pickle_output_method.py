@@ -16,7 +16,7 @@
 #
 # Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS - manuel.sanpedro@ledger.fr, victor.servant@ledger.fr, charles@ledger.fr
 
-import pickle
+import json
 
 import numpy as np
 
@@ -34,14 +34,15 @@ class DictOutputMethod(OutputMethod):
 
     pickle_output_method[engine_name][output_step] contains engine.results after output_step traces processed.
 
-    If a filename is specified, the finalize() method will store the dict inside a file using pickle.
+    If a filename is specified, the finalize() method will store the dict inside a numpy .npz file.
+    Results containing Python objects cannot be stored this way, since they would require pickle.
     """
 
     def __init__(self, *engines, filename=None):
         """
 
         :param engines: the engines to be tracked
-        :param filename: optional, if specified, the dict will be stored inside a pickle file.
+        :param filename: optional, if specified, the dict will be stored inside a numpy .npz file.
         """
         OutputMethod.__init__(self, *engines)
 
@@ -65,14 +66,26 @@ class DictOutputMethod(OutputMethod):
 
     def _finalize(self):
         if self.filename is not None:
+            index = []
+            arrays = {}
+            for engine_name, steps in self.results.items():
+                for step, result in steps.items():
+                    if result.dtype.hasobject:
+                        raise ValueError(
+                            "Engine %s: results containing Python objects cannot be saved by DictOutputMethod."
+                            % engine_name
+                        )
+                    arrays["arr_%d" % len(index)] = result
+                    index.append([engine_name, int(step)])
             with open(self.filename, "wb") as file:
-                pickle.dump(self.results, file)
+                np.savez(file, index=json.dumps(index), **arrays)
 
     @staticmethod
     def load(filename):
         out = DictOutputMethod()
-        with open(filename, "rb") as file:
-            out.results = pickle.load(file)
+        with np.load(filename, allow_pickle=False) as data:
+            for i, (engine_name, step) in enumerate(json.loads(str(data["index"]))):
+                out.results.setdefault(engine_name, {})[step] = data["arr_%d" % i]
         return out
 
     def __getitem__(self, item):

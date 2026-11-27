@@ -6,7 +6,7 @@ import numpy as np
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.layers import Flatten, Dense, Input, Conv1D, AveragePooling1D
 from tensorflow.keras.models import Model, Sequential
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
 # from tensorflow.keras.applications.imagenet_utils import _obtain_input_shape
 from tensorflow.keras.optimizers import RMSprop
@@ -27,7 +27,7 @@ def mlp_best(node=200, layer_nb=6):
     for i in range(layer_nb - 2):
         model.add(Dense(node, activation="relu"))
     model.add(Dense(256, activation="softmax"))
-    optimizer = RMSprop(lr=0.00001)
+    optimizer = RMSprop(learning_rate=0.00001)
     model.compile(
         loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
     )
@@ -65,7 +65,7 @@ def cnn_best(classes=256):
     inputs = img_input
     # Create model.
     model = Model(inputs, x, name="cnn_best")
-    optimizer = RMSprop(lr=0.00001)
+    optimizer = RMSprop(learning_rate=0.00001)
     model.compile(
         loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
     )
@@ -75,7 +75,7 @@ def cnn_best(classes=256):
 def load_sca_model(model_file):
     check_file_exists(model_file)
     try:
-        model = load_model(model_file)
+        model = load_model(model_file, safe_mode=True)
     except:
         print("Error: can't load Keras model file '%s'" % model_file)
         sys.exit(-1)

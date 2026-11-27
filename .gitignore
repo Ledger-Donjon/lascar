@@ -7,6 +7,9 @@ lascar.egg-info/
 *.h5
 *.pickle
 *.save
+*.npz
+*.skops
+*.keras
 .idea/
 .eggs/
 .pytest_cache/

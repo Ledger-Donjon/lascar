@@ -16,9 +16,8 @@
 #
 # Copyright 2018 Manuel San Pedro, Victor Servant, Charles Guillemet, Ledger SAS - manuel.sanpedro@ledger.fr, victor.servant@ledger.fr, charles@ledger.fr
 
-import pickle
-
 import numpy as np
+import skops.io
 from sklearn.model_selection import train_test_split
 
 from . import GuessEngine
@@ -66,7 +65,7 @@ class ProfileEngine(PartitionerEngine):
         import sklearn
 
         if not isinstance(classifier, sklearn.base.ClassifierMixin) and not (
-            isinstance(classifier, keras.Model) and classifier._is_compiled
+            isinstance(classifier, keras.Model) and classifier.compiled
         ):
             raise ValueError(
                 "Classifier should be a sklearn classifier or a compiled keras model."
@@ -194,24 +193,46 @@ class MatchEngine(GuessEngine):
 
 
 def save_classifier(classifier, filename):
+    """
+    Save a classifier: keras models go to a .keras file, sklearn classifiers to a .skops file.
+
+    :param classifier: keras model or sklearn classifier
+    :param filename: destination file, ending with .keras (keras) or .skops (sklearn)
+    """
+    filename = str(filename)
     if hasattr(classifier, "save"):  # keras save
+        if not filename.endswith(".keras"):
+            raise ValueError(
+                "Keras models must be saved to a .keras file, got %s." % filename
+            )
         classifier.save(filename)
-        return
-    try:
-        with open(filename, "wb") as f:  # sklearn save
-            pickle.dump(classifier, f)
-        return
-    except e:
-        pass
-
-    raise ValueError("Classifier cant be saved %s %s." % (classifier, filename))
+    elif filename.endswith(".skops"):  # sklearn save
+        skops.io.dump(classifier, filename)
+    else:
+        raise ValueError(
+            "Classifier %s must be saved to a .skops file, got %s."
+            % (classifier, filename)
+        )
 
 
-def load_classifier(filename):
-    try:  # sklearn load
-        with open(filename, "rb") as f:
-            return pickle.load(f)
-    except:  # keras load
-        from tensorflow.keras.models import load_model
+def load_classifier(filename, trusted=None):
+    """
+    Load a classifier saved with save_classifier.
 
-        return load_model(filename)
+    .keras files are loaded with keras safe_mode enabled.
+    .skops files can only rebuild types trusted by skops itself, or listed in trusted.
+    Any other file type is refused.
+
+    :param filename: .keras or .skops file
+    :param trusted: optional, list of additional type names (such as "mymodule.MyClassifier") to trust in a .skops file
+    """
+    filename = str(filename)
+    if filename.endswith(".keras"):  # keras load
+        from keras.models import load_model
+
+        return load_model(filename, safe_mode=True)
+    if filename.endswith(".skops"):  # sklearn load
+        return skops.io.load(filename, trusted=trusted)
+    raise ValueError(
+        "Cannot load classifier from %s: expected a .keras or .skops file." % filename
+    )
